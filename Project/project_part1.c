@@ -2,11 +2,11 @@
 
 /*
  * TERMINAL COMMANDS:
- * gcc -Wall -Werror -Wextra -g -o project.out project.c
- * gcc -Wall -Werror -Wextra -g -o project.out -D DEBUG_MODE project.c
- * valgrind -s ./project.out <ARGS HERE>
+ * gcc -Wall -Werror -Wextra -g -o project_part1.out project_part1.c
+ * gcc -Wall -Werror -Wextra -g -o project_part1.out -D DEBUG_MODE project_part1.c
+ * valgrind -s ./project_part1.out <ARGS HERE>
  * ARGS:
- * [...]
+ * 3 1 32 0.001 1024 4 0.75 256
  */
 
 #include <stdio.h>
@@ -25,9 +25,17 @@
 
 
 
+char (*gen_IDs(int n))[3];
+
+struct Process{
+    char ID[2];
+};
+
+
 int main(int argc, char** argv){
 #ifdef DEBUG_MODE
-    for(int i=1 ; i<=4 ; i++){printf("Arg #%d: %s // ", i, *(argv+i));}
+    printf("=Check Arg Input=   // ");
+    for(int i=1 ; i<=8 ; i++){printf("%s // ",*(argv+i));}
     printf("\n");
 #endif
     setbuf(stdout, NULL);
@@ -42,20 +50,47 @@ int main(int argc, char** argv){
     int n = atoi(argv[1]); // number of processes to simulate
     int n_cpu = atoi(argv[2]); // number of processes that are CPU-bound
     int seed = atoi(argv[3]); // seed for the pseudo-random number sequence
-    int lambda = atoi(argv[4]); // paramter in (1/lambda) for average rand. value generated for exponential distribution for interarrival times
-    int upBound = atoi(argv[5]); // upper bound for pseudo-random numbers for exponential distribution ^
+    float lambda = atof(argv[4]); // paramter in (1/lambda) for average rand. value generated for exponential distribution for interarrival times
+    int bound = atoi(argv[5]); // upper bound for pseudo-random numbers for exponential distribution ^
     int t_cs = atoi(argv[6]); // time, (in ms), that it takes to perform a context switch
-    int alpha = atoi(argv[7]); // for JF and SRT algorithms
+    float alpha = atof(argv[7]); // for JF and SRT algorithms
     int t_slice = atoi(argv[8]); // time slice value in ms for RR algorithm
-
-    // Process generation
-    for (char let='A' ; let<='Z' ; let++) {   // Loop A-Z
-        for (int num=0 ; num<=9 ; num++) {   // Loop 0-9
-            printf("%c%d\n", let, num);
-        }
-    }
-
+#if DEBUG_MODE
+    printf("Processes: %d\n", n); printf("CPU-bound: %d\n", n_cpu); printf("Seed: %d\n", seed); printf("lambda: %f\n", lambda);
+    printf("Upper Bound: %d\n", bound); printf("t_cs: %d\n", t_cs); printf("alpha: %f\n", alpha); printf("t_slice: %d\n", t_slice);
+    printf("\n\n");
+#endif
 
     if(t_cs<=0 && (t_cs%2)!=0) {perror("ERR: t_cs must be a positive even integer"); return EXIT_FAILURE;}
     if(t_slice<=0) {perror("ERR: t_slice must be a positive integer"); return EXIT_FAILURE;}
+
+    printf("<<< -- process set (n=%d) with %d CPU-bound process\n", n, n_cpu);
+    printf("<<< -- seed=%d; lambda=%f; bound=%d\n", seed, lambda, bound);
+
+    // Process ID generation
+    char (*IDs)[3] = gen_IDs(n);
+#if DEBUG_MODE
+    for (int i=0 ; i<n ; i++) {printf("%c%c\n", IDs[i][0], IDs[i][1]);}
+#endif
+    // remember to free! free(IDs)
+}
+
+
+
+
+
+char (*gen_IDs(int n))[3]{
+    char (*ret)[3] = malloc(n * sizeof(*ret)); //DYNAMIC.MEMORY
+    int i = 0;
+
+    for (char let='A' ; let<='Z' ; let++) {   // Loop A-Z
+        for (char num='0' ; num<='9' ; num++) {   // Loop 0-9
+            ret[i][0] = let;
+            ret[i][1] = num;
+            ret[i][2] = '\0';
+            i++;
+            if (i==n) {return ret;}
+        }
+    }
+    return ret;
 }
