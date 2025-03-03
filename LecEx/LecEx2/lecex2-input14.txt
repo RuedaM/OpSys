@@ -1,0 +1,388 @@
+\documentclass[11pt]{article}
+\usepackage[pdftex, colorlinks, linkcolor=red,citecolor=red,urlcolor=blue]{hyperref}
+
+\setlength{\parindent}{0cm}
+
+\setlength{\parskip}{0.3cm plus4mm minus3mm}
+
+\textwidth  6.5in
+\oddsidemargin +0.0in
+\evensidemargin +0.0in
+\textheight 9.0in
+\topmargin -0.5in
+
+\usepackage{upquote,textcomp}
+\usepackage{amsmath,amsfonts,amsthm}
+\usepackage{graphicx}
+\usepackage{ulem}
+\usepackage{multicol}
+
+\newcommand{\vect}[1]{{\bf #1}}                 %for bold chars
+\newcommand{\vecg}[1]{\mbox{\boldmath $ #1 $}}  %for bold greek chars
+\newcommand{\matx}[1]{{\bf #1}}
+
+\begin{document}
+\thispagestyle{empty}
+
+\begin{center}
+\large
+\textbf{CSCI 4210 --- Operating Systems \\
+Lecture Exercise 2 (document version 1.0) \\
+}
+
+\end{center}
+
+%%\section*{Overview}
+\begin{itemize}
+\item This lecture exercise is due by 11:59PM on Wednesday, February~5, 2025
+\item This lecture exercise consists of practice problems and problems to
+  be handed in for a grade; graded problems are to be done individually, so
+  \textbf{please do not share your work on graded problems with others}
+\item For all lecture exercise problems, take the time to work through
+  the corresponding course content to practice, learn, and master the material;
+  while the problems posed here are usually not exceedingly difficult,
+  they are important to understand before attempting to solve
+  the more extensive homework assignments in this course
+\item You \textbf{must} use C for this assignment,
+  and all submitted code \textbf{must} successfully compile via~\verb+gcc+
+  with no warning messages when the~\verb+-Wall+ (i.e.,~warn all)
+  compiler option is used;
+  we will also use~\verb+-Werror+, which will treat all warnings
+  as critical errors
+\item All submitted code \textbf{must} successfully compile and run on
+  Submitty, which currently uses Ubuntu v22.04.5~LTS
+  and~\verb+gcc+ version~11.4.0
+  (\verb+Ubuntu 11.4.0-1ubuntu1~22.04+)
+\item You will have \textbf{eight} penalty-free submissions on Submitty,
+  after which points will slowly be deducted, e.g.,~\verb+-1+ on submission \#9, etc.
+\item You will have at least \textbf{three} days before the due date to
+  submit your code to Submitty;
+  if the auto-grading is not available three days before the due date,
+  the due date will be 11:59PM three days after auto-grading becomes
+  available
+\end{itemize}
+
+\section*{Practice problems}
+Work through the practice problems below, but do not submit
+solutions to these problems.
+Feel free to post questions, comments, and answers
+in our Discussion Forum.
+
+\begin{enumerate}
+
+\item What is the exact terminal output of the~\verb+fork.c+ example
+  if we modify the code by
+  adding the following \verb+printf()+ statements both
+  before and after the~\verb+fork()+ call?
+\begin{verbatim}
+    printf( "PID %d: BEFORE fork()\n", getpid() );
+    /* create a new (child) process */
+    pid_t p = fork();
+    printf( "PID %d: AFTER fork()\n", getpid() );
+\end{verbatim}
+
+  To best answer this question, revise the diagram shown
+  in the comments after the \verb+main()+ function
+  in the \verb+fork.c+ example.
+
+  How does the behavior and output change if we remove the newline \verb+'\n'+
+  characters from the two \verb+printf()+ statements added above?
+
+  Next, how does the output change if we redirect \verb+stdout+ to a file?
+  As a hint, review the posted \verb+fork-buffering.c+ example.
+
+\vspace{0.1in}
+
+\item Review the code shown below.
+  Assuming no runtime errors occur,
+  how many distinct possible outputs to the terminal could there be?
+  Show all possible outputs by drawing a diagram.
+
+  How does program behavior change if output is redirected to a file?
+
+\begin{verbatim}
+  int main()
+  {
+    int t = 6181;
+    int * q = &t;
+    pid_t p = fork();
+
+    if ( p == -1 )
+    {
+      perror( "fork() failed" );
+      return EXIT_FAILURE;
+    }
+
+    if ( p == 0 )
+    {
+      q = calloc( 13, sizeof( int ) );
+      *q = 123;
+      *(q + 3) = 333;
+      printf( "CHILD: happy birthday to me!\n" );
+      printf( "CHILD: *q is %d\n", *q );
+      free( q );
+    }
+    else /* p > 0 */
+    {
+      printf( "PARENT: child process created\n" );
+      *q += 113;
+      printf( "PARENT: *q is %d\n", *q );
+    }
+
+    return EXIT_SUCCESS;
+  }
+\end{verbatim}
+
+  Remember that the parent (original) and child processes
+  each independently reach the~\verb+return+ statement in~\verb+main()+.
+
+  Before we return from \verb+main()+ and exit each process,
+  how many bytes are statically allocated for the given variables
+  in the parent process?
+  And in the child process?
+
+  How many bytes are dynamically allocated in each process?
+
+\newpage
+
+\item What are the differences between the \verb+waitpid()+
+  and \verb+wait()+ system calls?
+
+  What does the return value tell us?
+  What is the \verb+wstatus+ parameter used for?
+
+  How many bits are dedicated to each component encoded
+  in the \verb+wstatus+ value?
+  As a hint, refer to the \verb+man+ page for \verb+waitpid()+
+  and also use the \verb+-E+ flag of \verb+gcc+.
+
+\vspace{0.1in}
+
+\item
+  Modify the \verb+fork-with-exec.c+ example
+  to show a \verb+man+ page for the first command-line argument.
+  As an example, you would mimic this shell command:
+\begin{verbatim}
+  bash$ man fork
+\end{verbatim}
+
+  To run your code, use:
+\begin{verbatim}
+  bash$ ./a.out fork
+\end{verbatim}
+
+  First implement using \verb+execl()+, then review the \verb+man+ pages and
+  replace \verb+execl()+ with \verb+execv()+.
+
+  Also add functionality to allow the user to specify
+  which section to view, i.e.,~\verb+1+, \verb+2+, etc.
+
+\vspace{0.1in}
+
+\item Modify the posted \verb+fork-pass-by-fork.c+ example to use the first
+  command-line argument, i.e.,~\verb#*(argv+1)#, as input string \verb+data+.
+  Next, have the parent process create enough child processes such that
+  the first child process converts the first seven bytes to uppercase,
+  the second child process converts the next seven bytes to uppercase,
+  and so on through to the end of the given string.
+
+  The output should be formatted as given in the \verb+fork-pass-by-fork.c+ example.
+
+\vspace{0.1in}
+
+\end{enumerate}
+
+
+\newpage
+\section*{Graded problems}
+Complete the problems below and submit via Submitty for a grade.
+Please do not post any answers to these questions.
+All work on these problems is to be your own.
+
+\textbf{No square brackets allowed!}
+As with our previous assignments, use pointer arithmetic.
+Any line of code containing square brackets, including comments,
+will be \textbf{automatically deleted on Submitty}
+before compiling via~\verb+gcc+.
+
+\begin{enumerate}
+\item Review the \verb+forked.c+ code posted along with
+  this lecture exercise (also shown on the next page).
+  In this code, the parent process
+  calls the \verb+lecex2_parent()+ function,
+  while the child process calls the \verb+lecex2_child()+ function.
+
+  Your task is to write these two functions
+  in your own \verb+lecex2-q1.c+ code file.
+  Each of these functions is described further below.
+
+  Do \textbf{not} change the \verb+forked.c+ code
+  or submit this code to Submitty.
+  Submitty will compile your own code file
+  in with a hidden version of the given \verb+forked.c+ code as follows:
+\begin{verbatim}
+  bash$ gcc -Wall -Werror forked.c lecex2-q1.c
+\end{verbatim}
+
+  Only submit your \verb+lecex2-q1.c+ code file
+  for this problem.
+
+\begin{enumerate}
+\item In the \verb+lecex2_child()+ function,
+  open and read from a file called \verb+lecex2.txt+.
+  Using~\verb+open()+ and \verb+read()+,
+  read the \verb+n+th character in that file, then close the file.
+
+  If all is successful, exit the child process and return
+  the \verb+n+th character (i.e.,~one byte) as its exit status.
+  Note that the first byte in the file is
+  considered \verb+n+~$=1$, the second is \verb+n+~$=2$, etc.
+
+  If an error occurs, display an error message
+  to \verb+stderr+ and use the \verb+abort()+
+  library function to abnormally terminate the child process.
+
+  Read the \verb+man+ page for \verb+abort()+ for more details.
+
+\vspace{0.1in}
+
+  \item In the \verb+lecex2_parent()+ function,
+  use \verb+waitpid()+ to suspend the parent process
+  and wait for the child process to terminate.
+
+  If the child process terminates abnormally,
+  display the following line of output in the parent process
+  and return \verb+EXIT_FAILURE+:
+\begin{verbatim}
+  PARENT: child process terminated abnormally!
+\end{verbatim}
+
+  If instead the child process terminates normally,
+  display the following line of output in the parent process
+  and return \verb+EXIT_SUCCESS+:
+\begin{verbatim}
+  PARENT: child process exited with status '<char>'
+\end{verbatim}
+  Note that \verb+<char>+ here represents
+  the exit status received from
+  the child process---display this as a single character.
+
+  As an example, if \verb+'G'+ was the
+  \verb+n+th character in the file read by the child process,
+  the parent would output:
+\begin{verbatim}
+  PARENT: child process exited with status 'G'
+\end{verbatim}
+
+\end{enumerate}
+
+\newpage
+\begin{verbatim}
+  /* forked.c */
+
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include <unistd.h>
+
+  /* implement these functions in lecex2-q1.c */
+  int lecex2_child( unsigned int n );
+  int lecex2_parent();
+
+  int main()
+  {
+    unsigned int n = 7;  /* or some other non-negative value ... */
+    int rc;
+
+    /* create a new (child) process */
+    pid_t p = fork();
+
+    if ( p == -1 )
+    {
+      perror( "fork() failed" );
+      return EXIT_FAILURE;
+    }
+
+    if ( p == 0 )
+    {
+      rc = lecex2_child( n );
+    }
+    else /* p > 0 */
+    {
+      rc = lecex2_parent();
+    }
+
+    return rc;
+  }
+\end{verbatim}
+
+\newpage
+\item Based on the \verb+fork-with-waitpid.c+ example,
+  write code to create a child process,
+  then have this child process also call \verb+fork()+,
+  thereby creating a ``grandchild'' process.
+  Place your code entirely in \verb+lecex2-q2.c+.
+
+  The grandchild process must open the input file given as the
+  first command-line argument, i.e.,~\verb#*(argv+1)#, and
+  count the number of \textit{properly nested}
+  pairs of \verb+'{'+ and \verb+'}'+ characters in the file.
+%  To do so, you can count \verb+'}'+ characters that have a matching
+%  \verb+'{'+ character encountered earlier in the file.
+
+  After processing the input file,
+  the grandchild process returns the accumulated count as its exit status.
+
+  Next, the child process doubles this count and returns it
+  (to the original parent) as its exit status.
+  Finally, the original (top-level parent) process outputs this returned value.
+
+  If any errors occur, display a meaningful error message to \verb+stderr+
+  and return \verb+-1+ as a special sentinel value.
+
+  A simple example is shown below.
+\begin{verbatim}
+  bash$ cat simple.txt
+  int main() { printf( "LET'S GO LAKERS!\n" ); }
+  bash$ ./a.out simple.txt
+  GRANDCHILD: counted 1 properly nested pair of curly brackets
+  CHILD: doubled 1; returning 2
+  PARENT: there are 2 properly nested curly brackets
+\end{verbatim}
+
+  A more complex example is shown below.
+\begin{verbatim}
+  bash$ cat input.txt
+  { /* print parent PID value */
+  { printf( "PARENT: my PID is {%d}\n", getpid() ); } } /* :-}  :-{ */
+  bash$ ./a.out input.txt
+  GRANDCHILD: counted 3 properly nested pairs of curly brackets
+  CHILD: doubled 3; returning 6
+  PARENT: there are 6 properly nested curly brackets
+\end{verbatim}
+
+  Another example is shown below, with all three lines of output
+  written to \verb+stderr+.
+\begin{verbatim}
+  bash$ ./a.out nosuchfile.txt
+  GRANDCHILD: open() failed: No such file or directory
+  CHILD: rcvd -1 (error)
+  PARENT: rcvd -1 (error)
+\end{verbatim}
+
+  Specifically, error messages must be one line of output
+  and begin with \verb+GRANDCHILD:+, \verb+CHILD:+, or \verb+PARENT:+
+  (the rest of the line can be anything you would like).
+  This technique illustrates an example of propagating an error
+  back through one or more parent processes.
+
+\end{enumerate}
+
+\subsection*{What to submit}
+
+Please submit exactly two C source files called \verb+lecex2-q1.c+ and
+\verb+lecex2-q2.c+.
+(Do not use any local header files.)
+These two files will be automatically compiled and tested against various
+test cases, some of which will be hidden.
+
+\end{document}

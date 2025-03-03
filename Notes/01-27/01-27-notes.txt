@@ -1,0 +1,28 @@
+[01/27/2025]
+
+BEFORE fork() call:
+
+    <parent>
+    +----------+
+    |PID: 12345|
+    |          |
+    | fork()   |
+    |          |
+    |          |
+    +----------+
+
+AFTER fork() call:
+
+    <parent>
+    +----------+                    +----------+
+    |PID: 12345|                    |PID: 23456|
+    |          |                    |          |
+    | heap:XYZ |                    | heap:XYZ |
+    |          |                    |          |
+    |stack:x,p |                    |stack:x,p |
+    |          |                    |          |
+    | fork() ===========> duplicate | fork()   |
+    | rc: 23456|                    | rc: 0    |
+    |          |                    |          |
+    +----------+                    +----------+
+

@@ -1,0 +1,31 @@
+[01/09/2025]
+
+
+ PROCESS (in memory)
+
+ +-----------------------------+
+ | runtime heap                | <== dynamic allocation
+ |      | /cs/goldsd/s25/\0    |
+ |      |                      |
+ |      |                      |
+ |      v                      |
+ |                             |
+ |                             |
+ |                             |
+ |                             |
+ |      ^                      |
+ |      |                      |
+ |      |                      |
+ |      |                      |
+ |      | main()               |
+ |      |  int x, int*y        |
+ |      | name DAVIDQRSTU\0    |
+ |      |           xyz        |
+ |      | cptr                 |
+ |      |                      |
+ | runtime stack               | <== static allocation
+ |-----------------------------|     (e.g., int x, int * y)
+ | code/data/text segments     |
+ | 5 "ABCDEFgHIJ...XYZ\0"      | <== read-only memory
+ +-----------------------------+
+

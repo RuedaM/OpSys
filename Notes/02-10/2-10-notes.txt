@@ -1,0 +1,198 @@
+[02/10/2025]
+
+A process is a "running program" or "program in execution"
+
+Processes have a variety of states:
+
+   RUNNING          READY                   WAITING (on I/O)
+    STATE           STATE                    STATE
+   +-----+                                +------------------------------+
+   |     |     +--------------------+     |                              |
+   | CPU | <== | p3 | p6 | p5 | ... |     | I/O Subsystem                |
+   | p22 |     +--------------------+     |                              |
+   +-----+     <==READY QUEUE========     +------------------------------+
+
+-- a CPU burst is a set of assembly/machine instructions that are
+    executed by the CPU for a given process, e.g., p22
+
+-- an I/O burst is one or more I/O operations for a given process
+
+-- process states:
+
+   RUNNING STATE: process is actually using the CPU,
+                   i.e., executing its instructions
+
+   READY STATE: process is ready to use the CPU,
+                 i.e., process is idle in the ready queue
+
+   WAITING STATE: process is waiting for I/O operation(s) to complete
+                   (also similar is a SUSPENDED state, e.g., waitpid()...)
+
+-- CPU Scheduling (a.k.a. Short-Term Scheduling)
+
+   The scheduling system enables one process to use the CPU
+    while the other processes are waiting in the ready queue to use
+     the CPU (or waiting in the I/O Subsystem)
+
+   The goals of CPU Scheduling are to make efficient use of the CPU
+    and to minimize the TURNAROUND TIMES and WAIT TIMES for each process
+
+   We also want to achieve a high level of "fairness" across all processes
+
+
+Multiprogramming
+-- In multiprogramming, several processes reside in memory
+    at the same time
+-- CPU is shared and managed by the OS
+-- Addresses the problem of the CPU being under-utilized
+-- But this introduces a new problem...
+   ...need to perform a "context switch" to switch the CPU's
+       context from one process to another
+
+Processes in a multiprogramming system COMPETE for the CPU,
+ but they also often need to COOPERATE with one another via IPC
+  (i.e., we need SYNCHRONIZATION)
+
+Program execution (process)
+--START--------------------
+   |
+   |
+   v
+CPU burst
+   |
+   |
+   v
+I/O burst
+   |
+   |
+   v
+CPU burst
+   |
+   |
+   v
+I/O burst
+   |
+  ...
+   |
+   v
+CPU burst
+   |
+   |
+   v
+--TERMINATE----------------
+
+
+A CPU-bound process is one that will primarily have
+ longer CPU bursts (spending most of its time either
+  running with the CPU or waiting in the ready queue
+   until the CPU becomes available)
+...a.k.a. compute-bound process
+
+A I/O-bound process is one that will primarily have
+ shorter CPU bursts (spending most of its time waiting
+  on I/O operations to complete)
+...a.k.a. interactive process (e.g., shell)
+
+   +---------+ blocked +------------------------------+   +---------------+
+P1 |CPU burst|---------|       CPU burst              |---| CPU burst     |---->
+   +---------+  on I/O +------------------------------+   +---------------+
+
+   +-----+  blocked on I/O                              +-----+
+P2 | CPU |----------------------------------------------| CPU |---------------->
+   |burst|                                              |burst|
+   +-----+                                              +-----+
+
+      P1 is a CPU-bound or compute-bound process
+
+      P2 is an I/O-bound or interactive process
+
+
+
+Preemption occurs when the currently running (with the CPU) process is
+ preempted, i.e., kicked out while using the CPU
+
+(1) running process "decides" that it is done with its current
+     CPU burst, e.g., process calls read() or waitpid() or etc.
+
+(2) running process "decides" to terminate, e.g., exit()
+
+(3) running process is interrupted (and goes back to the ready state/queue)
+
+(4) preemption based on another process arriving or entering the
+     ready state
+
+
+
+CPU scheduling criteria and measures include:
+-- CPU utilization (busy versus idle CPU time)
+-- Throughput
+-- "Fairness"
+-- Arrival and departure times (of CPU bursts) and rates
+-- Response times
+-- Wait times
+-- Turnaround times
+
+*** For each CPU burst per each process:
+
+WAIT TIME: How much time does a process spend in the ready queue,
+           waiting for its time with the CPU?
+           (Note that the process is idle and in the READY state)
+
+TURNAROUND TIME: How much time is required for a process to complete
+                 its CPU burst, from the time it first enters the
+                 ready queue through to when it completes its CPU burst?
+
+TURNAROUND TIME  =  WAIT TIME  +  CPU BURST TIME  +  OVERHEAD
+                                                    (context switches)
+
+
+   RUNNING          READY                   WAITING (on I/O)
+    STATE           STATE                    STATE
+   +-----+                                +------------------------------+
+   |     |     +--------------------+     |                              |
+   | CPU | <== | P1 | P2 | P3 | ... |     | I/O Subsystem                |
+   |     |     +--------------------+     |                              |
+   +-----+     <==READY QUEUE========     +------------------------------+
+
+
+
+First-Come-First-Served (FCFS)
+
+  pid    CPU burst times   (three processes in the READY state)
+  P1       18 ms  <=== CPU-bound process
+  P2        3 ms  <=== I/O-bound process
+  P3        4 ms  <=== I/O-bound process
+
+  ready queue: P1 P2 P3  (assume that all processes arrived at time 0...)
+
+     context switch
+       v                 v   v    v
+       +-----------------+---+----+--------------->
+ FCFS: | P1              |P2 | P3 | CPU idle...
+       +-----------------+---+----+--------------->
+    t: 0                 18  21   25
+
+  P1 has 0 wait time       P1 has 18 ms turnaround time
+  P2 has 18 ms wait time   P2 has 21 ms turnaround time
+  P3 has 21 ms wait time   P3 has 25 ms turnaround time
+
+-- when a process arrives or transitions to the READY state,
+    we simply add it to the end of the READY queue
+
+ advantages: very simple; easy to implement; very low overhead
+
+ disadvantages: processes with larger CPU burst times will
+                 cause longer delays for other processes,
+                  e.g., CPU-bound versus I/O-bound process mix
+
+
+Shortest Job First (SJF)
+
+TO DO: repeat the above FCFS example using SJF...
+
+-- we order the ready queue by CPU burst times (ascending order)
+
+
+QUESTION: how does the OS know what the CPU burst times will be ahead of time...?
+
+          It doesn't!  It has to guess/estimate...

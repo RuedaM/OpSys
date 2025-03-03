@@ -1,0 +1,6 @@
+PID 4138174: Solving the knight's tour problem for a 3x3 board
+PID 4138174: Starting at row 0 and column 0 (move #1)
+PID 4138174: 2 possible moves after move #1; creating 2 child processes...
+PID 4138175: Dead end at move #8
+PID 4138176: Dead end at move #8
+PID 4138174: Search complete; best solution(s) visited 8 squares out of 9

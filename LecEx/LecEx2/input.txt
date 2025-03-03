@@ -1,0 +1,2 @@
+{ /* print parent PID value */
+{ printf( "PARENT: my PID is {%d}\n", getpid() ); } } /* :-} :-{ */
