@@ -24,5 +24,7 @@
 
 
 int main(){
+    char var = 64;
+    printf("%d", var);
     return EXIT_SUCCESS;
 }
