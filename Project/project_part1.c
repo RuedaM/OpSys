@@ -2,8 +2,8 @@
 
 /*
  * TERMINAL COMMANDS:
- * gcc -Wall -Werror -Wextra -g -o project_part1.out project_part1.c
- * gcc -Wall -Werror -Wextra -g -o project_part1.out -D DEBUG_MODE project_part1.c
+ * gcc -Wall -Werror -Wextra -g -o project_part1.out project_part1.c -lm
+ * gcc -Wall -Werror -Wextra -g -o project_part1.out -D DEBUG_MODE project_part1.c -lm
  * valgrind -s ./project_part1.out <ARGS HERE>
  * ARGS:
  * 3 1 32 0.001 1024 4 0.75 256
@@ -26,7 +26,7 @@
 
 
 char (*gen_IDs(int n))[3];
-float next_exp(float lambda);
+float next_exp(float lambda, int bound);
 
 struct Process{
     /*
@@ -86,16 +86,37 @@ int main(int argc, char** argv){
 
     // Process Generation Template
     srand48(seed);
-    struct Process* allProcesses = calloc(n, sizeof(struct Process)); //DYNAMIC.MEMORY
+    //struct Process* allProcesses = calloc(n, sizeof(struct Process)); //DYNAMIC.MEMORY
     // Remember to free in some way: free(allProcesses)
     for (int i=0 ; i<n ; i++){
 
         int binding; if (i<n_cpu) {binding = 0;} else {binding = 1;}
+        
+        float interarrival_time = next_exp(lambda, bound);
+        
+        int CPUBurstCount = ceil(drand48())*32; //TO-DO: ensure this ceil() still follows upper bound
+        for (int i=0 ; i<CPUBurstCount ; i++){
+            int CPUBurst = next_exp(lambda, bound);
+            int IOBurst = next_exp(lambda, bound)*8;
+        }
+        /* 
+         * For each of these CPU bursts, identify the CPU burst time and the I/O burst time as the
+         * “ceiling” of the next two random numbers in the sequence given by next_exp(); multiply
+         * the I/O burst time by 8 such that I/O burst time is close to an order of magnitude longer
+         * than CPU burst time; as noted above, for CPU-bound processes, multiply the CPU burst
+         * time by 4 and divide the I/O burst time by 8 (i.e., do not bother multiplying the original
+         * I/O burst time by 8 in this case); for the last CPU burst, do not generate an I/O burst time
+         * (since each process ends with a final CPU burst)
+         */
 
+#if DEBUG_MODE
+        printf("Current binding: ");
+        if (binding==0) {printf("CPU\n");} else {printf("I/O\n");}
+        printf("Generated interarrival_time: %f\n", interarrival_time);
+#endif
         
-        
-        struct Process proc = {IDs[i], binding};
-        allProcesses[i] = proc;
+        // struct Process proc = {IDs[i], binding};
+        // allProcesses[i] = proc;
     }
 
 }
@@ -120,28 +141,26 @@ char (*gen_IDs(int n))[3]{
 
 
 
-float next_exp(float lambda){
-    double min = 0, max = 0, sum = 0;
-    int iterations = 1000000;
+float next_exp(float lambda, int bound){
+    int min = 0, max = 0, sum = 0;
+    int iterations = 1000000; // Arbitrary, as long as it's large
 
     for (int i=0 ; i<iterations ; i++){
         double r = drand48();  // uniform dist [0.00,1.00)
 
-        /*  */
-        double x = -log(r) / lambda;   // generate the next pseudo-random value x
+        double x = (-log(r)/lambda);   // generate the next pseudo-random value x
         // (Note: log() = natural log)
         
-        if (x>3000) {i--; continue;}
+        if (x>bound) {i--; continue;}
 
-#if DEBUG_MODE
+#if DEEP_DEBUG_MODE
         /* display the first 20 pseudo-random values */
-        if (i<20) printf("x is %lf\n", x);
+        if (i<20) {printf("x is %lf\n", x);}
 #endif
-        double avg = sum / iterations;
 
         sum += x;
         if (i==0 || x<min) {min=x;}
         if (i==0 || x>max) {max=x;}
     }
-
+    return (sum/iterations);
 }
