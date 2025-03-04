@@ -26,9 +26,16 @@
 
 
 char (*gen_IDs(int n))[3];
+float next_exp(float lambda);
 
 struct Process{
+    /*
+     * 
+     */
     char ID[2];
+    int binding;   //Binding: CPU-Bound (0) / I/O-Bound (1)
+    int state;   // States: RUNNING (0) / READY (1) / WAITING (2)
+
 };
 
 
@@ -67,12 +74,30 @@ int main(int argc, char** argv){
     printf("<<< -- process set (n=%d) with %d CPU-bound process\n", n, n_cpu);
     printf("<<< -- seed=%d; lambda=%f; bound=%d\n", seed, lambda, bound);
 
-    // Process ID generation
+
+    // Process ID Generation
     char (*IDs)[3] = gen_IDs(n);
+    // Remember to free in some way: free(IDs)
+    // (Maybe loop through all processes and free each ID)
 #if DEBUG_MODE
-    for (int i=0 ; i<n ; i++) {printf("%c%c\n", IDs[i][0], IDs[i][1]);}
+    for (int i=0 ; i<n ; i++) {printf("%s\n", IDs[i]);}
 #endif
-    // remember to free! free(IDs)
+
+
+    // Process Generation Template
+    srand48(seed);
+    struct Process* allProcesses = calloc(n, sizeof(struct Process)); //DYNAMIC.MEMORY
+    // Remember to free in some way: free(allProcesses)
+    for (int i=0 ; i<n ; i++){
+
+        int binding; if (i<n_cpu) {binding = 0;} else {binding = 1;}
+
+        
+        
+        struct Process proc = {IDs[i], binding};
+        allProcesses[i] = proc;
+    }
+
 }
 
 
@@ -85,12 +110,38 @@ char (*gen_IDs(int n))[3]{
 
     for (char let='A' ; let<='Z' ; let++) {   // Loop A-Z
         for (char num='0' ; num<='9' ; num++) {   // Loop 0-9
-            ret[i][0] = let;
-            ret[i][1] = num;
-            ret[i][2] = '\0';
+            ret[i][0] = let; ret[i][1] = num; ret[i][2] = '\0';
             i++;
             if (i==n) {return ret;}
         }
     }
     return ret;
+}
+
+
+
+float next_exp(float lambda){
+    double min = 0, max = 0, sum = 0;
+    int iterations = 1000000;
+
+    for (int i=0 ; i<iterations ; i++){
+        double r = drand48();  // uniform dist [0.00,1.00)
+
+        /*  */
+        double x = -log(r) / lambda;   // generate the next pseudo-random value x
+        // (Note: log() = natural log)
+        
+        if (x>3000) {i--; continue;}
+
+#if DEBUG_MODE
+        /* display the first 20 pseudo-random values */
+        if (i<20) printf("x is %lf\n", x);
+#endif
+        double avg = sum / iterations;
+
+        sum += x;
+        if (i==0 || x<min) {min=x;}
+        if (i==0 || x>max) {max=x;}
+    }
+
 }
