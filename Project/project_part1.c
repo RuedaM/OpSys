@@ -22,21 +22,11 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <math.h>
+#include "project_part1.h"
 
 
-
-char (*gen_IDs(int n))[3];
 float next_exp(float lambda, int bound);
 
-struct Process{
-    /*
-     * 
-     */
-    char ID[2];
-    int binding;   //Binding: CPU-Bound (0) / I/O-Bound (1)
-    int state;   // States: RUNNING (0) / READY (1) / WAITING (2)
-
-};
 
 
 int main(int argc, char** argv){
@@ -68,15 +58,25 @@ int main(int argc, char** argv){
     printf("\n\n");
 #endif
 
-    if(t_cs<=0 && (t_cs%2)!=0) {perror("ERR: t_cs must be a positive even integer"); return EXIT_FAILURE;}
-    if(t_slice<=0) {perror("ERR: t_slice must be a positive integer"); return EXIT_FAILURE;}
+    // Command Line Argument Error Checking
+    if(n<=0) {perror("ERROR: n must be a positive integer"); return EXIT_FAILURE;}
+    // Next few error checks are assumptions that they must be a positive integer. Can change/remove later when more test cases/examples are given
+    // --------------------------- REMOVE THESE AS APPROPRIATE ---------------------------
+    if(n_cpu<=0) {perror("ERROR: n_cpu must be a positive integer"); return EXIT_FAILURE;}
+    if(seed<=0) {perror("ERROR: seed must be a positive integer"); return EXIT_FAILURE;}
+    if(lambda<=0) {perror("ERROR: lambda must be a positive float"); return EXIT_FAILURE;}
+    if(bound<=0) {perror("ERROR: bound must be a positive integer"); return EXIT_FAILURE;}
+    // -----------------------------------------------------------------------------------
+    if(t_cs<=0 && (t_cs%2)!=0) {perror("ERROR: t_cs must be a positive even integer"); return EXIT_FAILURE;}
+    if(alpha<0 || alpha>1) {perror("ERROR: alpha must be in range [0,1]}"); return EXIT_FAILURE;}
+    if(t_slice<=0) {perror("ERROR: t_slice must be a positive integer"); return EXIT_FAILURE;}
 
     printf("<<< -- process set (n=%d) with %d CPU-bound process\n", n, n_cpu);
     printf("<<< -- seed=%d; lambda=%f; bound=%d\n", seed, lambda, bound);
 
 
     // Process ID Generation
-    char (*IDs)[3] = gen_IDs(n);
+    char** IDs = gen_IDs(n);
     // Remember to free in some way: free(IDs)
     // (Maybe loop through all processes and free each ID)
 #if DEBUG_MODE
@@ -86,7 +86,7 @@ int main(int argc, char** argv){
 
     // Process Generation Template
     srand48(seed);
-    //struct Process* allProcesses = calloc(n, sizeof(struct Process)); //DYNAMIC.MEMORY
+    // struct Process* allProcesses = calloc(n, sizeof(struct Process)); //DYNAMIC.MEMORY
     // Remember to free in some way: free(allProcesses)
     for (int i=0 ; i<n ; i++){
 
@@ -119,25 +119,9 @@ int main(int argc, char** argv){
         // allProcesses[i] = proc;
     }
 
+    return EXIT_SUCCESS;
 }
 
-
-
-
-
-char (*gen_IDs(int n))[3]{
-    char (*ret)[3] = malloc(n * sizeof(*ret)); //DYNAMIC.MEMORY
-    int i = 0;
-
-    for (char let='A' ; let<='Z' ; let++) {   // Loop A-Z
-        for (char num='0' ; num<='9' ; num++) {   // Loop 0-9
-            ret[i][0] = let; ret[i][1] = num; ret[i][2] = '\0';
-            i++;
-            if (i==n) {return ret;}
-        }
-    }
-    return ret;
-}
 
 
 
