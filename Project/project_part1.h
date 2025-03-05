@@ -14,18 +14,17 @@
 
 // Struct for holding info for a single process
 struct Process{
-    /*
-     * 
-     */
-    char ID[2]; // Process ID (A0 - Z9)
-    int arrivalTime; // Process arrival time
-    int numBurst;   // Number of CPU burst for a single process
-    int binding;   // Binding: CPU-Bound (0) / I/O-Bound (1)
+    char* ID; // Process ID (A0 - Z9)
     int state;   // States: RUNNING (0) / READY (1) / WAITING (2)
-
-    // Containers for storing CPU burst times and IO burst times
-    int* cpuTimes;
-    int* ioTimes;
+    int binding;   // Binding: CPU-Bound (0) / I/O-Bound (1)
+    
+    int arrivalTime; // Process arrival time
+    int cpuBurstCount;   // Number of CPU burst for a single process
+    // (Note: ioBurstCount = cpuBurstCount-1)
+    
+    // Containers for storing CPU and I/O burst times
+    int* cpuBurstTimes;
+    int* ioBurstTimes;
 };
 
 // Generate IDs for processes

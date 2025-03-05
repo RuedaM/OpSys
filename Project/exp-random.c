@@ -26,30 +26,23 @@
 int main(){
 
     srand48( time( NULL ) );
-    
-#if 1
                             /* uniform to exponential distribution: */
                             /*                                      */
     double min = 0;         /*        -ln(r)                        */
     double max = 0;         /*  x = ----------                      */
     double sum = 0;         /*        lambda                        */
                             /*                                      */
-#endif
+
     double lambda = 0.001;  /* average should be 1/lambda ===> 1000 */
 
-#if 1
     int iterations = 1000000; /* <== make this number very large */
 
     for (int i=0 ; i<iterations ; i++){
-#endif
         double r = drand48();  /* uniform dist [0.00,1.00) -- also see random() */
 
         /* generate the next pseudo-random value x */
         double x = -log(r) / lambda;   /* log() is natural log (see man page) */
 
-#if 0
-        printf( "x is %lf\n", x );
-#else
         /* skip values that are far down the "long tail" of the distribution */
         if (x>3000) {i--; continue;}
 
@@ -66,5 +59,4 @@ int main(){
     printf("minimum value: %lf\n", min);
     printf("maximum value: %lf\n", max);
     printf("average value: %lf\n", avg);
-#endif
 }

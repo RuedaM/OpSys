@@ -22,28 +22,29 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <math.h>
+
 #include "project_part1.h"
 
 
-float next_exp(float lambda, int bound);
+float next_exp(float lambda, int bound, char* rounding, int only_drand);
 
 
 
 int main(int argc, char** argv){
-#ifdef DEBUG_MODE
-    printf("=Check Arg Input=   // ");
-    for(int i=1 ; i<=8 ; i++){printf("%s // ",*(argv+i));}
-    printf("\n");
-#endif
+    
     setbuf(stdout, NULL);
 
-    // Command Line Args
-    if (argc!=9){ // (1 .out file + 8 inputs = 9 args)
+#ifdef DEBUG_MODE
+    printf("=Check Arg Input= // "); for(int i=1 ; i<=8 ; i++){printf("%s // ",*(argv+i));} printf("\n");
+#endif
+        
+    if(argc!=9){ // (1 .out file + 8 inputs = 9 args)
         perror("ERR: invalid number of arguments");
         perror("USAGE: ./hw2.out <Proc_Count> <CPU-Bound_Procs> <IntArr_Times_Seed> <Lambda> <RandNumber_Upper_Bound> <t_cs> <alpha> <t_slice>");
         return EXIT_FAILURE;
     }
 
+    // Command Line Arg Storage+Setting
     int n = atoi(argv[1]); // number of processes to simulate
     int n_cpu = atoi(argv[2]); // number of processes that are CPU-bound
     int seed = atoi(argv[3]); // seed for the pseudo-random number sequence
@@ -53,12 +54,15 @@ int main(int argc, char** argv){
     float alpha = atof(argv[7]); // for JF and SRT algorithms
     int t_slice = atoi(argv[8]); // time slice value in ms for RR algorithm
 #if DEBUG_MODE
-    printf("Processes: %d\n", n); printf("CPU-bound: %d\n", n_cpu); printf("Seed: %d\n", seed); printf("lambda: %f\n", lambda);
-    printf("Upper Bound: %d\n", bound); printf("t_cs: %d\n", t_cs); printf("alpha: %f\n", alpha); printf("t_slice: %d\n", t_slice);
-    printf("\n\n");
+    printf("Arg verification:\n");
+    printf("  Processes: %d", n); printf("\t\tCPU-bound: %d\n", n_cpu);
+    printf("  Seed: %d", seed); printf("\t\tlambda: %f\n", lambda);
+    printf("  Upper Bound: %d", bound); printf("\tt_cs: %d\n", t_cs);
+    printf("  alpha: %f", alpha); printf("\tt_slice: %d\n", t_slice);
+    printf("\n");
 #endif
 
-    // Command Line Argument Error Checking
+    // Command Line Arg Error Checking
     if(n<=0) {perror("ERROR: n must be a positive integer"); return EXIT_FAILURE;}
     // Next few error checks are assumptions that they must be a positive integer. Can change/remove later when more test cases/examples are given
     // --------------------------- REMOVE THESE AS APPROPRIATE ---------------------------
@@ -71,53 +75,79 @@ int main(int argc, char** argv){
     if(alpha<0 || alpha>1) {perror("ERROR: alpha must be in range [0,1]}"); return EXIT_FAILURE;}
     if(t_slice<=0) {perror("ERROR: t_slice must be a positive integer"); return EXIT_FAILURE;}
 
+    // Terminal Output
     printf("<<< -- process set (n=%d) with %d CPU-bound process\n", n, n_cpu);
     printf("<<< -- seed=%d; lambda=%f; bound=%d\n", seed, lambda, bound);
-
+#if DEBUG_MODE
+    printf("\n");
+#endif
 
     // Process ID Generation
     char** IDs = gen_IDs(n);
     // Remember to free in some way: free(IDs)
     // (Maybe loop through all processes and free each ID)
 #if DEBUG_MODE
-    for (int i=0 ; i<n ; i++) {printf("%s\n", IDs[i]);}
+    printf("Generated IDs: // "); for (int i=0 ; i<n ; i++) {printf("%s // ", IDs[i]);} printf("\n\n");
 #endif
 
-
-    // Process Generation Template
+    // Process Generation TEMPLATE
     srand48(seed);
-    // struct Process* allProcesses = calloc(n, sizeof(struct Process)); //DYNAMIC.MEMORY
+    struct Process* allProcesses = calloc(n, sizeof(struct Process)); //DYNAMIC.MEMORY
     // Remember to free in some way: free(allProcesses)
     for (int i=0 ; i<n ; i++){
+        int binding; if(i<n_cpu) {binding=0;} else {binding=1;}
 
-        int binding; if (i<n_cpu) {binding = 0;} else {binding = 1;}
+        float arrivalTime = next_exp(lambda, bound, "floor", 0);
         
-        float interarrival_time = next_exp(lambda, bound);
+        int cpuBurstCount = next_exp(lambda, bound, "ceil", 1)*32; //TO-DO: ensure this ceil() still follows upper bound
         
-        int CPUBurstCount = ceil(drand48())*32; //TO-DO: ensure this ceil() still follows upper bound
-        for (int i=0 ; i<CPUBurstCount ; i++){
-            int CPUBurst = next_exp(lambda, bound);
-            int IOBurst = next_exp(lambda, bound)*8;
+        int* cpuBurstTimes = calloc(cpuBurstCount, sizeof(int));
+        int* ioBurstTimes = calloc(cpuBurstCount-1, sizeof(int));
+        int cpuBurstTime, ioBurstTime;
+        // For all same-index CPU and I/O bursts
+        for (int i=0 ; i<cpuBurstCount-1 ; i++){
+            if(binding==0){ //CPU-bound
+                cpuBurstTime = next_exp(lambda, bound, "ceil", 0)*4;
+                ioBurstTime = next_exp(lambda, bound, "ceil", 0);
+            }
+            else if(binding==1){ //I/O-bound
+                cpuBurstTime = next_exp(lambda, bound, "ceil", 0);
+                ioBurstTime = next_exp(lambda, bound, "ceil", 0)*8;
+            }
+            cpuBurstTimes[i] = cpuBurstTime; ioBurstTimes[i] = ioBurstTime;
         }
-        /* 
-         * For each of these CPU bursts, identify the CPU burst time and the I/O burst time as the
-         * “ceiling” of the next two random numbers in the sequence given by next_exp(); multiply
-         * the I/O burst time by 8 such that I/O burst time is close to an order of magnitude longer
-         * than CPU burst time; as noted above, for CPU-bound processes, multiply the CPU burst
-         * time by 4 and divide the I/O burst time by 8 (i.e., do not bother multiplying the original
-         * I/O burst time by 8 in this case); for the last CPU burst, do not generate an I/O burst time
-         * (since each process ends with a final CPU burst)
-         */
+        // For the last CPU burst
+        if(binding==0) {cpuBurstTime = next_exp(lambda, bound, "ceil", 0)*4;}
+        else if(binding==1) {cpuBurstTime = next_exp(lambda, bound, "ceil", 0);}
+        cpuBurstTimes[cpuBurstCount-1] = cpuBurstTime;
 
 #if DEBUG_MODE
-        printf("Current binding: ");
+        printf("Building Process %s:\n", IDs[i]);
+        printf("  Current binding: ");
         if (binding==0) {printf("CPU\n");} else {printf("I/O\n");}
-        printf("Generated interarrival_time: %f\n", interarrival_time);
+        printf("  Generated interarrival_time: %f\n", arrivalTime);
+        printf("  CPU Bursts: %d --- I/O Bursts: %d\n", cpuBurstCount, cpuBurstCount-1);
+        printf("  CPU Burst Times: |");
+        for (int i=0 ; i<cpuBurstCount ; i++){printf("%d] %d |", i, cpuBurstTimes[i]);} printf("\n");
+        printf("  I/O Burst Times: |");
+        for (int i=0 ; i<cpuBurstCount-1 ; i++){printf("%d] %d |", i, ioBurstTimes[i]);} printf("\n");
+        printf("\n");
 #endif
         
-        // struct Process proc = {IDs[i], binding};
-        // allProcesses[i] = proc;
+        struct Process proc = {IDs[i], 2, binding, arrivalTime, cpuBurstCount, cpuBurstTimes, ioBurstTimes};
+        allProcesses[i] = proc;
     }
+#if DEBUG_MODE
+for (int i=0 ; i<n ; i++){
+    printf("Process %s verified\n", allProcesses[i].ID);
+}
+#endif
+
+
+
+
+
+
 
     return EXIT_SUCCESS;
 }
@@ -125,26 +155,25 @@ int main(int argc, char** argv){
 
 
 
-float next_exp(float lambda, int bound){
-    int min = 0, max = 0, sum = 0;
-    int iterations = 1000000; // Arbitrary, as long as it's large
+float next_exp(float lambda, int bound, char* rounding, int only_drand){
+    double r, x;
+    while(1){
+        r = drand48();   // uniform dist [0.00,1.00)
 
-    for (int i=0 ; i<iterations ; i++){
-        double r = drand48();  // uniform dist [0.00,1.00)
+        if(only_drand){   // "Function ONLY asking for next value of just drand48()"
+            if(r>bound) {continue;}
+            else {return r;}
+        }
 
-        double x = (-log(r)/lambda);   // generate the next pseudo-random value x
+        x = (-log(r)/lambda);   // generate next pseudo-random value
         // (Note: log() = natural log)
         
-        if (x>bound) {i--; continue;}
+        if(strcmp(rounding, "ceil")) {x = ceil(x);}
+        if(strcmp(rounding, "floor")) {x = floor(x);}
 
-#if DEEP_DEBUG_MODE
-        /* display the first 20 pseudo-random values */
-        if (i<20) {printf("x is %lf\n", x);}
-#endif
-
-        sum += x;
-        if (i==0 || x<min) {min=x;}
-        if (i==0 || x>max) {max=x;}
+        if(x>bound) {continue;}
+        else {break;}
     }
-    return (sum/iterations);
+
+    return x;
 }

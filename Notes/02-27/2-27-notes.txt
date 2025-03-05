@@ -1,0 +1,215 @@
+[02/27/2025]
+
+Exam 1 --- average ~53% (see Submitty for your exam and more stats...)
+
+(1) We will add 7 percentage points to each exam grade to raise the average to ~60%
+
+(2) We will also add more points to each exam grade once we are done
+     taking/grading Exam 2 --- to raise the Exam 1 average to the
+      Exam 2 average...
+
+(3) On Exam 2, we will have two multiple choice questions from Exam 1
+     repeated...
+
+(4) Project -- due date will be moved forward...
+
+==========================================================================
+
+Q1 fd table:                             mem leak 8 bytes
+   0 data.txt (O_RDONLY)
+   1 *q1 (read end of pipe)
+   2 stderr
+   3 *(q1+1) (write end of pipe)
+   4 q1.txt (O_WRONLY)
+
+
+
+Q2        heap memory:
+
+              short*
+             +------+
+   q2 --> [0]| NULL |
+ STACK       +------+   +-------------------+
+          [1]| ========>| 8 short values... |  16 bytes
+             +------+   +-------------------+
+               ...
+             +------+   +-----------------------------+
+          [3]| ========>| 17 short values............ |
+             +------+   +-----------------------------+
+               ...                             34 bytes
+             +------+
+          [7]| ???? |
+             +------+
+             64 bytes          (TOTAL 114 bytes)
+
+    free( q2 );
+
+   q2 --> ???
+                        +-------------------+
+                        | 8 short values... |  16 bytes
+                        +-------------------+
+
+                        +-----------------------------+
+                        | 17 short values............ |
+                        +-----------------------------+
+                                               34 bytes
+
+
+                                     mem leak: 50 bytes
+
+
+
+Q3 fd table:
+   0
+   1 q3.txt (O_WRONLY)
+   2 stderr
+   3 q3.txt (O_WRONLY)
+   4 data.txt (O_RDONLY)
+
+   how many bytes do we write to q3.txt?
+   -- 3 bytes "THR" from the write() call
+   -- 7 bytes "Q3-777\n" from the printf() call
+
+   after the close( q3 ) call:
+   fd table:
+   0
+   1 q3.txt (O_WRONLY)
+   2 stderr
+   3 q3.txt (O_WRONLY)
+   4 data.txt (O_RDONLY)
+
+
+
+Q4        P1               stdout
+          | \              buffer
+         P1  P2            "fork?"
+       /  |  |  \
+     P3  P1  P2  P4
+   /  |   |  |   |  \
+ P5  P3  P1  P2  P4  P6    "fork?"    "fork!\n"
+
+
+   here is the resulting process tree:
+
+                  P1
+                /    \
+              P2      P3
+            /            \
+          P4              P5
+        /
+     P6
+
+
+
+Q5 statically allocated
+   int ** q5 ====> 8 bytes
+   ...
+   int x = 2, y = 4 ====> 4 + 4 bytes
+   ...
+   int * s ====> 8 bytes
+
+   (TOTAL 24 bytes)
+
+
+          heap memory:
+                        **q5   x+=*(*(q5+0)+3)
+               int *      |
+             +------+   +-v-----------------+
+   q5 --> [0]| ========>| 0 | 0 | 0 | 0 | 4 |
+ STACK       +------+   +-------------------+
+          [1]| NULL |<==*(q5 + 1)
+             +------+
+               ...
+             +------+
+          [4]| NULL |
+             +------+
+
+
+   memory leak: 32 bytes (8 x 4)
+          +-------------------------------+
+    s --> | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+ STACK    +-------------------------------+
+
+
+
+Q6/Q7
+   fd table:
+   0 *q6 (read end of pipe)
+   1 *(q6+1) (write end of pipe)
+   2 stderr
+
+         [0]    [1]     [2]
+        +------------------------------+
+ q6 ==> | read | write | <char buffer> |
+        +---------------^--------------+
+                        |
+                 void * A
+                 char * L
+
+              char * L = (char *)A;
+
+ pipe: "GO-S" (after the first printf() call)
+ pipe: "GO-SPARADISE" (after the printf() call in f6())
+ pipe: "ADISE" (after the read() call)
+
+ terminal output: GO-SPARKS\n
+
+
+
+Q8
+                   fork()
+                  /      \
+                 /        \
+ ---------<child>---  ---<parent>----------
+ CHILD: q8 is 64      PARENT: q8 is 16 <== in stdout buffer
+ -------------------  ---waitpid()---------
+                          |
+                      PARENT: exit status is 64
+
+
+ one possible output:
+ CHILD: q8 is 64
+ PARENT: q8 is 16
+ PARENT: exit status is 64
+
+
+
+Q9 0644 ==> 110 100 100
+            rwx rwx rwx
+            rw- r-- r--
+
+
+
+Q10 PARENT fd table:
+    0 *q10 (read end of pipe)
+    1 stdout
+    2 stderr
+    3 *(q10+1) (write end of pipe)
+
+    CHILD fd table:
+    0 *q10 (read end of pipe)
+    1 stdout
+    2 stderr
+    3 *(q10+1) (write end of pipe)
+
+    x = 0
+    y = 3
+
+    after the first printf() call...
+
+    PARENT fd table:
+    0
+    1 stdout
+    2 stderr
+    3 *(q10+1) (write end of pipe)
+
+    CHILD fd table:
+    0 *q10 (read end of pipe)
+    1 stdout
+    2 stderr
+    3 *(q10+1) (write end of pipe)
+
+ parent writes to pipe
+ pipe: "abc\ndefg\nhijk\nlmn\n" (18 bytes)
+ parent stdout buffer: "A18-"
+
