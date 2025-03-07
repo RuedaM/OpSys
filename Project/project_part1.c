@@ -138,9 +138,7 @@ int main(int argc, char** argv){
         allProcesses[i] = proc;
     }
 #if DEBUG_MODE
-for (int i=0 ; i<n ; i++){
-    printf("Process %s verified\n", allProcesses[i].ID);
-}
+for (int i=0 ; i<n ; i++) {printf("Process %s verified\n", allProcesses[i].ID);}
 #endif
 
 
