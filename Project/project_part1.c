@@ -26,9 +26,6 @@
 #include "project_part1.h"
 
 
-float next_exp(float lambda, int bound, char* rounding, int only_drand);
-
-
 
 int main(int argc, char** argv){
     
@@ -142,7 +139,7 @@ for (int i=0 ; i<n ; i++) {printf("Process %s verified\n", allProcesses[i].ID);}
         cpuBoundAvgIOBurstTime += cpuBoundAvgIOBurstTime_1Proc;
         ioBoundAvgIOBurstTime += ioBoundAvgIOBurstTime_1Proc;
         totalAvgIOBurstTime += totalAvgIOBurstTime_1Proc;
-        }
+    }
     cpuBoundAvgCPUBurstTime /= n_cpu;
     ioBoundAvgCPUBurstTime /= (n-n_cpu);
     totalAvgCPUBurstTime /= n;
