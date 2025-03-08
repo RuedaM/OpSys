@@ -39,8 +39,7 @@ int main(int argc, char** argv){
 #endif
         
     if(argc!=9){ // (1 .out file + 8 inputs = 9 args)
-        perror("ERR: invalid number of arguments");
-        perror("USAGE: ./hw2.out <Proc_Count> <CPU-Bound_Procs> <IntArr_Times_Seed> <Lambda> <RandNumber_Upper_Bound> <t_cs> <alpha> <t_slice>");
+        fprintf(stderr, "ERROR: Invalid number of arguments\n");
         return EXIT_FAILURE;
     }
 
@@ -63,17 +62,17 @@ int main(int argc, char** argv){
 #endif
 
     // Command Line Arg Error Checking
-    if(n<=0) {perror("ERROR: n must be a positive integer"); return EXIT_FAILURE;}
+    if(n<=0) {fprintf(stderr, "ERROR: n must be a positive integer\n"); return EXIT_FAILURE;}
     // Next few error checks are assumptions that they must be a positive integer. Can change/remove later when more test cases/examples are given
     // --------------------------- REMOVE THESE AS APPROPRIATE ---------------------------
-    if(n_cpu<=0) {perror("ERROR: n_cpu must be a positive integer"); return EXIT_FAILURE;}
-    if(seed<=0) {perror("ERROR: seed must be a positive integer"); return EXIT_FAILURE;}
-    if(lambda<=0) {perror("ERROR: lambda must be a positive float"); return EXIT_FAILURE;}
-    if(bound<=0) {perror("ERROR: bound must be a positive integer"); return EXIT_FAILURE;}
+    if(n_cpu<=0) {fprintf(stderr, "ERROR: n_cpu must be a positive integer\n"); return EXIT_FAILURE;}
+    if(seed<=0) {fprintf(stderr, "ERROR: seed must be a positive integer\n"); return EXIT_FAILURE;}
+    if(lambda<=0) {fprintf(stderr, "ERROR: lambda must be a positive float\n"); return EXIT_FAILURE;}
+    if(bound<=0) {fprintf(stderr, "ERROR: bound must be a positive integer\n"); return EXIT_FAILURE;}
     // -----------------------------------------------------------------------------------
-    if(t_cs<=0 && (t_cs%2)!=0) {perror("ERROR: t_cs must be a positive even integer"); return EXIT_FAILURE;}
-    if(alpha<0 || alpha>1) {perror("ERROR: alpha must be in range [0,1]}"); return EXIT_FAILURE;}
-    if(t_slice<=0) {perror("ERROR: t_slice must be a positive integer"); return EXIT_FAILURE;}
+    if(t_cs<=0 && (t_cs%2)!=0) {fprintf(stderr, "ERROR: t_cs must be a positive even integer\n"); return EXIT_FAILURE;}
+    if(alpha<0 || alpha>1) {fprintf(stderr, "ERROR: alpha must be in range [0,1]}\n"); return EXIT_FAILURE;}
+    if(t_slice<=0) {fprintf(stderr, "ERROR: t_slice must be a positive integer\n"); return EXIT_FAILURE;}
 
     // Terminal Output
     printf("<<< -- process set (n=%d) with %d CPU-bound process\n", n, n_cpu);
@@ -81,6 +80,24 @@ int main(int argc, char** argv){
 #if DEBUG_MODE
     printf("\n");
 #endif
+
+    // simout.txt Initialization
+    int fd = open("simout.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    // Remember to close in some way: close(fd)
+    if (fd==-1) {fprintf(stderr, "ERROR: open() failed\n"); return EXIT_FAILURE;}
+    
+    ssize_t bytesWritten; char toWrite[200];
+
+    sprintf(toWrite, "-- number of processes: %d\n", n);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- number of CPU-bound processes: %d\n", n_cpu);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- number of I/O-bound processes: %d\n", n-n_cpu);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+
 
     // Process ID Generation
     char** IDs = gen_IDs(n);
@@ -90,56 +107,67 @@ int main(int argc, char** argv){
     printf("Generated IDs: // "); for (int i=0 ; i<n ; i++) {printf("%s // ", IDs[i]);} printf("\n\n");
 #endif
 
-    // Process Generation TEMPLATE
-    srand48(seed);
-    struct Process* allProcesses = calloc(n, sizeof(struct Process)); //DYNAMIC.MEMORY
-    // Remember to free in some way: free(allProcesses)
-    for (int i=0 ; i<n ; i++){
-        int binding; if(i<n_cpu) {binding=0;} else {binding=1;}
-
-        float arrivalTime = next_exp(lambda, bound, "floor", 0);
-        
-        int cpuBurstCount = next_exp(lambda, bound, "ceil", 1)*32; //TO-DO: ensure this ceil() still follows upper bound
-        
-        int* cpuBurstTimes = calloc(cpuBurstCount, sizeof(int));
-        int* ioBurstTimes = calloc(cpuBurstCount-1, sizeof(int));
-        int cpuBurstTime, ioBurstTime;
-        // For all same-index CPU and I/O bursts
-        for (int i=0 ; i<cpuBurstCount-1 ; i++){
-            if(binding==0){ //CPU-bound
-                cpuBurstTime = next_exp(lambda, bound, "ceil", 0)*4;
-                ioBurstTime = next_exp(lambda, bound, "ceil", 0);
-            }
-            else if(binding==1){ //I/O-bound
-                cpuBurstTime = next_exp(lambda, bound, "ceil", 0);
-                ioBurstTime = next_exp(lambda, bound, "ceil", 0)*8;
-            }
-            cpuBurstTimes[i] = cpuBurstTime; ioBurstTimes[i] = ioBurstTime;
-        }
-        // For the last CPU burst
-        if(binding==0) {cpuBurstTime = next_exp(lambda, bound, "ceil", 0)*4;}
-        else if(binding==1) {cpuBurstTime = next_exp(lambda, bound, "ceil", 0);}
-        cpuBurstTimes[cpuBurstCount-1] = cpuBurstTime;
-
-#if DEBUG_MODE
-        printf("Building Process %s:\n", IDs[i]);
-        printf("  Current binding: ");
-        if (binding==0) {printf("CPU\n");} else {printf("I/O\n");}
-        printf("  Generated interarrival_time: %f\n", arrivalTime);
-        printf("  CPU Bursts: %d --- I/O Bursts: %d\n", cpuBurstCount, cpuBurstCount-1);
-        printf("  CPU Burst Times: |");
-        for (int i=0 ; i<cpuBurstCount ; i++){printf("%d] %d |", i, cpuBurstTimes[i]);} printf("\n");
-        printf("  I/O Burst Times: |");
-        for (int i=0 ; i<cpuBurstCount-1 ; i++){printf("%d] %d |", i, ioBurstTimes[i]);} printf("\n");
-        printf("\n");
-#endif
-        
-        struct Process proc = {IDs[i], 2, binding, arrivalTime, cpuBurstCount, cpuBurstTimes, ioBurstTimes};
-        allProcesses[i] = proc;
-    }
+    // Process Generation
+    struct Process* allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
 #if DEBUG_MODE
 for (int i=0 ; i<n ; i++) {printf("Process %s verified\n", allProcesses[i].ID);}
 #endif
+    
+    float cpuBoundAvgCPUBurstTime, ioBoundAvgCPUBurstTime, totalAvgCPUBurstTime, cpuBoundAvgIOBurstTime, ioBoundAvgIOBurstTime, totalAvgIOBurstTime;
+    for(int i=0 ; i<n ; i++){ //For every process...
+        
+        int cpuBoundAvgCPUBurstTime_1Proc = 0, ioBoundAvgCPUBurstTime_1Proc = 0, totalAvgCPUBurstTime_1Proc = 0;
+        for(int j=0 ; j<allProcesses[i].cpuBurstCount ; j++){ //Looking at CPU burst times
+            if (allProcesses[i].binding==0) {cpuBoundAvgCPUBurstTime_1Proc += allProcesses[i].cpuBurstTimes[j];} //CPU-bound
+            if (allProcesses[i].binding==1) {ioBoundAvgCPUBurstTime_1Proc += allProcesses[i].cpuBurstTimes[j];} //I/O-Bound
+            totalAvgCPUBurstTime_1Proc += allProcesses[i].cpuBurstTimes[j];
+        }
+        cpuBoundAvgCPUBurstTime_1Proc /= allProcesses[i].cpuBurstCount;
+        ioBoundAvgCPUBurstTime_1Proc /= allProcesses[i].cpuBurstCount;
+        totalAvgCPUBurstTime_1Proc /= allProcesses[i].cpuBurstCount;
+
+        int cpuBoundAvgIOBurstTime_1Proc = 0, ioBoundAvgIOBurstTime_1Proc = 0, totalAvgIOBurstTime_1Proc = 0;
+        for(int j=0 ; j<allProcesses[i].cpuBurstCount-1 ; j++){ //Looking at I/O burst times
+            if (allProcesses[i].binding==0) {cpuBoundAvgIOBurstTime_1Proc += allProcesses[i].ioBurstTimes[j];} //CPU-Bound
+            if (allProcesses[i].binding==1) {ioBoundAvgIOBurstTime_1Proc += allProcesses[i].ioBurstTimes[j];} //I/O-Bound
+            totalAvgIOBurstTime_1Proc += allProcesses[i].ioBurstTimes[j];
+        }
+        cpuBoundAvgIOBurstTime_1Proc /= (allProcesses[i].cpuBurstCount-1);
+        ioBoundAvgIOBurstTime_1Proc /= (allProcesses[i].cpuBurstCount-1);
+        totalAvgIOBurstTime_1Proc /= (allProcesses[i].cpuBurstCount-1);
+
+        cpuBoundAvgCPUBurstTime += cpuBoundAvgCPUBurstTime_1Proc;
+        ioBoundAvgCPUBurstTime += ioBoundAvgCPUBurstTime_1Proc;
+        totalAvgCPUBurstTime += totalAvgCPUBurstTime_1Proc;
+        cpuBoundAvgIOBurstTime += cpuBoundAvgIOBurstTime_1Proc;
+        ioBoundAvgIOBurstTime += ioBoundAvgIOBurstTime_1Proc;
+        totalAvgIOBurstTime += totalAvgIOBurstTime_1Proc;
+        }
+    cpuBoundAvgCPUBurstTime /= n_cpu;
+    ioBoundAvgCPUBurstTime /= (n-n_cpu);
+    totalAvgCPUBurstTime /= n;
+    cpuBoundAvgIOBurstTime /= n_cpu;
+    ioBoundAvgIOBurstTime /= (n-n_cpu);
+    totalAvgIOBurstTime /= n;
+
+    sprintf(toWrite, "-- CPU-bound average CPU burst time: %.3f ms\n", cpuBoundAvgCPUBurstTime);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- I/O-bound average CPU burst time: %.3f ms\n", ioBoundAvgCPUBurstTime);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- overall average CPU burst time: %.3f ms\n", totalAvgCPUBurstTime);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- CPU-bound average I/O burst time: %.3f ms\n", cpuBoundAvgIOBurstTime);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- I/O-bound average I/O burst time: %.3f ms\n", ioBoundAvgIOBurstTime);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- overall average I/O burst time: %.3f ms\n\n", totalAvgIOBurstTime);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
 
 
 
@@ -148,30 +176,4 @@ for (int i=0 ; i<n ; i++) {printf("Process %s verified\n", allProcesses[i].ID);}
 
 
     return EXIT_SUCCESS;
-}
-
-
-
-
-float next_exp(float lambda, int bound, char* rounding, int only_drand){
-    double r, x;
-    while(1){
-        r = drand48();   // uniform dist [0.00,1.00)
-
-        if(only_drand){   // "Function ONLY asking for next value of just drand48()"
-            if(r>bound) {continue;}
-            else {return r;}
-        }
-
-        x = (-log(r)/lambda);   // generate next pseudo-random value
-        // (Note: log() = natural log)
-        
-        if(strcmp(rounding, "ceil")) {x = ceil(x);}
-        if(strcmp(rounding, "floor")) {x = floor(x);}
-
-        if(x>bound) {continue;}
-        else {break;}
-    }
-
-    return x;
 }
