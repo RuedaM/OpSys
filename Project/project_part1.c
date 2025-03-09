@@ -78,24 +78,6 @@ int main(int argc, char** argv){
     printf("\n");
 #endif
 
-    // simout.txt Initialization
-    int fd = open("simout.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    // Remember to close in some way: close(fd)
-    if (fd==-1) {fprintf(stderr, "ERROR: open() failed\n"); return EXIT_FAILURE;}
-    
-    ssize_t bytesWritten; char toWrite[200];
-
-    sprintf(toWrite, "-- number of processes: %d\n", n);
-    bytesWritten = write(fd, toWrite, strlen(toWrite));
-    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    sprintf(toWrite, "-- number of CPU-bound processes: %d\n", n_cpu);
-    bytesWritten = write(fd, toWrite, strlen(toWrite));
-    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    sprintf(toWrite, "-- number of I/O-bound processes: %d\n", n-n_cpu);
-    bytesWritten = write(fd, toWrite, strlen(toWrite));
-    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-
-
     // Process ID Generation
     char** IDs = gen_IDs(n);
     // Remember to free in some way: free(IDs)
@@ -109,7 +91,14 @@ int main(int argc, char** argv){
 #if DEBUG_MODE
 for (int i=0 ; i<n ; i++) {printf("Process %s verified\n", allProcesses[i].ID);}
 #endif
+    // Process Generation Terminal Output
+    for(int i=0 ; i<n ; i++){ //For every process...
+        printf("CPU-bound process %s: arrival time %dms; %d CPU bursts:\n", allProcesses[i].ID, allProcesses[i].arrivalTime, allProcesses[i].cpuBurstCount);
+        for(int j=0 ; j<allProcesses[i].cpuBurstCount-1 ; j++){printf("==> CPU burst %dms ==> I/O burst %dms\n", allProcesses[i].cpuBurstTimes[j], allProcesses[i].ioBurstTimes[j]);}
+        printf("==> CPU burst %dms\n\n", allProcesses[i].cpuBurstTimes[allProcesses[i].cpuBurstCount-1]);
+    }
     
+    // Calculations for simout.txt
     float cpuBoundAvgCPUBurstTime, ioBoundAvgCPUBurstTime, totalAvgCPUBurstTime, cpuBoundAvgIOBurstTime, ioBoundAvgIOBurstTime, totalAvgIOBurstTime;
     for(int i=0 ; i<n ; i++){ //For every process...
         
@@ -147,6 +136,24 @@ for (int i=0 ; i<n ; i++) {printf("Process %s verified\n", allProcesses[i].ID);}
     ioBoundAvgIOBurstTime /= (n-n_cpu);
     totalAvgIOBurstTime /= n;
 
+    // simout.txt Initialization
+    int fd = open("simout.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    // Remember to close in some way: close(fd)
+    if (fd==-1) {fprintf(stderr, "ERROR: open() failed\n"); return EXIT_FAILURE;}
+    
+    ssize_t bytesWritten; char toWrite[200];
+
+    sprintf(toWrite, "-- number of processes: %d\n", n);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- number of CPU-bound processes: %d\n", n_cpu);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- number of I/O-bound processes: %d\n", n-n_cpu);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+
+    // simout.txt Output
     sprintf(toWrite, "-- CPU-bound average CPU burst time: %.3f ms\n", cpuBoundAvgCPUBurstTime);
     bytesWritten = write(fd, toWrite, strlen(toWrite));
     if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
