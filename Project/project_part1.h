@@ -133,6 +133,7 @@ struct Process pop(struct Process* procQ, int numProc){
     struct Process* buffer = calloc(numProc, sizeof(struct Process));
     memcpy(buffer, procQ, sizeof(struct Process)*(numProc-1));  // Copy all processes but the last one to a buffer
     memcpy(procQ, buffer, sizeof(struct Process)*(numProc));    // Copy buffer back to original queue
+    for(int i=0 ; i<numProc ; i++){free(procQ[i].cpuBurstTimes);free(procQ[i].ioBurstTimes);} // Free arrays in each struct in buffer
     free(buffer);
     
     return ret;
