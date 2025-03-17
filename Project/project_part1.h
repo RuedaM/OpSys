@@ -78,9 +78,9 @@ struct Process* gen_procs(char** IDs, int seed, int n, int n_cpu, float lambda, 
 
         int binding; if(i<n_cpu) {binding=0;} else {binding=1;}
 
-        float arrivalTime = next_exp(lambda, bound, "floor", 0);
+        float arrivalTime = next_exp(lambda, bound, "ceil", 0); // ON THE HANDOUT IT SHOULD SAY TO USE CEIL NOT FLOOR WTF
         
-        int cpuBurstCount = ceil(next_exp(lambda, bound, "-", 1)*32); //TO-DO: ensure this ceil() still follows upper bound
+        int cpuBurstCount = ceil(next_exp(lambda, bound, "-", 1)*32); //TO-DO: ensure this ceil() still follows upper bound(?)
         
         int* cpuBurstTimes = calloc(cpuBurstCount, sizeof(int));
         int* ioBurstTimes = calloc(cpuBurstCount-1, sizeof(int));
@@ -88,12 +88,12 @@ struct Process* gen_procs(char** IDs, int seed, int n, int n_cpu, float lambda, 
         // For all same-index CPU and I/O bursts
         for (int i=0 ; i<cpuBurstCount-1 ; i++){
             if(binding==0){ //CPU-bound
-                cpuBurstTime = next_exp(lambda, bound, "ceil", 0)*4;
+                cpuBurstTime = ceil(next_exp(lambda, bound, "-", 0)*4);
                 ioBurstTime = next_exp(lambda, bound, "ceil", 0);
             }
             else if(binding==1){ //I/O-bound
                 cpuBurstTime = next_exp(lambda, bound, "ceil", 0);
-                ioBurstTime = next_exp(lambda, bound, "ceil", 0)*8;
+                ioBurstTime = ceil(next_exp(lambda, bound, "-", 0)*8);
             }
             cpuBurstTimes[i] = cpuBurstTime; ioBurstTimes[i] = ioBurstTime;
         }
