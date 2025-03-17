@@ -36,8 +36,7 @@ float next_exp(float lambda, int bound, char* rounding, int only_drand){
         r = drand48();   // uniform dist [0.00,1.00)
 
         if(only_drand){   // "Function ONLY asking for next value of just drand48()"
-            if(r>bound) {continue;}
-            else {return r;}
+            if(r<=bound) {return r;}
         }
 
         x = (-log(r)/lambda);   // generate next pseudo-random value
@@ -46,8 +45,7 @@ float next_exp(float lambda, int bound, char* rounding, int only_drand){
         if(strcmp(rounding, "ceil")) {x = ceil(x);}
         if(strcmp(rounding, "floor")) {x = floor(x);}
 
-        if(x>bound) {continue;}
-        else {break;}
+        if(x<=bound) {break;}
     }
 
     return x;
@@ -82,7 +80,7 @@ struct Process* gen_procs(char** IDs, int seed, int n, int n_cpu, float lambda, 
 
         float arrivalTime = next_exp(lambda, bound, "floor", 0);
         
-        int cpuBurstCount = next_exp(lambda, bound, "ceil", 1)*32; //TO-DO: ensure this ceil() still follows upper bound
+        int cpuBurstCount = ceil(next_exp(lambda, bound, "-", 1)*32); //TO-DO: ensure this ceil() still follows upper bound
         
         int* cpuBurstTimes = calloc(cpuBurstCount, sizeof(int));
         int* ioBurstTimes = calloc(cpuBurstCount-1, sizeof(int));

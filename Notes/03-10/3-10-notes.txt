@@ -1,4 +1,107 @@
-[3/10/2025]
+[03/10/2025]
 
 * * * * * * * *  SYNCHRONIZATION  * * * * * * * *
+
+              SHARED MEMORY
+             +-------------+
+             | shared x    | <== initially x is 5
+             +-------------+
+
+ Process P1                  Process P2
++----------+                +----------+
+| local y  |                | local z  |
+|          |                |          |
+|          |                |          |
+|----------|                |----------|
+| x += 4   |                | x++      |
+| y = x    |                | z = x    |
+|----------|                |----------|
+|          |                |          |
+| print x  |                | print x  |
+| print y  |                | print z  |
+|          |                |          |
+| <point A>|                | <point B>|
++----------+                +----------+
+
+ What is the value of x when BOTH processes
+  reach <point A> and <point B>?
+
+ Does x have to be 10...?
+
+ What are the possible values for local variables y and z?
+
+ <<< this is one possibility >>>
+     x == 5
+ P1: x += 4  <-- x == 9
+ P1: y = x   <-- y == 9
+ P2: x++     <-- x == 10
+ P2: z = x   <-- z == 10
+
+ ANSWER: x could be 10 (most likely) or 6 or 9 ...
+
+ <<< this is another (very unlikely) possibility >>>
+ P1: x += 4 ============> x = x + 4
+
+                    LOAD x    ; load the value of x into a register (5)
+                    ADD #4    ; add 4 to that register (9)
+    <-------context-switch-over-to-P2------------------------------------->
+                    STORE x   ; store the new value (9) back in x
+
+
+ P2: x++ ===============> x = x + 1
+
+                    LOAD x    ; load the value of x into a register (5)
+                    INCR      ; add 1 to that register (6)
+                    STORE x   ; store the new value (6) back in x
+
+
+
+               [P1] LOAD x    ; load the value of x into a register (5)
+               [P1] ADD #4    ; add 4 to that register (9)
+    <-------context-switch-over-to-P2------------------------------------->
+               [P2] LOAD x    ; load the value of x into a register (5)
+               [P2] INCR      ; add 1 to that register (6)
+               [P2] STORE x   ; store the new value (6) back in x
+    <-------context-switch-over-to-P1------------------------------------->
+               [P1] STORE x   ; store the new value (9) back in x
+
+
+
+
+              SHARED MEMORY
+             +-------------+
+             | shared x    | <== initially x is 5
+             | shared abc  |
+             +-------------+
+
+ Process P1                  Process P2
++----------+                +----------+
+| local y  |                | local z  |
+|          |                |          |
+|          |                |          |
+|----------|                |----------|
+> x += 4   < CRITICAL       > x++      <
+> y = x    < SECTIONS for x > z = x    <
+|----------|                |----------|
+|          |                |          |
+| print x  |                | print x  |
+| print y  |                | print z  |
+|          |                |          |
+| <point A>|                | <point B>|
++----------+                +----------+
+
+The highlighted CRITICAL SECTIONS are shown above...
+
+-- to synchronize these two processes, only one (and no more than one)
+    process can be in its critical section at any given time
+
+And a CRITICAL SECTION guarantees MUTUAL EXCLUSION among multiple processes
+ for access to one or more shared resources, e.g., shared variable x
+
+To synchronize processes, first we must identify the critical sections
+ of code within each process
+
+-- the OS must control access to the critical sections by providing us
+    (as programmers) some mechanism to define the critical sections, etc.
+   -- e.g., semaphores
 

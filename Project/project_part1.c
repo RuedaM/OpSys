@@ -28,7 +28,6 @@
 
 
 int main(int argc, char** argv){
-    
     setbuf(stdout, NULL);
 
 #ifdef DEBUG_MODE
@@ -73,7 +72,7 @@ int main(int argc, char** argv){
 
     // Terminal Output
     printf("<<< -- process set (n=%d) with %d CPU-bound process\n", n, n_cpu);
-    printf("<<< -- seed=%d; lambda=%f; bound=%d\n", seed, lambda, bound);
+    printf("<<< -- seed=%d; lambda=%f; bound=%d\n\n", seed, lambda, bound);
 #if DEBUG_MODE
     printf("\n");
 #endif
@@ -93,7 +92,9 @@ for (int i=0 ; i<n ; i++) {printf("Process %s verified\n", allProcesses[i].ID);}
 #endif
     // Process Generation Terminal Output
     for(int i=0 ; i<n ; i++){ //For every process...
-        printf("CPU-bound process %s: arrival time %dms; %d CPU bursts:\n", allProcesses[i].ID, allProcesses[i].arrivalTime, allProcesses[i].cpuBurstCount);
+        if (allProcesses[i].binding==0) {printf("CPU");}
+        else {printf("I/O");}
+        printf("-bound process %s: arrival time %dms; %d CPU bursts:\n", allProcesses[i].ID, allProcesses[i].arrivalTime, allProcesses[i].cpuBurstCount);
         for(int j=0 ; j<allProcesses[i].cpuBurstCount-1 ; j++){printf("==> CPU burst %dms ==> I/O burst %dms\n", allProcesses[i].cpuBurstTimes[j], allProcesses[i].ioBurstTimes[j]);}
         printf("==> CPU burst %dms\n\n", allProcesses[i].cpuBurstTimes[allProcesses[i].cpuBurstCount-1]);
     }

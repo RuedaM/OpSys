@@ -1,4 +1,4 @@
-/* shm.c */
+/* shm.c-string */
 
 /* TO DO: write a separate program to attach to the shared memory segment
  *         created below
@@ -28,14 +28,22 @@
 #include <unistd.h>
 #include <sys/shm.h>
 #include <sys/wait.h>
+#include <termios.h>
 
 #define SHM_SHARED_KEY 7890
 
 int main(){
+    struct termios ttyraw, ttyrestore;
+    if(isatty(STDIN_FILENO)){
+        tcgetattr(STDIN_FILENO, &ttyrestore);
+        cfmakeraw(&ttyraw);
+        tcsetattr(STDIN_FILENO, TCSANOW, &ttyraw);
+    }
+    
     /* create the shared memory segment with a size of 4 bytes */
     key_t key = SHM_SHARED_KEY;
-    int shmid = shmget(key, sizeof(int), IPC_CREAT | IPC_EXCL | 0660);
-                                                            /* rw-rw---- */
+    int shmid = shmget(key, 32, IPC_CREAT | IPC_EXCL | 0660);
+                        /*for string*/           /* rw-rw---- */
     if(shmid==-1) {perror("shmget() failed"); return EXIT_FAILURE;}
 
     printf("shmget() returned %d\n", shmid);
@@ -44,7 +52,7 @@ int main(){
 
 
     /* attach to the shared memory segment */
-    int * x = shmat(shmid, NULL, 0);
+    char* x = shmat(shmid, NULL, 0);
     if(x==(void*)-1) {perror("shmat() failed"); return EXIT_FAILURE;}
 
 
@@ -55,19 +63,28 @@ int main(){
     if(p==-1) {perror("fork() failed"); return EXIT_FAILURE;}
 
     if(p==0){
-        printf("CHILD: writing my pid %d to shared memory...\n", getpid());
-        *x = getpid();
+        printf("CHILD: type some characters (enter '!' to end)\n");
+        int c;
+        char* ptr  =x;
+        do{
+            c = getchar();
+            *ptr = c;
+            ptr++; //Buffer overflow! Careful!
+        }while(c!='!');
     }
 
     if(p>0){
-#if 0
-        /* this is the only synchronization mechanism that's
-        *  in this code --- synchronizes write and read on
-        *   the shared memory segment
-        */
-        waitpid( p, NULL, 0 );
-#endif
-        printf("PARENT: shared memory contains %d\n", *x);
+        while(1){
+            printf("PARENT: shared memory contains \"%s\"\n", x);
+            sleep(1);
+            if (waitpid(p, NULL, WNOHANG)>0) {break;} //Oopsie, check for error
+        }
+
+        printf("\rPARENT: all done\n");
+    }
+
+    if(isatty(STDIN_FILENO)){
+        tcsetattr(STDIN_FILENO, TCSANOW, &ttyraw);
     }
 
 

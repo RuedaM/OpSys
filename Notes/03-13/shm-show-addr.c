@@ -1,4 +1,4 @@
-/* shm.c */
+/* shm-show-addr.c */
 
 /* TO DO: write a separate program to attach to the shared memory segment
  *         created below
@@ -34,9 +34,9 @@
 int main(){
     /* create the shared memory segment with a size of 4 bytes */
     key_t key = SHM_SHARED_KEY;
-    int shmid = shmget(key, sizeof(int), IPC_CREAT | IPC_EXCL | 0660);
-                                                            /* rw-rw---- */
-    if(shmid==-1) {perror("shmget() failed"); return EXIT_FAILURE;}
+    int shmid = shmget(key, sizeof(int), IPC_CREAT | /* IPC_EXCL | */ 0660);
+                                                                    /* rw-rw---- */
+    if (shmid==-1) {perror("shmget() failed"); return EXIT_FAILURE;}
 
     printf("shmget() returned %d\n", shmid);
 
@@ -44,22 +44,24 @@ int main(){
 
 
     /* attach to the shared memory segment */
-    int * x = shmat(shmid, NULL, 0);
-    if(x==(void*)-1) {perror("shmat() failed"); return EXIT_FAILURE;}
+    int* x = shmat( shmid, NULL, 0 );
+    if (x==(void *)-1) {perror("shmat() failed"); return EXIT_FAILURE;}
 
 
     /* create a child process --- child process inherits
     *  the pointer to the shared memory segment
     */
     pid_t p = fork();
-    if(p==-1) {perror("fork() failed"); return EXIT_FAILURE;}
+    if (p==-1) {perror("fork() failed"); return EXIT_FAILURE;}
 
-    if(p==0){
+    if (p==0){
+        printf("CHILD: shared memory is at %p\n", x);
         printf("CHILD: writing my pid %d to shared memory...\n", getpid());
         *x = getpid();
     }
 
-    if(p>0){
+    if (p>0){
+        printf("PARENT: shared memory is at %p\n", x);
 #if 0
         /* this is the only synchronization mechanism that's
         *  in this code --- synchronizes write and read on
@@ -73,45 +75,19 @@ int main(){
 
     /* detach from the shared memory segment */
     int rc = shmdt(x);
-    if(rc==-1) {perror("shmdt() failed"); return EXIT_FAILURE;}
+    if (rc == -1) {perror( "shmdt() failed"); return EXIT_FAILURE;}
 
 #if 0
-    sleep( 15 );
+    sleep(15);
 #endif
 
 #if 0
-    if(p>0){
+    if (p>0){
         /* mark the shared memory segment for deletion... */
-        printf( "PARENT: removing shared memory segment...\n" );
-        if (shmctl( shmid, IPC_RMID, 0)==-1){
-            perror("shmctl() failed");
-            return EXIT_FAILURE;
-        }
+        printf("PARENT: removing shared memory segment...\n");
+        if (shmctl(shmid, IPC_RMID, 0)==-1) {perror( "shmctl() failed" ); return EXIT_FAILURE;}
     }
 #endif
 
     return EXIT_SUCCESS;
 }
-
-
-
-#if 0
-******** without the waitpid() call... ********
-goldsd3@linux-new:~/s25/csci4210$ ./a.out
-shmget() returned 98336
-PARENT: shared memory contains 0
-PARENT: removing shared memory segment...
-CHILD: writing my pid 218480 to shared memory...
-
-goldsd3@linux-new:~/s25/csci4210$ ./a.out
-shmget() returned 98337
-CHILD: writing my pid 218482 to shared memory...
-PARENT: shared memory contains 0
-PARENT: removing shared memory segment...
-
-goldsd3@linux-new:~/s25/csci4210$ ./a.out
-shmget() returned 98338
-CHILD: writing my pid 218484 to shared memory...
-PARENT: shared memory contains 218484
-PARENT: removing shared memory segment...
-#endif

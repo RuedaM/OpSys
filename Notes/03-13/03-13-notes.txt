@@ -1,0 +1,76 @@
+[03/13/2025]
+
+
+
+ <PARENT PROCESS>
++--------------------------------+
+|                                |
+|                                |
+|                                |
+|                                |
+|                                |
+|                                |
+|                                |
+|                                |
+|                                |
+|                                |
+|                                |
++--------------------------------+
+
+call fork()...
+
+ the process is organized into
+  distinct pages of memory...
+ <PARENT PROCESS>               fork()   <CHILD PROCESS>
++-----------------------------+        +--------------------------------+
+|HEAP|HEAP|HEAP|HEAP|HEAP|HEAP|        |                                |
+|    |    |    |    |    |    |        |                                |
+|-----------------------------|        |                                |
+|HEAP|HEAP|HEAP|HEAP|STCK|STCK|        |                                |
+|    |    |    |    |    |    |        |                                |
+|-----------------------------|        |   ------                       |
+|STCK|STCK|STCK|STCK|STCK|STCK|        |   |STCK|                       |
+|    |pid_t p  |    |    |    |        |   |pid_t p                     |
+|-----------------------------|        |   ------                       |
+|CODE|CODE|CODE|CODE|CODE|CODE|        |                                |
+|    |    |    |    |    |    |        |                                |
++-----------------------------+        +--------------------------------+
+
+POLICY: use copy-on-write (COW) meaning that when a write operation occurs,
+         that's when we copy the page of memory from parent to child...
+
+        the write operations include changing a variable value,
+         allocating dynamic memory, calling a function, etc.
+
+
+===========================================================================
+
+ Multi-threaded programming
+
+  ONE PROCESS ./a.out
+ +---------------------------------+
+ |            main()               |
+ |    stack:    |     heap:        |   ADVANTAGES:
+ |    alarm     |     XXXXX        |   ADVANTAGES:
+ |              |     XXXXX        |   -- faster runtime?
+ |              v                  |   -- parallel programming
+ |                                 |   -- less overall OS memory usage
+ |    create a few threads ...     |   -- larger/longer CPU bursts...?
+ |                                 |
+ | thread1   thread2    thread3    |   DISADVANTAGES:
+ |   |         |          |        |   -- increased need for synchronization
+ |   |        /           |        |   -- complexity
+ |   |       |             \       |   -- if one thread seg-faults,
+ |  /         \             \      |       then ALL threads are dead...
+ | |           |             |     |
+ | |           |              \    |
+ | v           v              |    |
+ |                            |    |
+ |                            v    |
+ |                                 |
+ | these threads might join() back |
+ |  in to the parent thread        |
+ |               |                 |
+ |               |                 |
+ |               v                 |
+ +---------------------------------+

@@ -1,2 +1,0 @@
-/* shm-shared.c */
-
