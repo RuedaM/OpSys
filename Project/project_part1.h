@@ -89,17 +89,17 @@ struct Process* gen_procs(char** IDs, int seed, int n, int n_cpu, float lambda, 
         for (int i=0 ; i<cpuBurstCount-1 ; i++){
             if(binding==0){ //CPU-bound
                 cpuBurstTime = ceil(next_exp(lambda, bound, "-", 0)*4);
-                ioBurstTime = next_exp(lambda, bound, "ceil", 0);
+                ioBurstTime = next_exp(lambda, bound, "ceil", 0)+1;
             }
             else if(binding==1){ //I/O-bound
-                cpuBurstTime = next_exp(lambda, bound, "ceil", 0);
+                cpuBurstTime = next_exp(lambda, bound, "ceil", 0)+1;
                 ioBurstTime = ceil(next_exp(lambda, bound, "-", 0)*8);
             }
             cpuBurstTimes[i] = cpuBurstTime; ioBurstTimes[i] = ioBurstTime;
         }
         // For the last CPU burst
-        if(binding==0) {cpuBurstTime = next_exp(lambda, bound, "ceil", 0)*4;}
-        else if(binding==1) {cpuBurstTime = next_exp(lambda, bound, "ceil", 0);}
+        if(binding==0) {cpuBurstTime = ceil(next_exp(lambda, bound, "-", 0)*4);}
+        else if(binding==1) {cpuBurstTime = next_exp(lambda, bound, "ceil", 0)+1;}
         cpuBurstTimes[cpuBurstCount-1] = cpuBurstTime;
 
 #if DEBUG_MODE

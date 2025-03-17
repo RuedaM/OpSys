@@ -6,7 +6,10 @@
  * gcc -Wall -Werror -Wextra -g -o project_part1.out -D DEBUG_MODE project_part1.c -lm
  * valgrind -s ./project_part1.out <ARGS HERE>
  * ARGS:
- * 3 1 32 0.001 1024 4 0.75 256
+ * 3  1  32  0.001 1024 4 0.75 256
+ * 8  6  768 0.001 1024 6 0.95 128
+ * 16 2  256 0.001 2048 4 0.45 32
+ * 20 16 128 0.01  4096 4 0.99 64
  */
 
 #include <stdio.h>
@@ -71,7 +74,8 @@ int main(int argc, char** argv){
     if(t_slice<=0) {fprintf(stderr, "ERROR: t_slice must be a positive integer\n"); return EXIT_FAILURE;}
 
     // Terminal Output
-    printf("<<< -- process set (n=%d) with %d CPU-bound process\n", n, n_cpu);
+    printf("<<< -- process set (n=%d) with %d CPU-bound process", n, n_cpu);
+    if (n_cpu>1) {printf("es\n");} else {printf("\n");}
     printf("<<< -- seed=%d; lambda=%f; bound=%d\n\n", seed, lambda, bound);
 #if DEBUG_MODE
     printf("\n");
@@ -94,88 +98,101 @@ for (int i=0 ; i<n ; i++) {printf("Process %s verified\n", allProcesses[i].ID);}
     for(int i=0 ; i<n ; i++){ //For every process...
         if (allProcesses[i].binding==0) {printf("CPU");}
         else {printf("I/O");}
-        printf("-bound process %s: arrival time %dms; %d CPU bursts:\n", allProcesses[i].ID, allProcesses[i].arrivalTime, allProcesses[i].cpuBurstCount);
+        printf("-bound process %s: arrival time %dms; %d CPU burst", allProcesses[i].ID, allProcesses[i].arrivalTime, allProcesses[i].cpuBurstCount);
+        if (allProcesses[i].cpuBurstCount>1) {printf("s:\n");} else {printf(":\n");}
         for(int j=0 ; j<allProcesses[i].cpuBurstCount-1 ; j++){printf("==> CPU burst %dms ==> I/O burst %dms\n", allProcesses[i].cpuBurstTimes[j], allProcesses[i].ioBurstTimes[j]);}
         printf("==> CPU burst %dms\n\n", allProcesses[i].cpuBurstTimes[allProcesses[i].cpuBurstCount-1]);
     }
     
 
-    // NOT TESTED. UNCOMMENT THIS SECTION AND THEN COMMENT THE OTHER SECTION TO TEST CODE
-    // // --------------------- Ivan's Attempt at Calculations ---------------------
-    // float cpuBoundAvgCPUBurstTime, ioBoundAvgCPUBurstTime, totalAvgCPUBurstTime, cpuBoundAvgIOBurstTime, ioBoundAvgIOBurstTime, totalAvgIOBurstTime;
-    // int numCPUBoundAvgCPUBursts, numCPUBoundAvgIOBursts, numIOBoundAvgCPUBursts, numIOBoundAvgIOBursts;
-    // for(int i=0 ; i<n ; i++){//For every process...
-    //     if (allProcesses[i].binding==0) { //Process is CPU-bound
-    //         for(int j=0 ; j<allProcesses[i].cpuBurstCount-1 ; j++){
-    //             cpuBoundAvgCPUBurstTime += allProcesses[i].cpuBurstTimes[j]; //Looking at CPU burst times
-    //             cpuBoundAvgIOBurstTime += allProcesses[i].ioBurstTimes[j]; // Looking at I/O burst times
-    //         }
-    //         cpuBoundAvgCPUBurstTime += allProcesses[i].cpuBurstTimes[allProcesses[i].cpuBurstCount-1]; //One more time for CPU burst time
-    //         numCPUBoundAvgCPUBursts += allProcesses[i].cpuBurstCount; //Add CPU burst count
-    //         numCPUBoundAvgIOBursts += allProcesses[i].cpuBurstCount-1; //Add I/O burst count
-    //     } else { //Process is I/O-bound
-    //         for(int j=0 ; j<allProcesses[i].cpuBurstCount-1 ; j++){
-    //             ioBoundAvgCPUBurstTime += allProcesses[i].cpuBurstTimes[j]; //Looking at CPU burst times
-    //             ioBoundAvgIOBurstTime += allProcesses[i].ioBurstTimes[j]; //Looking at I/O burst times
-    //         }
-    //         ioBoundAvgCPUBurstTime += allProcesses[i].cpuBurstTimes[allProcesses[i].cpuBurstCount-1]; //One more time for CPU burst time
-    //         numIOBoundAvgCPUBursts += allProcesses[i].cpuBurstCount; //Add CPU burst count
-    //         numIOBoundAvgIOBursts += allProcesses[i].cpuBurstCount-1; //Add I/O burst count
-    //     }
-    // }
-    // totalAvgCPUBurstTime = cpuBoundAvgCPUBurstTime + ioBoundAvgCPUBurstTime; //Sum all CPU burst times
-    // totalAvgIOBurstTime = cpuBoundAvgIOBurstTime + ioBoundAvgIOBurstTime; //Sum all I/O burst times
-    // // Finding Averages
-    // // Convert milliseconds to microseconds to correctly round using ceil function. Then convert microseconds back to milliseconds
-    // totalAvgCPUBurstTime = cail((totalAvgCPUBurstTime/(numCPUBoundAvgCPUBursts+numIOBoundAvgCPUBursts))*1000)/1000;
-    // totalAvgIOBurstTime = ceil((totalAvgIOBurstTime/(numCPUBoundAvgIOBursts+numIOBoundAvgIOBursts))*1000)/1000;
-    // cpuBoundAvgCPUBurstTime = cail((cpuBoundAvgCPUBurstTime/numCPUBoundAvgCPUBursts)*1000)/1000;
-    // cpuBoundAvgIOBurstTime = cail((cpuBoundAvgIOBurstTime/numCPUBoundAvgIOBursts)*1000)/1000;
-    // ioBoundAvgCPUBurstTime = cail((ioBoundAvgCPUBurstTime/numIOBoundAvgCPUBursts)*1000)/1000;
-    // ioBoundAvgIOBurstTime = cail((ioBoundAvgIOBurstTime/numIOBoundAvgIOBursts)*1000)/1000;
-    // // --------------------------------------------------------------------------
-
-
-
-
-
     // Calculations for simout.txt
     float cpuBoundAvgCPUBurstTime, ioBoundAvgCPUBurstTime, totalAvgCPUBurstTime, cpuBoundAvgIOBurstTime, ioBoundAvgIOBurstTime, totalAvgIOBurstTime;
-    for(int i=0 ; i<n ; i++){ //For every process...
-        
-        int cpuBoundAvgCPUBurstTime_1Proc = 0, ioBoundAvgCPUBurstTime_1Proc = 0, totalAvgCPUBurstTime_1Proc = 0;
-        for(int j=0 ; j<allProcesses[i].cpuBurstCount ; j++){ //Looking at CPU burst times
-            if (allProcesses[i].binding==0) {cpuBoundAvgCPUBurstTime_1Proc += allProcesses[i].cpuBurstTimes[j];} //CPU-bound
-            if (allProcesses[i].binding==1) {ioBoundAvgCPUBurstTime_1Proc += allProcesses[i].cpuBurstTimes[j];} //I/O-Bound
-            totalAvgCPUBurstTime_1Proc += allProcesses[i].cpuBurstTimes[j];
+    int numCPUBoundAvgCPUBursts, numCPUBoundAvgIOBursts, numIOBoundAvgCPUBursts, numIOBoundAvgIOBursts;
+    for(int i=0 ; i<n ; i++){//For every process...
+        if (allProcesses[i].binding==0) { //Process is CPU-bound
+            for(int j=0 ; j<allProcesses[i].cpuBurstCount-1 ; j++){
+                cpuBoundAvgCPUBurstTime += allProcesses[i].cpuBurstTimes[j]; //Looking at CPU burst times
+                cpuBoundAvgIOBurstTime += allProcesses[i].ioBurstTimes[j]; // Looking at I/O burst times
+            }
+            cpuBoundAvgCPUBurstTime += allProcesses[i].cpuBurstTimes[allProcesses[i].cpuBurstCount-1]; //One more time for CPU burst time
+            numCPUBoundAvgCPUBursts += allProcesses[i].cpuBurstCount; //Add CPU burst count
+            numCPUBoundAvgIOBursts += allProcesses[i].cpuBurstCount-1; //Add I/O burst count
+        } else { //Process is I/O-bound
+            for(int j=0 ; j<allProcesses[i].cpuBurstCount-1 ; j++){
+                ioBoundAvgCPUBurstTime += allProcesses[i].cpuBurstTimes[j]; //Looking at CPU burst times
+                ioBoundAvgIOBurstTime += allProcesses[i].ioBurstTimes[j]; //Looking at I/O burst times
+            }
+            ioBoundAvgCPUBurstTime += allProcesses[i].cpuBurstTimes[allProcesses[i].cpuBurstCount-1]; //One more time for CPU burst time
+            numIOBoundAvgCPUBursts += allProcesses[i].cpuBurstCount; //Add CPU burst count
+            numIOBoundAvgIOBursts += allProcesses[i].cpuBurstCount-1; //Add I/O burst count
         }
-        cpuBoundAvgCPUBurstTime_1Proc /= allProcesses[i].cpuBurstCount;
-        ioBoundAvgCPUBurstTime_1Proc /= allProcesses[i].cpuBurstCount;
-        totalAvgCPUBurstTime_1Proc /= allProcesses[i].cpuBurstCount;
-
-        int cpuBoundAvgIOBurstTime_1Proc = 0, ioBoundAvgIOBurstTime_1Proc = 0, totalAvgIOBurstTime_1Proc = 0;
-        for(int j=0 ; j<allProcesses[i].cpuBurstCount-1 ; j++){ //Looking at I/O burst times
-            if (allProcesses[i].binding==0) {cpuBoundAvgIOBurstTime_1Proc += allProcesses[i].ioBurstTimes[j];} //CPU-Bound
-            if (allProcesses[i].binding==1) {ioBoundAvgIOBurstTime_1Proc += allProcesses[i].ioBurstTimes[j];} //I/O-Bound
-            totalAvgIOBurstTime_1Proc += allProcesses[i].ioBurstTimes[j];
-        }
-        cpuBoundAvgIOBurstTime_1Proc /= (allProcesses[i].cpuBurstCount-1);
-        ioBoundAvgIOBurstTime_1Proc /= (allProcesses[i].cpuBurstCount-1);
-        totalAvgIOBurstTime_1Proc /= (allProcesses[i].cpuBurstCount-1);
-
-        cpuBoundAvgCPUBurstTime += cpuBoundAvgCPUBurstTime_1Proc;
-        ioBoundAvgCPUBurstTime += ioBoundAvgCPUBurstTime_1Proc;
-        totalAvgCPUBurstTime += totalAvgCPUBurstTime_1Proc;
-        cpuBoundAvgIOBurstTime += cpuBoundAvgIOBurstTime_1Proc;
-        ioBoundAvgIOBurstTime += ioBoundAvgIOBurstTime_1Proc;
-        totalAvgIOBurstTime += totalAvgIOBurstTime_1Proc;
     }
-    cpuBoundAvgCPUBurstTime /= n_cpu;
-    ioBoundAvgCPUBurstTime /= (n-n_cpu);
-    totalAvgCPUBurstTime /= n;
-    cpuBoundAvgIOBurstTime /= n_cpu;
-    ioBoundAvgIOBurstTime /= (n-n_cpu);
-    totalAvgIOBurstTime /= n;
+    totalAvgCPUBurstTime = cpuBoundAvgCPUBurstTime + ioBoundAvgCPUBurstTime; //Sum all CPU burst times
+    totalAvgIOBurstTime = cpuBoundAvgIOBurstTime + ioBoundAvgIOBurstTime; //Sum all I/O burst times
+    // Finding Averages
+    // Convert milliseconds to microseconds to correctly round using ceil function. Then convert microseconds back to milliseconds
+    totalAvgCPUBurstTime = ceil((totalAvgCPUBurstTime/(numCPUBoundAvgCPUBursts+numIOBoundAvgCPUBursts))*1000)/1000;
+    totalAvgIOBurstTime = ceil((totalAvgIOBurstTime/(numCPUBoundAvgIOBursts+numIOBoundAvgIOBursts))*1000)/1000;
+    cpuBoundAvgCPUBurstTime = ceil((cpuBoundAvgCPUBurstTime/numCPUBoundAvgCPUBursts)*1000)/1000;
+    cpuBoundAvgIOBurstTime = ceil((cpuBoundAvgIOBurstTime/numCPUBoundAvgIOBursts)*1000)/1000;
+    ioBoundAvgCPUBurstTime = ceil((ioBoundAvgCPUBurstTime/numIOBoundAvgCPUBursts)*1000)/1000;
+    ioBoundAvgIOBurstTime = ceil((ioBoundAvgIOBurstTime/numIOBoundAvgIOBursts)*1000)/1000;
+    // --------------------------------------------------------------------------
+
+
+
+
+
+
+    // float cpuBoundAvgCPUBurstTime, ioBoundAvgCPUBurstTime, totalAvgCPUBurstTime, cpuBoundAvgIOBurstTime, ioBoundAvgIOBurstTime, totalAvgIOBurstTime;
+    // for(int i=0 ; i<n ; i++){ //For every process...
+        
+    //     int cpuBoundAvgCPUBurstTime_1Proc = 0, ioBoundAvgCPUBurstTime_1Proc = 0, totalAvgCPUBurstTime_1Proc = 0;
+    //     for(int j=0 ; j<allProcesses[i].cpuBurstCount ; j++){ //Looking at CPU burst times
+    //         if (allProcesses[i].binding==0) {cpuBoundAvgCPUBurstTime_1Proc += allProcesses[i].cpuBurstTimes[j];} //CPU-bound
+    //         if (allProcesses[i].binding==1) {ioBoundAvgCPUBurstTime_1Proc += allProcesses[i].cpuBurstTimes[j];} //I/O-Bound
+    //         totalAvgCPUBurstTime_1Proc += allProcesses[i].cpuBurstTimes[j];
+    //     }
+    //     if (allProcesses[i].cpuBurstCount==0){
+    //         cpuBoundAvgCPUBurstTime_1Proc = 0;
+    //         ioBoundAvgCPUBurstTime_1Proc = 0;
+    //         totalAvgCPUBurstTime_1Proc = 0;
+    //     }else{
+    //         cpuBoundAvgCPUBurstTime_1Proc /= allProcesses[i].cpuBurstCount;
+    //         ioBoundAvgCPUBurstTime_1Proc /= allProcesses[i].cpuBurstCount;
+    //         totalAvgCPUBurstTime_1Proc /= allProcesses[i].cpuBurstCount;
+    //     }
+
+    //     int cpuBoundAvgIOBurstTime_1Proc = 0, ioBoundAvgIOBurstTime_1Proc = 0, totalAvgIOBurstTime_1Proc = 0;
+    //     for(int j=0 ; j<allProcesses[i].cpuBurstCount-1 ; j++){ //Looking at I/O burst times
+    //         if (allProcesses[i].binding==0) {cpuBoundAvgIOBurstTime_1Proc += allProcesses[i].ioBurstTimes[j];} //CPU-Bound
+    //         if (allProcesses[i].binding==1) {ioBoundAvgIOBurstTime_1Proc += allProcesses[i].ioBurstTimes[j];} //I/O-Bound
+    //         totalAvgIOBurstTime_1Proc += allProcesses[i].ioBurstTimes[j];
+    //     }
+    //     if (allProcesses[i].cpuBurstCount-1==0){
+    //         cpuBoundAvgIOBurstTime_1Proc = 0;
+    //         ioBoundAvgIOBurstTime_1Proc = 0;
+    //         totalAvgIOBurstTime_1Proc = 0;
+    //     }
+    //     else{
+    //         cpuBoundAvgIOBurstTime_1Proc /= (allProcesses[i].cpuBurstCount-1);
+    //         ioBoundAvgIOBurstTime_1Proc /= (allProcesses[i].cpuBurstCount-1);
+    //         totalAvgIOBurstTime_1Proc /= (allProcesses[i].cpuBurstCount-1);
+    //     }
+
+    //     cpuBoundAvgCPUBurstTime += cpuBoundAvgCPUBurstTime_1Proc;
+    //     ioBoundAvgCPUBurstTime += ioBoundAvgCPUBurstTime_1Proc;
+    //     totalAvgCPUBurstTime += totalAvgCPUBurstTime_1Proc;
+    //     cpuBoundAvgIOBurstTime += cpuBoundAvgIOBurstTime_1Proc;
+    //     ioBoundAvgIOBurstTime += ioBoundAvgIOBurstTime_1Proc;
+    //     totalAvgIOBurstTime += totalAvgIOBurstTime_1Proc;
+    // }
+    // cpuBoundAvgCPUBurstTime /= n_cpu;
+    // ioBoundAvgCPUBurstTime /= (n-n_cpu);
+    // totalAvgCPUBurstTime /= n;
+    // cpuBoundAvgIOBurstTime /= n_cpu;
+    // ioBoundAvgIOBurstTime /= (n-n_cpu);
+    // totalAvgIOBurstTime /= n;
 
     // simout.txt Initialization
     int fd = open("simout.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
