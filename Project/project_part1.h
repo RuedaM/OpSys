@@ -167,29 +167,6 @@ printf("\n");
     return allProcesses;
 }
 
-// Function for getting and removing the first process in queue. Takes in the queue array and size of the queue array
-struct Process pop(struct Process* procQ, int numProc){
-    struct Process ret = procQ[0]; // Get the first process which will be returned later
-
-    for (int i=0 ; i<numProc-1; i++) {procQ[i] = procQ[i+1];} // Move all processes to the left by 1
-    
-    struct Process* buffer = calloc(numProc, sizeof(struct Process));
-    memcpy(buffer, procQ, sizeof(struct Process)*(numProc-1)); // Copy all processes but the last one to a buffer
-    memcpy(procQ, buffer, sizeof(struct Process)*(numProc)); // Copy buffer back to original queue
-    for(int i=0 ; i<numProc ; i++){free(procQ[i].cpuBurstTimes);free(procQ[i].ioBurstTimes);} // Free arrays in each struct in buffer
-    free(buffer);
-    
-    return ret;
-}
-
-// Function for pushing a process into queue. Takes in the queue array, process to be added, and size of the queue array
-void push_back(struct Process* procQ, struct Process proc, int numProc){
-    for (int i=0 ; i<numProc; i++){    // Check if the process is in the incorrect state (RUNNING - 0)
-        if (procQ[i].state==0) {procQ[i] = proc; break;}   // Add process to queue and terminate rest of for loop
-        else {continue;}
-    }
-}
-
 // Function for adding process to queue, sorted by shortest current I/O burst
 void queue_push(struct Queue* q, struct Process p_in){
     struct ProcessPlus p2 = {NULL, NULL, p_in};
