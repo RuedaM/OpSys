@@ -27,7 +27,10 @@
 #include <math.h>
 
 #include "project_part1.h"
-
+#include "FCFS.c"
+#include "SJF.c"
+#include "SRT.c"
+#include "RR.c"
 
 
 int main(int argc, char** argv){
