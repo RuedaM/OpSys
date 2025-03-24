@@ -1,3 +1,6 @@
+#ifndef PROJECT_PART1_H
+#define PROJECT_PART1_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -11,12 +14,13 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <math.h>
-#include <time.h>
 
 #define SLEEP_TIME 1
 
 
-
+// =========================================================================================
+// ======================================== STRUCTS ========================================
+// =========================================================================================
 // Struct for holding info for a single process
 struct Process{
     char* ID; // Process ID (A0 - Z9)
@@ -50,23 +54,9 @@ struct Queue{
 
 
 
-// Print relevant process statistics - mostly for debugging
-void print_proc(struct Process p){
-    printf("  Process %s is ", p.ID);
-    if (p.state==0) {printf("IN-CPU");}
-    if (p.state==1) {printf("IN-QUEUE");}
-    if (p.state==2) {printf("IN-MEMORY");}
-    if (p.state==3) {printf("IN-I/O");}
-    printf(" bound by ");
-    if (p.binding==0) {printf("CPU\n");}
-    if (p.binding==1) {printf("I/O\n");}
-    printf("  Total CPU Bursts: %d  //", p.cpuBurstCount);
-    printf("  Total I/O Bursts: %d\n", p.cpuBurstCount-1);
-    printf("  Index: %d\n", p.idx);
-    printf("  Current CPU Burst: %d  //", p.cpuBurstCurr);
-    printf("  Current I/O Burst: %d\n", p.ioBurstCurr);
-}
-
+// =========================================================================================
+// ================================ .C FILE HELPER FUNCTIONS ===============================
+// =========================================================================================
 // Function for generating next pseudo-random number - can return either drand48() directly or an ouput of a function of lambda
 float next_exp(float lambda, int bound, char* rounding, int only_drand){
     double r, x;
@@ -166,6 +156,11 @@ printf("\n");
     return allProcesses;
 }
 
+
+
+// =========================================================================================
+// ============================== I/O "QUEUE" HELPER FUNCTIONS =============================
+// =========================================================================================
 // Function for adding process to queue, sorted by shortest current I/O burst
 void queue_push(struct Queue* q, struct Process p_in){
     struct ProcessPlus p2 = {NULL, NULL, p_in};
@@ -210,6 +205,55 @@ struct Process queue_pop(struct Queue* q){
 }
 
 
+
+// =========================================================================================
+// ================================= FCFS HELPER FUNCTIONS =================================
+// =========================================================================================
+// Function for getting+removing 1st process in queue. Takes in queue array + its size
+struct Process pop(struct Process* procQ, int numProc){
+    struct Process ret = procQ[0]; // Get the first process which will be returned later
+
+    for (int i=0 ; i<numProc-1; i++) {procQ[i] = procQ[i+1];} // Move all processes to the left by 1
+    
+    struct Process* buffer = calloc(numProc, sizeof(struct Process));
+    memcpy(buffer, procQ, sizeof(struct Process)*(numProc-1)); // Copy all processes but the last one to a buffer
+    memcpy(procQ, buffer, sizeof(struct Process)*(numProc)); // Copy buffer back to original queue
+    for(int i=0 ; i<numProc ; i++){free(procQ[i].cpuBurstTimes);free(procQ[i].ioBurstTimes);} // Free arrays in each struct in buffer
+    free(buffer);
+    
+    return ret;
+}
+
+// Function for adding process queue. Takes in queue array, process to be added, and size of queue
+void push_back(struct Process* procQ, struct Process proc, int numProc){
+    for (int i=0 ; i<numProc; i++){    // Check if the process is in the incorrect state (RUNNING - 0)
+        if (procQ[i].state==0) {procQ[i] = proc; break;}   // Add process to queue and terminate rest of for loop
+        else {continue;}
+    }
+}
+
+
+
+// =========================================================================================
+// ============================= PRINTING + DEBUGGING FUNCTIONS ============================
+// =========================================================================================
+// Print relevant process statistics - mostly for debugging
+void print_proc(struct Process p){
+    printf("  Process %s is ", p.ID);
+    if (p.state==0) {printf("IN-CPU");}
+    if (p.state==1) {printf("IN-QUEUE");}
+    if (p.state==2) {printf("IN-MEMORY");}
+    if (p.state==3) {printf("IN-I/O");}
+    printf(" bound by ");
+    if (p.binding==0) {printf("CPU\n");}
+    if (p.binding==1) {printf("I/O\n");}
+    printf("  Total CPU Bursts: %d  //", p.cpuBurstCount);
+    printf("  Total I/O Bursts: %d\n", p.cpuBurstCount-1);
+    printf("  Index: %d\n", p.idx);
+    printf("  Current CPU Burst: %d  //", p.cpuBurstCurr);
+    printf("  Current I/O Burst: %d\n", p.ioBurstCurr);
+}
+
 void queue_status(struct Process* queue, int queueLen){
 // #if DEBUG_MODE
 // printf("\n...checking queue...\n");
@@ -220,3 +264,6 @@ void queue_status(struct Process* queue, int queueLen){
         for(int i=0 ; i<queueLen ; i++) {printf(" %s", queue[i].ID);}}
     printf("]\n");
 }
+
+
+#endif  // PROJECT_PART1_H

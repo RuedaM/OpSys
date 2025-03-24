@@ -30,7 +30,7 @@
 #include "FCFS.h"
 #include "SJF.h"
 #include "SRT.h"
-#include "RR.h
+#include "RR.h"
 
 
 int main(int argc, char** argv){

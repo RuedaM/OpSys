@@ -17,7 +17,9 @@
 
 #define SLEEP_TIME 1
 
-// =====First Come First Serve (FCFS)=====
+
+
+// ====================First Come First Serve (FCFS)====================
 int FCFS(struct Process* allProcesses, int n, int t_cs){
     int time = 0;
     int FCFSFlag = 1;
