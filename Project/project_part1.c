@@ -78,7 +78,7 @@ int main(int argc, char** argv){
     if (n_cpu>1) {printf("es\n");} else {printf("\n");}
     printf("<<< -- seed=%d; lambda=%f; bound=%d\n\n", seed, lambda, bound);
 #if DEBUG_MODE
-    printf("\n");
+printf("\n");
 #endif
 
     // Process ID Generation
@@ -86,7 +86,7 @@ int main(int argc, char** argv){
     // Remember to free in some way: free(IDs)
     // (Maybe loop through all processes and free each ID)
 #if DEBUG_MODE
-    printf("Generated IDs: // "); for (int i=0 ; i<n ; i++) {printf("%s // ", IDs[i]);} printf("\n\n");
+printf("Generated IDs: // "); for (int i=0 ; i<n ; i++) {printf("%s // ", IDs[i]);} printf("\n\n");
 #endif
 
     // Process Generation
@@ -95,7 +95,7 @@ int main(int argc, char** argv){
 for (int i=0 ; i<n ; i++) {printf("Process %s verified\n", allProcesses[i].ID);}
 #endif
     // Process Generation Terminal Output
-    for(int i=0 ; i<n ; i++){ //For every process...
+    for(int i=0 ; i<n ; i++){ //for every process...
         if (allProcesses[i].binding==0) {printf("CPU");}
         else {printf("I/O");}
         printf("-bound process %s: arrival time %dms; %d CPU burst", allProcesses[i].ID, allProcesses[i].arrivalTime, allProcesses[i].cpuBurstCount);
@@ -108,8 +108,8 @@ for (int i=0 ; i<n ; i++) {printf("Process %s verified\n", allProcesses[i].ID);}
     // Calculations for simout.txt
     float cpuBoundAvgCPUBurstTime, ioBoundAvgCPUBurstTime, totalAvgCPUBurstTime, cpuBoundAvgIOBurstTime, ioBoundAvgIOBurstTime, totalAvgIOBurstTime;
     int numCPUBoundAvgCPUBursts, numCPUBoundAvgIOBursts, numIOBoundAvgCPUBursts, numIOBoundAvgIOBursts;
-    for(int i=0 ; i<n ; i++){//For every process...
-        if (allProcesses[i].binding==0) { //Process is CPU-bound
+    for(int i=0 ; i<n ; i++){//for every process...
+        if (allProcesses[i].binding==0) { //CPU-bound process
             for(int j=0 ; j<allProcesses[i].cpuBurstCount-1 ; j++){
                 cpuBoundAvgCPUBurstTime += allProcesses[i].cpuBurstTimes[j]; //Looking at CPU burst times
                 cpuBoundAvgIOBurstTime += allProcesses[i].ioBurstTimes[j]; // Looking at I/O burst times
@@ -117,7 +117,7 @@ for (int i=0 ; i<n ; i++) {printf("Process %s verified\n", allProcesses[i].ID);}
             cpuBoundAvgCPUBurstTime += allProcesses[i].cpuBurstTimes[allProcesses[i].cpuBurstCount-1]; //One more time for CPU burst time
             numCPUBoundAvgCPUBursts += allProcesses[i].cpuBurstCount; //Add CPU burst count
             numCPUBoundAvgIOBursts += allProcesses[i].cpuBurstCount-1; //Add I/O burst count
-        } else { //Process is I/O-bound
+        } else { //I/O-bound process
             for(int j=0 ; j<allProcesses[i].cpuBurstCount-1 ; j++){
                 ioBoundAvgCPUBurstTime += allProcesses[i].cpuBurstTimes[j]; //Looking at CPU burst times
                 ioBoundAvgIOBurstTime += allProcesses[i].ioBurstTimes[j]; //Looking at I/O burst times
@@ -129,70 +129,15 @@ for (int i=0 ; i<n ; i++) {printf("Process %s verified\n", allProcesses[i].ID);}
     }
     totalAvgCPUBurstTime = cpuBoundAvgCPUBurstTime + ioBoundAvgCPUBurstTime; //Sum all CPU burst times
     totalAvgIOBurstTime = cpuBoundAvgIOBurstTime + ioBoundAvgIOBurstTime; //Sum all I/O burst times
-    // Finding Averages
-    // Convert milliseconds to microseconds to correctly round using ceil function. Then convert microseconds back to milliseconds
+    
+    // Finding Averages -- convert milliseconds to microseconds to correctly round using ceil function. Then convert microseconds back to milliseconds
     totalAvgCPUBurstTime = ceil((totalAvgCPUBurstTime/(numCPUBoundAvgCPUBursts+numIOBoundAvgCPUBursts))*1000)/1000;
     totalAvgIOBurstTime = ceil((totalAvgIOBurstTime/(numCPUBoundAvgIOBursts+numIOBoundAvgIOBursts))*1000)/1000;
     cpuBoundAvgCPUBurstTime = ceil((cpuBoundAvgCPUBurstTime/numCPUBoundAvgCPUBursts)*1000)/1000;
     cpuBoundAvgIOBurstTime = ceil((cpuBoundAvgIOBurstTime/numCPUBoundAvgIOBursts)*1000)/1000;
     ioBoundAvgCPUBurstTime = ceil((ioBoundAvgCPUBurstTime/numIOBoundAvgCPUBursts)*1000)/1000;
     ioBoundAvgIOBurstTime = ceil((ioBoundAvgIOBurstTime/numIOBoundAvgIOBursts)*1000)/1000;
-    // --------------------------------------------------------------------------
 
-
-
-
-
-
-    // float cpuBoundAvgCPUBurstTime, ioBoundAvgCPUBurstTime, totalAvgCPUBurstTime, cpuBoundAvgIOBurstTime, ioBoundAvgIOBurstTime, totalAvgIOBurstTime;
-    // for(int i=0 ; i<n ; i++){ //For every process...
-        
-    //     int cpuBoundAvgCPUBurstTime_1Proc = 0, ioBoundAvgCPUBurstTime_1Proc = 0, totalAvgCPUBurstTime_1Proc = 0;
-    //     for(int j=0 ; j<allProcesses[i].cpuBurstCount ; j++){ //Looking at CPU burst times
-    //         if (allProcesses[i].binding==0) {cpuBoundAvgCPUBurstTime_1Proc += allProcesses[i].cpuBurstTimes[j];} //CPU-bound
-    //         if (allProcesses[i].binding==1) {ioBoundAvgCPUBurstTime_1Proc += allProcesses[i].cpuBurstTimes[j];} //I/O-Bound
-    //         totalAvgCPUBurstTime_1Proc += allProcesses[i].cpuBurstTimes[j];
-    //     }
-    //     if (allProcesses[i].cpuBurstCount==0){
-    //         cpuBoundAvgCPUBurstTime_1Proc = 0;
-    //         ioBoundAvgCPUBurstTime_1Proc = 0;
-    //         totalAvgCPUBurstTime_1Proc = 0;
-    //     }else{
-    //         cpuBoundAvgCPUBurstTime_1Proc /= allProcesses[i].cpuBurstCount;
-    //         ioBoundAvgCPUBurstTime_1Proc /= allProcesses[i].cpuBurstCount;
-    //         totalAvgCPUBurstTime_1Proc /= allProcesses[i].cpuBurstCount;
-    //     }
-
-    //     int cpuBoundAvgIOBurstTime_1Proc = 0, ioBoundAvgIOBurstTime_1Proc = 0, totalAvgIOBurstTime_1Proc = 0;
-    //     for(int j=0 ; j<allProcesses[i].cpuBurstCount-1 ; j++){ //Looking at I/O burst times
-    //         if (allProcesses[i].binding==0) {cpuBoundAvgIOBurstTime_1Proc += allProcesses[i].ioBurstTimes[j];} //CPU-Bound
-    //         if (allProcesses[i].binding==1) {ioBoundAvgIOBurstTime_1Proc += allProcesses[i].ioBurstTimes[j];} //I/O-Bound
-    //         totalAvgIOBurstTime_1Proc += allProcesses[i].ioBurstTimes[j];
-    //     }
-    //     if (allProcesses[i].cpuBurstCount-1==0){
-    //         cpuBoundAvgIOBurstTime_1Proc = 0;
-    //         ioBoundAvgIOBurstTime_1Proc = 0;
-    //         totalAvgIOBurstTime_1Proc = 0;
-    //     }
-    //     else{
-    //         cpuBoundAvgIOBurstTime_1Proc /= (allProcesses[i].cpuBurstCount-1);
-    //         ioBoundAvgIOBurstTime_1Proc /= (allProcesses[i].cpuBurstCount-1);
-    //         totalAvgIOBurstTime_1Proc /= (allProcesses[i].cpuBurstCount-1);
-    //     }
-
-    //     cpuBoundAvgCPUBurstTime += cpuBoundAvgCPUBurstTime_1Proc;
-    //     ioBoundAvgCPUBurstTime += ioBoundAvgCPUBurstTime_1Proc;
-    //     totalAvgCPUBurstTime += totalAvgCPUBurstTime_1Proc;
-    //     cpuBoundAvgIOBurstTime += cpuBoundAvgIOBurstTime_1Proc;
-    //     ioBoundAvgIOBurstTime += ioBoundAvgIOBurstTime_1Proc;
-    //     totalAvgIOBurstTime += totalAvgIOBurstTime_1Proc;
-    // }
-    // cpuBoundAvgCPUBurstTime /= n_cpu;
-    // ioBoundAvgCPUBurstTime /= (n-n_cpu);
-    // totalAvgCPUBurstTime /= n;
-    // cpuBoundAvgIOBurstTime /= n_cpu;
-    // ioBoundAvgIOBurstTime /= (n-n_cpu);
-    // totalAvgIOBurstTime /= n;
 
     // simout.txt Initialization
     int fd = open("simout.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
@@ -212,28 +157,32 @@ for (int i=0 ; i<n ; i++) {printf("Process %s verified\n", allProcesses[i].ID);}
     if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
 
     // simout.txt Output
-    sprintf(toWrite, "-- CPU-bound average CPU burst time: %.3f ms\n", cpuBoundAvgCPUBurstTime);
-    bytesWritten = write(fd, toWrite, strlen(toWrite));
-    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    sprintf(toWrite, "-- I/O-bound average CPU burst time: %.3f ms\n", ioBoundAvgCPUBurstTime);
-    bytesWritten = write(fd, toWrite, strlen(toWrite));
-    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    sprintf(toWrite, "-- overall average CPU burst time: %.3f ms\n", totalAvgCPUBurstTime);
-    bytesWritten = write(fd, toWrite, strlen(toWrite));
-    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    sprintf(toWrite, "-- CPU-bound average I/O burst time: %.3f ms\n", cpuBoundAvgIOBurstTime);
-    bytesWritten = write(fd, toWrite, strlen(toWrite));
-    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    sprintf(toWrite, "-- I/O-bound average I/O burst time: %.3f ms\n", ioBoundAvgIOBurstTime);
-    bytesWritten = write(fd, toWrite, strlen(toWrite));
-    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    sprintf(toWrite, "-- overall average I/O burst time: %.3f ms\n\n", totalAvgIOBurstTime);
-    bytesWritten = write(fd, toWrite, strlen(toWrite));
-    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    // sprintf(toWrite, "-- CPU-bound average CPU burst time: %.3f ms\n", cpuBoundAvgCPUBurstTime);
+    // bytesWritten = write(fd, toWrite, strlen(toWrite));
+    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    // sprintf(toWrite, "-- I/O-bound average CPU burst time: %.3f ms\n", ioBoundAvgCPUBurstTime);
+    // bytesWritten = write(fd, toWrite, strlen(toWrite));
+    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    // sprintf(toWrite, "-- overall average CPU burst time: %.3f ms\n", totalAvgCPUBurstTime);
+    // bytesWritten = write(fd, toWrite, strlen(toWrite));
+    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    // sprintf(toWrite, "-- CPU-bound average I/O burst time: %.3f ms\n", cpuBoundAvgIOBurstTime);
+    // bytesWritten = write(fd, toWrite, strlen(toWrite));
+    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    // sprintf(toWrite, "-- I/O-bound average I/O burst time: %.3f ms\n", ioBoundAvgIOBurstTime);
+    // bytesWritten = write(fd, toWrite, strlen(toWrite));
+    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    // sprintf(toWrite, "-- overall average I/O burst time: %.3f ms\n\n", totalAvgIOBurstTime);
+    // bytesWritten = write(fd, toWrite, strlen(toWrite));
+    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
 
 
 
+    // Project Simulations
+    printf("<<< PROJECT SIMULATIONS\n<<< -- t_cs=%dms; alpha=%f; t_slice=%dms\n", t_cs, alpha, t_slice);
 
+    int ret = FCFS(allProcesses, n, t_cs);
+    if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
 
 
 

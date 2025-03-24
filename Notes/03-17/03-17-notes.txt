@@ -1,0 +1,66 @@
+[03/17/2025]
+
+IPC
+
+ <process>                      <process>
++---------+                    +---------+
+|         |                    |         |    slow
+|         |<==RW==>file<==RW==>|         |    requires synchronization
+|         |                    |         |    is this really IPC...?
++---------+                    +---------+
+
+ <process>                      <process>
++---------+                    +---------+
+|         |                    |         |    interrupts running process
+|         |--------signal----->|         |    messy
+|         |                    |         |    is this really IPC...?
++---------+                    +---------+
+
+
+fork() -- no process memory is shared after fork() returns
+
+ <parent>                       <child>
++---------+                    +---------+
+|         |<=R=====pipe<====W==|         |    efficient (memory)
+|         |                    |         |    unidirectional
+|         |==W=====pipe=====R=>|         |     (so may need 2 pipes)
+|         |                    |         |    requires a protocol
++---------+                    +---------+
+
+
+ <process>                      <process>
++---------+                    +---------+
+|         |                    |         |    efficient (memory)
+|         |<==RW==>shm<==RW===>|         |    persistent
+|         |                    |         |    requires synchronization
++---------+                    +---------+
+
+
+
+pthread_create() -- arguments, global variables, runtime heap are shared
+
+ <process>
++---------------------------------------+
+|                                       |
+| globals         main()         heap   |
+|                   |       XXXX YYYY   |
+|                   |        ZZZZ       |
+|                   v                   |
+|           pthread_create()            |
+|            /    main()                |
+|           /       |                   |
+|     thread1     pthread_create()      |
+|        |          |        \          |
+|        |          |         \         |
+|        |          |      thread2      |
+|        v          |      pthread_detach()
+|       end         |              |    |
+|         \         |              |    |
+|          \        |              v    |
+|           pthread_join()        end   |
+|                 main()                |
+|                   |                   |
+|                   |                   |
+|                   |                   |
+|                   v                   |
++---------------------------------------+
