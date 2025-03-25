@@ -182,10 +182,18 @@ for (int i=0 ; i<n ; i++) {printf("Process %s verified\n", allProcesses[i].ID);}
 
 
     // Project Simulations
-    printf("<<< PROJECT SIMULATIONS\n<<< -- t_cs=%dms; alpha=%f; t_slice=%dms\n", t_cs, alpha, t_slice);
+    printf("<<< PROJECT SIMULATIONS\n<<< -- t_cs=%dms; alpha=%.2f; t_slice=%dms\n", t_cs, alpha, t_slice);
 
     int ret = FCFS(allProcesses, n, t_cs);
     if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
+
+
+
+
+
+    // Freeing all Dynamically-Allocated Memory
+    // for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
+    // free(allProcesses);
 
 
 

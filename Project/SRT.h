@@ -15,7 +15,7 @@
 
 #include "project_part1.h"
 
-#define SLEEP_TIME 1
+
 
 // void SRT(){
 //     int time = 0;

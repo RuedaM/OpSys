@@ -15,8 +15,6 @@
 #include <signal.h>
 #include <math.h>
 
-#define SLEEP_TIME 1
-
 
 // =========================================================================================
 // ======================================== STRUCTS ========================================
@@ -44,7 +42,7 @@ struct Process{
 struct ProcessPlus{
     struct ProcessPlus* prev;
     struct ProcessPlus* next;
-    struct Process p;
+    struct Process* p;
 };
 
 // Struct for representing a queue as a linked list
@@ -113,8 +111,8 @@ struct Process* gen_procs(char** IDs, int seed, int n, int n_cpu, float lambda, 
 
         int idx = 0;
         
-        int* cpuBurstTimes = calloc(cpuBurstCount, sizeof(int));
-        int* ioBurstTimes = calloc(cpuBurstCount-1, sizeof(int));
+        int* cpuBurstTimes = calloc(cpuBurstCount, sizeof(int)); //DYNAMIC.MEMORY
+        int* ioBurstTimes = calloc(cpuBurstCount-1, sizeof(int)); //DYNAMIC.MEMORY
         int cpuBurstTime, ioBurstTime;
         // For all same-index CPU and I/O bursts
         for (int i=0 ; i<cpuBurstCount-1 ; i++){
@@ -161,47 +159,72 @@ printf("\n");
 // =========================================================================================
 // ============================== I/O "QUEUE" HELPER FUNCTIONS =============================
 // =========================================================================================
-// Function for adding process to queue, sorted by shortest current I/O burst
-void queue_push(struct Queue* q, struct Process p_in){
-    struct ProcessPlus p2 = {NULL, NULL, p_in};
+// Function for adding process to queue, sorted by shortest current I/O burst, returns head of queue
+struct Process* queue_push(struct Queue* q, struct Process* p_in){
+    //struct ProcessPlus p2 = {NULL, NULL, p_in};
     struct ProcessPlus* node = malloc(sizeof(struct ProcessPlus));
-    if (node == NULL) {fprintf(stderr, "ERROR: add() failed\n"); exit(EXIT_FAILURE);}
+    if (node==NULL) {fprintf(stderr, "ERROR: queue_push() failed\n"); exit(EXIT_FAILURE);}
 
-    *node = p2;
+    node->p = p_in;
     node->prev = NULL;
     node->next = NULL;
 
-    if (q->head==NULL) {q->head = node;}
-    else{
-        struct ProcessPlus* curr = q->head;
-        if (curr->p.ioBurstCurr<=p_in.ioBurstCurr){
-            curr->prev=node;
-            curr->prev->next=curr;
-            q->head=node;
-        }else{
-            while (curr->next != NULL) {
-                curr=curr->next;
-                if (curr->p.ioBurstCurr<=p_in.ioBurstCurr){
-                    curr->prev=node;
-                    curr->prev->next=curr;
-                    break;
-                }
-            }
-        }
+    if (q->head==NULL){ // Empty queue; new node = head
+        q->head = node;
+        return q->head->p;
     }
+
+    struct ProcessPlus* curr = q->head;
+    
+    if (p_in->ioBurstCurr < curr->p->ioBurstCurr) { // Filled queue, node has smallest I/O burst; node = head
+        node->next = q->head;
+        q->head->prev = node;
+        q->head = node;
+        return q->head->p;
+    }
+
+    // Case 3: Traverse the queue to find the correct insertion point
+
+    while (curr->next != NULL && curr->next->p->ioBurstCurr<p_in->ioBurstCurr) { // Filled queue, node has normal I/O burst; node is inserted
+        curr = curr->next;
+    }
+    node->next = curr->next;
+    node->prev = curr;
+    curr->next = node;
+
+    if (node->next!=NULL) {node->next->prev = node;} // If end isn't reached, change next node's prev ptr
+
+    return q->head->p; // Return ptr to head PROCESS (NOT head node)
 }
 
 // Function for removing a process from a queue, which is sorted by shortest current I/O burst
-struct Process queue_pop(struct Queue* q){
+struct Process* queue_pop(struct Queue* q){
     struct ProcessPlus* curr = q->head;
 
     if (curr->next!=NULL) {curr->next->prev = NULL;}
     q->head = curr->next;
 
-    struct Process ret = curr->p;
+    struct Process* ret = curr->p;
     free(curr);
 
     return ret;
+}
+
+// Function for seeing the status of the whole queue
+void io_status(struct Queue* io){
+// #if DEBUG_MODE
+// printf("...checking I/O queue...\n");
+// #endif
+    struct ProcessPlus* curr = io->head;
+    printf("/---CURRENT I/O QUEUE--------------\n");
+    if (io==NULL || io->head==NULL){printf("| -EMPTY-\n");}
+    else{
+        while (curr!=NULL){
+            printf("| Process %s with %dms left\n", curr->p->ID, curr->p->ioBurstCurr);
+            curr = curr->next;
+        }
+    }
+    printf("\\----------------------------------\n");
 }
 
 
@@ -210,27 +233,25 @@ struct Process queue_pop(struct Queue* q){
 // ================================= FCFS HELPER FUNCTIONS =================================
 // =========================================================================================
 // Function for getting+removing 1st process in queue. Takes in queue array + its size
-struct Process pop(struct Process* procQ, int numProc){
-    struct Process ret = procQ[0]; // Get the first process which will be returned later
+struct Process* pop(struct Process** procQ, int numProc){
+    if (numProc==0 || procQ==NULL) {return NULL;} // Safety check
 
-    for (int i=0 ; i<numProc-1; i++) {procQ[i] = procQ[i+1];} // Move all processes to the left by 1
+    struct Process* ret = procQ[0]; // Get the first process which will be returned later
     
-    struct Process* buffer = calloc(numProc, sizeof(struct Process));
-    memcpy(buffer, procQ, sizeof(struct Process)*(numProc-1)); // Copy all processes but the last one to a buffer
-    memcpy(procQ, buffer, sizeof(struct Process)*(numProc)); // Copy buffer back to original queue
-    for(int i=0 ; i<numProc ; i++){free(procQ[i].cpuBurstTimes);free(procQ[i].ioBurstTimes);} // Free arrays in each struct in buffer
-    free(buffer);
+    for (int i=0 ; i<numProc-1; i++) {procQ[i] = procQ[i+1];} // Move all processes to the left by 1
+
+    procQ[numProc-1] = NULL; // Avoid dangling pointer
     
     return ret;
 }
 
-// Function for adding process queue. Takes in queue array, process to be added, and size of queue
-void push_back(struct Process* procQ, struct Process proc, int numProc){
-    for (int i=0 ; i<numProc; i++){    // Check if the process is in the incorrect state (RUNNING - 0)
-        if (procQ[i].state==0) {procQ[i] = proc; break;}   // Add process to queue and terminate rest of for loop
-        else {continue;}
-    }
-}
+// // Function for adding process queue. Takes in queue array, process to be added, and size of queue
+// void push_back(struct Process* procQ, struct Process proc, int numProc){
+//     for (int i=0 ; i<numProc; i++){    // Check if the process is in the incorrect state (RUNNING - 0)
+//         if (procQ[i].state==0) {procQ[i] = proc; break;}   // Add process to queue and terminate rest of for loop
+//         else {continue;}
+//     }
+// }
 
 
 
@@ -239,7 +260,7 @@ void push_back(struct Process* procQ, struct Process proc, int numProc){
 // =========================================================================================
 // Print relevant process statistics - mostly for debugging
 void print_proc(struct Process p){
-    printf("  Process %s is ", p.ID);
+    printf("||  Process %s is ", p.ID);
     if (p.state==0) {printf("IN-CPU");}
     if (p.state==1) {printf("IN-QUEUE");}
     if (p.state==2) {printf("IN-MEMORY");}
@@ -247,21 +268,34 @@ void print_proc(struct Process p){
     printf(" bound by ");
     if (p.binding==0) {printf("CPU\n");}
     if (p.binding==1) {printf("I/O\n");}
-    printf("  Total CPU Bursts: %d  //", p.cpuBurstCount);
-    printf("  Total I/O Bursts: %d\n", p.cpuBurstCount-1);
-    printf("  Index: %d\n", p.idx);
-    printf("  Current CPU Burst: %d  //", p.cpuBurstCurr);
-    printf("  Current I/O Burst: %d\n", p.ioBurstCurr);
+    printf("||  Total CPU Bursts: %d  ", p.cpuBurstCount);
+    printf("//  Total I/O Bursts: %d\n", p.cpuBurstCount-1);
+    printf("||  Index: %d\n", p.idx);
+    printf("||  Current CPU Burst: %d  ", p.cpuBurstCurr);
+    printf("//  Current I/O Burst: %d\n", p.ioBurstCurr);
+    // printf("  CPU Burst Times: |");
+    // for (int i=0 ; i<p.cpuBurstCount ; i++){printf("%d] %d |", i, p.cpuBurstTimes[i]);} printf("\n");
+    // printf("  I/O Burst Times: |");
+    // for (int i=0 ; i<p.cpuBurstCount-1 ; i++){printf("%d] %d |", i, p.ioBurstTimes[i]);} printf("\n");
+
 }
 
-void queue_status(struct Process* queue, int queueLen){
+void print_all_proc(struct Process* allProcesses, int n){
+    printf("//====ALL PROCESSES====================================\n");
+    for(int i=0 ; i<n ; i++){
+        print_proc(allProcesses[i]);
+        printf("\\\\=====================================================\n");
+    }
+}
+
+void priority_queue_status(struct Process** priorityQueue, int queueLen){
 // #if DEBUG_MODE
-// printf("\n...checking queue...\n");
+// printf("\n...checking priority queue...\n");
 // #endif
     printf(" [Q");
     if (queueLen==0) {printf(" empty");}
     else {
-        for(int i=0 ; i<queueLen ; i++) {printf(" %s", queue[i].ID);}}
+        for(int i=0 ; i<queueLen ; i++) {printf(" %s", priorityQueue[i]->ID);}}
     printf("]\n");
 }
 
