@@ -24,14 +24,16 @@
 
 int FCFS(struct Process* allProcesses, int n, int t_cs){
     int time = 0;
+    #if DEBUG_MODE
     int timeAdd = 0;
+    #endif
     int FCFSFlag = 1;
     int csLeft = t_cs/2;
     
     // Priority Queue = array of Process pointers
     struct Process** priorityQueue = calloc(0, sizeof(struct Process)); //DYNAMIC.MEMORY
     if (priorityQueue==NULL) {fprintf(stderr, "ERROR: calloc() failed\n"); exit(EXIT_FAILURE);}
-    // Remember to free in some way: free(queue)
+    // Remember to free in some way: free(priorityQueue)
     int queueLen = 0;
 
     // Pointer to "in-CPU" process
@@ -65,7 +67,9 @@ printf("~~ Checking if process can be deleted or added to I/O...\n");
 #endif
         if (cpuIsRunning && cpuProc->cpuBurstCurr==0){ // If CPU in-use and cpuProc's burst is done...
             
-            cpuProc->ioBurstCurr = cpuProc->ioBurstTimes[cpuProc->idx];   // Establish current I/O burst time
+            if (cpuProc->idx!=cpuProc->cpuBurstCount-1){ // If proc not about to terminate, set current I/O burst time
+                cpuProc->ioBurstCurr = cpuProc->ioBurstTimes[cpuProc->idx];
+            }
 
             if(csLeft==0){ // If done cs'ing...
                 csLeft = t_cs/2; //Reset
@@ -310,8 +314,15 @@ sleep(SLEEP_TIME_ADVANCING);
 #endif
     }
 
-    // simout.txt info
+
+
+    // simout.txt Informaton
     // [...]
+
+
+    
+    free(priorityQueue);
+    free(io);
 
     return EXIT_SUCCESS;
 }

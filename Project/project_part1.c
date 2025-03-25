@@ -5,6 +5,7 @@
  * gcc -Wall -Werror -Wextra -g -o project_part1.out project_part1.c -lm
  * gcc -Wall -Werror -Wextra -g -o project_part1.out -D DEBUG_MODE project_part1.c -lm
  * valgrind -s ./project_part1.out <ARGS HERE>
+ * valgrind -s --leak-check=full ./project_part1.out <ARGS HERE>
  * ARGS:
  * 3  1  32  0.001 1024 4 0.75 256
  * 8  6  768 0.001 1024 6 0.95 128
@@ -192,8 +193,13 @@ for (int i=0 ; i<n ; i++) {printf("Process %s verified\n", allProcesses[i].ID);}
 
 
     // Freeing all Dynamically-Allocated Memory
-    // for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
-    // free(allProcesses);
+    for (int i=0 ; i<n ; i++){
+        free(allProcesses[i].cpuBurstTimes);
+        free(allProcesses[i].ioBurstTimes);
+        free(IDs[i]);
+    }
+    free(allProcesses);
+    free(IDs);
 
 
 

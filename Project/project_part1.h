@@ -79,13 +79,15 @@ float next_exp(float lambda, int bound, char* rounding, int only_drand){
 
 // Generate IDs for processes
 char** gen_IDs(int n){
-    char** ret = (char**) malloc(n*sizeof(char*));
+    char** ret = (char**) malloc(n*sizeof(char*)); //DYNAMIC.MEMORY
+    // Remember to free in some way: free(ret)
     if (ret==NULL) {fprintf(stderr, "ERROR: gen_IDs calloc() failed\n"); return NULL;}
     
     int i = 0;
     for (char let='A' ; let<='Z' ; let++) {   // Loop A-Z
         for (char num='0' ; num<='9' ; num++) {   // Loop 0-9
-            ret[i] = (char*) malloc(3*sizeof(char));
+            ret[i] = (char*) malloc(3*sizeof(char)); //DYNAMIC.MEMORY
+            // Remember to free in some way: free(ret[i])
             ret[i][0] = let; ret[i][1] = num; ret[i][2] = '\0';
             i++;
             if (i==n) {return ret;}
@@ -98,8 +100,8 @@ char** gen_IDs(int n){
 struct Process* gen_procs(char** IDs, int seed, int n, int n_cpu, float lambda, int bound){
     srand48(seed);
     struct Process* allProcesses = calloc(n, sizeof(struct Process)); //DYNAMIC.MEMORY
-
     // Remember to free in some way: free(allProcesses)
+
     for (int i=0 ; i<n ; i++){
         int state = 2; // State 2 = waiting
 
@@ -113,6 +115,7 @@ struct Process* gen_procs(char** IDs, int seed, int n, int n_cpu, float lambda, 
         
         int* cpuBurstTimes = calloc(cpuBurstCount, sizeof(int)); //DYNAMIC.MEMORY
         int* ioBurstTimes = calloc(cpuBurstCount-1, sizeof(int)); //DYNAMIC.MEMORY
+        // Remember to free in some way: free(cpuBurstTimes), free(ioBurstTimes)
         int cpuBurstTime, ioBurstTime;
         // For all same-index CPU and I/O bursts
         for (int i=0 ; i<cpuBurstCount-1 ; i++){
@@ -163,6 +166,7 @@ printf("\n");
 struct Process* queue_push(struct Queue* q, struct Process* p_in){
     //struct ProcessPlus p2 = {NULL, NULL, p_in};
     struct ProcessPlus* node = malloc(sizeof(struct ProcessPlus));
+    // Remember to free in some way: free(node)
     if (node==NULL) {fprintf(stderr, "ERROR: queue_push() failed\n"); exit(EXIT_FAILURE);}
 
     node->p = p_in;
@@ -265,6 +269,7 @@ void print_proc(struct Process p){
     if (p.state==1) {printf("IN-QUEUE");}
     if (p.state==2) {printf("IN-MEMORY");}
     if (p.state==3) {printf("IN-I/O");}
+    if (p.state==4) {printf("TERMINATED");}
     printf(" bound by ");
     if (p.binding==0) {printf("CPU\n");}
     if (p.binding==1) {printf("I/O\n");}
