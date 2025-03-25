@@ -53,7 +53,7 @@ int main(int argc, char** argv){
     float lambda = atof(argv[4]); // paramter in (1/lambda) for average rand. value generated for exponential distribution for interarrival times
     int bound = atoi(argv[5]); // upper bound for pseudo-random numbers for exponential distribution ^
     int t_cs = atoi(argv[6]); // time, (in ms), that it takes to perform a context switch
-    float alpha = atof(argv[7]); // for JF and SRT algorithms
+    float alpha = atof(argv[7]); // for SJF and SRT algorithms
     int t_slice = atoi(argv[8]); // time slice value in ms for RR algorithm
 #if DEBUG_MODE
     printf("Arg verification:\n");

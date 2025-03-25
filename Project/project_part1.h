@@ -257,7 +257,19 @@ struct Process* pop(struct Process** procQ, int numProc){
 //     }
 // }
 
+// =========================================================================================
+// ================================= RR HELPER FUNCTIONS ===================================
+// =========================================================================================
 
+struct Process cpuPop(struct Process* procQ){
+    if (procQ==NULL) {return NULL;} // Safety check
+
+    struct Process ret = procQ; // Get CPU process which will be returned later
+
+    procQ = NULL; // Avoid dangling pointer
+    
+    return ret;
+}
 
 // =========================================================================================
 // ============================= PRINTING + DEBUGGING FUNCTIONS ============================
