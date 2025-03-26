@@ -4,8 +4,13 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <sys/shm.h>
+#include <ctype.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
+#include <fcntl.h>
+
+#include <sys/shm.h>
 
 
 
@@ -25,5 +30,37 @@
  * ==> child process must produce no output to stdout
  */
 int lecex3_q1_child(int pipefd){
+    int size;
+    key_t memKey;
 
+    read(pipefd, &size, sizeof(int));
+    read(pipefd, &memKey, sizeof(int));
+
+    // Getting ID of shared mem segment
+    int shmid = shmget(memKey, size, 0660);
+    if (shmid==-1) {perror("ERROR: shmget() failed"); return EXIT_FAILURE;}
+
+    // Attach to shared memory segment
+    char* x = shmat(shmid, NULL, 0);
+    if (x==(void*)-1) {perror("ERROR: shmat() failed"); return EXIT_FAILURE;}
+
+    char* ptr = x;
+    while(*ptr){
+
+        if (isalpha(*ptr)!=0){ // If alphabetical...
+            if (islower(*ptr)==0){ // If lowercase...
+                *ptr = tolower(*ptr); // Convert to lowercase
+            }
+        } else if (isdigit(*ptr)){ // If numerical...
+            *ptr = ' '; // Replace with space
+        }
+
+        ptr++;
+    }
+
+    // Detach from shared memory segment
+    int rc = shmdt(x);
+    if (rc==-1) {perror("shmdt() failed"); return EXIT_FAILURE;}
+
+    return EXIT_SUCCESS;
 }

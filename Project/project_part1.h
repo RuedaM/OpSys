@@ -22,7 +22,7 @@
 // Struct for holding info for a single process
 struct Process{
     char* ID; // Process ID (A0 - Z9)
-    int state;   // States: IN-CPU (0) / IN-QUEUE (1) / IN-MEMORY (2) / IN-I/O (3) / TERMINATED (4)
+    int state;   // States: IN-MEMORY (0) / IN-QUEUE (1) / PRE-CPU (2) / IN-CPU (3) / POST-CPU (4) / IN-I/O (5) / TERMINATED (6)
     int binding;   // Binding: CPU-Bound (0) / I/O-Bound (1)
     
     int arrivalTime;   // Process arrival time
@@ -105,7 +105,7 @@ struct Process* gen_procs(char** IDs, int seed, int n, int n_cpu, float lambda, 
     // Remember to free in some way: free(allProcesses)
 
     for (int i=0 ; i<n ; i++){
-        int state = 2; // State 2 = waiting
+        int state = 0; //state=IN-MEMORY
 
         int binding; if(i<n_cpu) {binding=0;} else {binding=1;}
 
@@ -267,12 +267,15 @@ struct Process* pop(struct Process** procQ, int numProc){
 // ================================== SJF HELPER FUNCTIONS =================================
 // =========================================================================================
 // Function for adding Process pointer to priority queue following SJF algorithm (sorting by CPU burst); returns head of priority queue
-struct Process* priority_queue_push_SJF(struct Process** priorityQueue, int numProc, struct Process* p_in){
-    priorityQueue = realloc(priorityQueue, (numProc + 1) * sizeof(struct Process*));
+struct Process* priority_queue_push_SJF(struct Process** priorityQueue, int priorityQueueLen, struct Process* p_in){
+    
+    if (priorityQueue==NULL || p_in==NULL) {fprintf(stderr, "ERROR: p_q_push_SJF() param(s) invalid\n"); return NULL;}  // Return unchanged queue
+
+    priorityQueue = realloc(priorityQueue, (priorityQueueLen+1)*sizeof(struct Process*));
     if (priorityQueue==NULL) {fprintf(stderr, "ERROR: realloc failed\n"); exit(EXIT_FAILURE);}
 
     int i;
-    for(i=numProc-1 ; i>=0 && (priorityQueue[i]->tau)>(p_in->tau) ; i--){
+    for(i=priorityQueueLen-1 ; i>=0 && (priorityQueue[i]->tau)>(p_in->tau) ; i--){
         priorityQueue[i+1] = priorityQueue[i]; // Shift elements right
     }
     priorityQueue[i+1] = p_in; // Insert new process at correct spot
@@ -288,18 +291,21 @@ struct Process* priority_queue_push_SJF(struct Process** priorityQueue, int numP
 // Print relevant process statistics - mostly for debugging
 void print_proc(struct Process p){
     printf("||  Process %s is ", p.ID);
-    if (p.state==0) {printf("IN-CPU");}
+    if (p.state==0) {printf("IN-MEMORY");}
     if (p.state==1) {printf("IN-QUEUE");}
-    if (p.state==2) {printf("IN-MEMORY");}
-    if (p.state==3) {printf("IN-I/O");}
-    if (p.state==4) {printf("TERMINATED");}
+    if (p.state==2) {printf("PRE-CPU");}
+    if (p.state==3) {printf("IN-CPU");}
+    if (p.state==4) {printf("POST-CPU");}
+    if (p.state==5) {printf("IN-I/O");}
+    if (p.state==6) {printf("TERMINATED");}
     printf(" bound by ");
     if (p.binding==0) {printf("CPU\n");}
     if (p.binding==1) {printf("I/O\n");}
     printf("||  Total CPU Bursts: %d  ", p.cpuBurstCount);
     printf("//  Total I/O Bursts: %d\n", p.cpuBurstCount-1);
-    printf("||  Index: %d\n", p.idx);
-    printf("||  Tau: %d\n", p.tau);
+    printf("||  ArrTime: %d  ", p.arrivalTime);
+    printf("//  Index: %d  ", p.idx);
+    printf("//  Tau: %d\n", p.tau);
     printf("||  Current CPU Burst: %d  ", p.cpuBurstCurr);
     printf("//  Current I/O Burst: %d\n", p.ioBurstCurr);
     // printf("  CPU Burst Times: |");
@@ -324,7 +330,13 @@ void priority_queue_status(struct Process** priorityQueue, int queueLen){
     printf(" [Q");
     if (queueLen==0) {printf(" empty");}
     else{
-        for(int i=0 ; i<queueLen ; i++) {printf(" %s", priorityQueue[i]->ID);}
+        for(int i=0 ; i<queueLen ; i++) {
+            if (priorityQueue[i]==NULL) {printf(" ERROR_NULL");}
+            else if (priorityQueue[i]->ID==NULL) {printf(" ERROR_ID_NULL");}
+            else {
+                if (priorityQueue[i]->state==1) {printf(" %s", priorityQueue[i]->ID);}
+            }
+        }
     }
     printf("]\n");
 }
