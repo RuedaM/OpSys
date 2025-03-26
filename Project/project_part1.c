@@ -53,7 +53,7 @@ int main(int argc, char** argv){
     float lambda = atof(argv[4]); // paramter in (1/lambda) for avg rand. value generated for exp.dist. for interarrival times
     int bound = atoi(argv[5]); // upper bound for pseudo-random numbers for exponential distribution ^
     int t_cs = atoi(argv[6]); // time, (in ms), that it takes to perform a context switch
-    float alpha = atof(argv[7]); // for JF and SRT algorithms
+    float alpha = atof(argv[7]); // for SJF and SRT algorithms
     int t_slice = atoi(argv[8]); // time slice value in ms for RR algorithm
     #if DEBUG_MODE
     printf("Arg verification:\n");
@@ -201,7 +201,18 @@ int main(int argc, char** argv){
     allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
     ret = SJF(allProcesses, n, t_cs, alpha, bytesWritten, toWrite);
     if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
-    for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
+
+    // int ret = RR(allProcesses, n, t_cs, t_slice);
+    // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
+
+
+
+    // Freeing all Dynamically-Allocated Memory
+    for (int i=0 ; i<n ; i++){
+        free(allProcesses[i].cpuBurstTimes);
+        free(allProcesses[i].ioBurstTimes);
+        free(IDs[i]);
+    }
     free(allProcesses);
 
     // ret = STR(allProcesses, n, t_cs, alpha, t_slice, bytesWritten, toWrite);
