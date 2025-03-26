@@ -188,7 +188,8 @@ for (int i=0 ; i<n ; i++) {printf("Process %s verified\n", allProcesses[i].ID);}
     int ret = FCFS(allProcesses, n, t_cs);
     if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
 
-
+    // int ret = RR(allProcesses, n, t_cs, t_slice);
+    // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
 
 
 

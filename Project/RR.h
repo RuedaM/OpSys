@@ -91,7 +91,7 @@ printf("~~ Checking if time slice expired...\n");
         if (timeSlice==0) {
             timeSlice = t_slice; //Reset
             
-            printf("time %dms: Time slice expired; no preemption because ready queue is empty");
+            printf("time %dms: Time slice expired; no preemption because ready queue is empty", time);
             priority_queue_status(priorityQueue, queueLen);
         }
     }
