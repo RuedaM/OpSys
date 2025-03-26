@@ -37,36 +37,33 @@
 int main(int argc, char** argv){
     setbuf(stdout, NULL);
 
-#ifdef DEBUG_MODE
+    //======================================================================================================================
+    #ifdef DEBUG_MODE
     printf("=Check Arg Input= // "); for(int i=1 ; i<=8 ; i++){printf("%s // ",*(argv+i));} printf("\n");
-#endif
-        
-    if(argc!=9){ // (1 .out file + 8 inputs = 9 args)
-        fprintf(stderr, "ERROR: Invalid number of arguments\n");
-        return EXIT_FAILURE;
-    }
+    #endif    
+    if(argc!=9) {fprintf(stderr, "ERROR: Invalid number of arguments\n"); return EXIT_FAILURE;} // (1 .out file + 8 inputs = 9 args)
 
     // Command Line Arg Storage+Setting
     int n = atoi(argv[1]); // number of processes to simulate
     int n_cpu = atoi(argv[2]); // number of processes that are CPU-bound
     int seed = atoi(argv[3]); // seed for the pseudo-random number sequence
-    float lambda = atof(argv[4]); // paramter in (1/lambda) for average rand. value generated for exponential distribution for interarrival times
+    float lambda = atof(argv[4]); // paramter in (1/lambda) for avg rand. value generated for exp.dist. for interarrival times
     int bound = atoi(argv[5]); // upper bound for pseudo-random numbers for exponential distribution ^
     int t_cs = atoi(argv[6]); // time, (in ms), that it takes to perform a context switch
     float alpha = atof(argv[7]); // for JF and SRT algorithms
     int t_slice = atoi(argv[8]); // time slice value in ms for RR algorithm
-#if DEBUG_MODE
+    #if DEBUG_MODE
     printf("Arg verification:\n");
     printf("  Processes: %d", n); printf("\t\tCPU-bound: %d\n", n_cpu);
     printf("  Seed: %d", seed); printf("\t\tlambda: %f\n", lambda);
     printf("  Upper Bound: %d", bound); printf("\tt_cs: %d\n", t_cs);
     printf("  alpha: %f", alpha); printf("\tt_slice: %d\n", t_slice);
     printf("\n");
-#endif
+    #endif
 
     // Command Line Arg Error Checking
     if(n<=0) {fprintf(stderr, "ERROR: n must be a positive integer\n"); return EXIT_FAILURE;}
-    // Next few error checks are assumptions that they must be a positive integer. Can change/remove later when more test cases/examples are given
+    // Below are written, asuming they must be positive integers -- change/remove as needed
     // --------------------------- REMOVE THESE AS APPROPRIATE ---------------------------
     if(n_cpu<=0) {fprintf(stderr, "ERROR: n_cpu must be a positive integer\n"); return EXIT_FAILURE;}
     if(seed<=0) {fprintf(stderr, "ERROR: seed must be a positive integer\n"); return EXIT_FAILURE;}
@@ -81,34 +78,37 @@ int main(int argc, char** argv){
     printf("<<< -- process set (n=%d) with %d CPU-bound process", n, n_cpu);
     if (n_cpu>1) {printf("es\n");} else {printf("\n");}
     printf("<<< -- seed=%d; lambda=%f; bound=%d\n\n", seed, lambda, bound);
-#if DEBUG_MODE
-printf("\n");
-#endif
+    #if DEBUG_MODE
+    printf("\n");
+    #endif
 
-    // Process ID Generation
+    //======================================================================================================================
+    // Process + Process ID Generation
     char** IDs = gen_IDs(n);
     // Remember to free in some way: free(IDs)
-    // (Maybe loop through all processes and free each ID)
-#if DEBUG_MODE
-printf("Generated IDs: // "); for (int i=0 ; i<n ; i++) {printf("%s // ", IDs[i]);} printf("\n\n");
-#endif
+    #if DEBUG_MODE
+    printf("Generated IDs: // "); for (int i=0 ; i<n ; i++) {printf("%s // ", IDs[i]);} printf("\n\n");
+    #endif
 
     // Process Generation
     struct Process* allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
-#if DEBUG_MODE
-for (int i=0 ; i<n ; i++) {printf("Process %s verified\n", allProcesses[i].ID);}
-#endif
+    #if DEBUG_MODE
+    for (int i=0 ; i<n ; i++) {printf("Process %s verified\n", allProcesses[i].ID);}
+    #endif
     // Process Generation Terminal Output
     for(int i=0 ; i<n ; i++){ //for every process...
         if (allProcesses[i].binding==0) {printf("CPU");}
         else {printf("I/O");}
         printf("-bound process %s: arrival time %dms; %d CPU burst", allProcesses[i].ID, allProcesses[i].arrivalTime, allProcesses[i].cpuBurstCount);
         if (allProcesses[i].cpuBurstCount>1) {printf("s:\n");} else {printf(":\n");}
-        for(int j=0 ; j<allProcesses[i].cpuBurstCount-1 ; j++){printf("==> CPU burst %dms ==> I/O burst %dms\n", allProcesses[i].cpuBurstTimes[j], allProcesses[i].ioBurstTimes[j]);}
+        for(int j=0 ; j<allProcesses[i].cpuBurstCount-1 ; j++){
+            printf("==> CPU burst %dms ==> I/O burst %dms\n", allProcesses[i].cpuBurstTimes[j], allProcesses[i].ioBurstTimes[j]);
+        }
         printf("==> CPU burst %dms\n\n", allProcesses[i].cpuBurstTimes[allProcesses[i].cpuBurstCount-1]);
     }
     
 
+    //======================================================================================================================
     // Calculations for simout.txt
     float cpuBoundAvgCPUBurstTime, ioBoundAvgCPUBurstTime, totalAvgCPUBurstTime, cpuBoundAvgIOBurstTime, ioBoundAvgIOBurstTime, totalAvgIOBurstTime;
     int numCPUBoundAvgCPUBursts, numCPUBoundAvgIOBursts, numIOBoundAvgCPUBursts, numIOBoundAvgIOBursts;
@@ -182,13 +182,20 @@ for (int i=0 ; i<n ; i++) {printf("Process %s verified\n", allProcesses[i].ID);}
 
 
 
-    // Project Simulations
+    //======================================================================================================================
     printf("<<< PROJECT SIMULATIONS\n<<< -- t_cs=%dms; alpha=%.2f; t_slice=%dms\n", t_cs, alpha, t_slice);
 
-    int ret = FCFS(allProcesses, n, t_cs);
+    // int ret = FCFS(allProcesses, n, t_cs);
+    // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
+
+    int ret = SJF(allProcesses, n, t_cs, alpha);
     if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
 
+    // int ret = STR(allProcesses, n, t_cs, t_slice);
+    // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
 
+    // int ret = RR(allProcesses, n, t_cs, t_slice);
+    // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
 
 
 

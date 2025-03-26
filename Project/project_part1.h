@@ -29,6 +29,8 @@ struct Process{
     int cpuBurstCount;   // Number of CPU burst for a single process
     // (Note: ioBurstCount = cpuBurstCount-1)
     int idx;   // Variable for indexing CPU bursts and I/O bursts
+
+    int tau;   // Predicted CPU burst time (for SJF and SRT)
     
     // Containers for storing CPU and I/O burst times
     int* cpuBurstTimes;
@@ -112,6 +114,8 @@ struct Process* gen_procs(char** IDs, int seed, int n, int n_cpu, float lambda, 
         int cpuBurstCount = ceil(next_exp(lambda, bound, "-", 1)*32);
 
         int idx = 0;
+
+        int tau = ceil(1/lambda);
         
         int* cpuBurstTimes = calloc(cpuBurstCount, sizeof(int)); //DYNAMIC.MEMORY
         int* ioBurstTimes = calloc(cpuBurstCount-1, sizeof(int)); //DYNAMIC.MEMORY
@@ -150,7 +154,7 @@ for (int i=0 ; i<cpuBurstCount-1 ; i++){printf("%d] %d |", i, ioBurstTimes[i]);}
 printf("\n");
 #endif
         
-        struct Process proc = {IDs[i], state, binding, arrivalTime, cpuBurstCount, idx, cpuBurstTimes, ioBurstTimes, cpuBurstCurr, ioBurstCurr};
+        struct Process proc = {IDs[i], state, binding, arrivalTime, cpuBurstCount, idx, tau, cpuBurstTimes, ioBurstTimes, cpuBurstCurr, ioBurstCurr};
         allProcesses[i] = proc;
     }
 
@@ -163,7 +167,7 @@ printf("\n");
 // ============================== I/O "QUEUE" HELPER FUNCTIONS =============================
 // =========================================================================================
 // Function for adding process to queue, sorted by shortest current I/O burst, returns head of queue
-struct Process* queue_push(struct Queue* q, struct Process* p_in){
+struct Process* queue_push_to_end(struct Queue* q, struct Process* p_in){
     //struct ProcessPlus p2 = {NULL, NULL, p_in};
     struct ProcessPlus* node = malloc(sizeof(struct ProcessPlus));
     // Remember to free in some way: free(node)
@@ -260,6 +264,25 @@ struct Process* pop(struct Process** procQ, int numProc){
 
 
 // =========================================================================================
+// ================================== SJF HELPER FUNCTIONS =================================
+// =========================================================================================
+// Function for adding Process pointer to priority queue following SJF algorithm (sorting by CPU burst); returns head of priority queue
+struct Process* priority_queue_push_SJF(struct Process** priorityQueue, int numProc, struct Process* p_in){
+    priorityQueue = realloc(priorityQueue, (numProc + 1) * sizeof(struct Process*));
+    if (priorityQueue==NULL) {fprintf(stderr, "ERROR: realloc failed\n"); exit(EXIT_FAILURE);}
+
+    int i;
+    for(i=numProc-1 ; i>=0 && (priorityQueue[i]->tau)>(p_in->tau) ; i--){
+        priorityQueue[i+1] = priorityQueue[i]; // Shift elements right
+    }
+    priorityQueue[i+1] = p_in; // Insert new process at correct spot
+
+    return priorityQueue[0]; // return head of queue
+}
+
+
+
+// =========================================================================================
 // ============================= PRINTING + DEBUGGING FUNCTIONS ============================
 // =========================================================================================
 // Print relevant process statistics - mostly for debugging
@@ -276,6 +299,7 @@ void print_proc(struct Process p){
     printf("||  Total CPU Bursts: %d  ", p.cpuBurstCount);
     printf("//  Total I/O Bursts: %d\n", p.cpuBurstCount-1);
     printf("||  Index: %d\n", p.idx);
+    printf("||  Tau: %d\n", p.tau);
     printf("||  Current CPU Burst: %d  ", p.cpuBurstCurr);
     printf("//  Current I/O Burst: %d\n", p.ioBurstCurr);
     // printf("  CPU Burst Times: |");
@@ -299,10 +323,11 @@ void priority_queue_status(struct Process** priorityQueue, int queueLen){
 // #endif
     printf(" [Q");
     if (queueLen==0) {printf(" empty");}
-    else {
-        for(int i=0 ; i<queueLen ; i++) {printf(" %s", priorityQueue[i]->ID);}}
+    else{
+        for(int i=0 ; i<queueLen ; i++) {printf(" %s", priorityQueue[i]->ID);}
+    }
     printf("]\n");
 }
 
 
-#endif  // PROJECT_PART1_H
+#endif  // PROJECT_PART1_Hf

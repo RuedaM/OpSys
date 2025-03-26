@@ -27,14 +27,13 @@ int FCFS(struct Process* allProcesses, int n, int t_cs){
     #if DEBUG_MODE
     int timeAdd = 0;
     #endif
-    int FCFSFlag = 1;
     int csLeft = t_cs/2;
     
     // Priority Queue = array of Process pointers
     struct Process** priorityQueue = calloc(0, sizeof(struct Process)); //DYNAMIC.MEMORY
     if (priorityQueue==NULL) {fprintf(stderr, "ERROR: calloc() failed\n"); exit(EXIT_FAILURE);}
     // Remember to free in some way: free(priorityQueue)
-    int queueLen = 0;
+    int priorityQueueLen = 0;
 
     // Pointer to "in-CPU" process
     struct Process* cpuProc;
@@ -49,22 +48,24 @@ int FCFS(struct Process* allProcesses, int n, int t_cs){
     int completedProcs = 0;
 
     printf("time %dms: Simulator started for FCFS", time);
-    priority_queue_status(priorityQueue, queueLen);
-#if DEBUG_MODE
-printf("~~ ===BEGINNING FCFS===\n");
-#endif
+    priority_queue_status(priorityQueue, priorityQueueLen);
+
 
 
     //======================================================================================================================
-    while(FCFSFlag){
-        //======================================================================================================================
-#if DEBUG_MODE
-printf("~~ TIME: %d\n", time);
-#endif
+    #if DEBUG_MODE
+    printf("~~ ===BEGINNING FCFS===\n");
+    #endif
+    while(1){
+        #if DEBUG_MODE
+        printf("~~ TIME: %d\n", time);
+        #endif
 
-#if DEBUG_MODE
-printf("~~ Checking if process can be deleted or added to I/O...\n");
-#endif
+
+        //======================================================================================================================
+        #if DEBUG_MODE
+        printf("~~ Checking if process can be deleted or added to I/O...\n");
+        #endif
         if (cpuIsRunning && cpuProc->cpuBurstCurr==0){ // If CPU in-use and cpuProc's burst is done...
             
             if (cpuProc->idx!=cpuProc->cpuBurstCount-1){ // If proc not about to terminate, set current I/O burst time
@@ -87,137 +88,122 @@ printf("~~ Checking if process can be deleted or added to I/O...\n");
                     #endif
                     cpuProc->state = 3; //state==IN-I/O
                     cpuProc->ioBurstCurr = cpuProc->ioBurstTimes[cpuProc->idx];   // Establish current I/O burst time
-                    queue_push(io, cpuProc);
+                    queue_push_to_end(io, cpuProc);
                     ioLen += 1;
                 }
             }else{ // If not, just print info
                 if ((cpuProc->idx+1)==cpuProc->cpuBurstCount){ // If CPUProc has no more CPU bursts...
                     printf("time %dms: Process %s terminated", time, cpuProc->ID);
-                    priority_queue_status(priorityQueue, queueLen);
+                    priority_queue_status(priorityQueue, priorityQueueLen);
                 }else{ // If CPUProc still has CPU bursts...
                     printf("time %dms: Process %s completed a CPU burst; %d burst",
                         time, cpuProc->ID, (cpuProc->cpuBurstCount-(cpuProc->idx+1)));
                     if (cpuProc->cpuBurstCount-(cpuProc->idx+1) == 1) {printf(" to go");}
                     else                                              {printf("s to go");}
-                    priority_queue_status(priorityQueue, queueLen);
+                    priority_queue_status(priorityQueue, priorityQueueLen);
                     printf("time %dms: Process %s switching out of CPU; blocking on I/O until time %dms",
                         time, cpuProc->ID, (time+(t_cs/2)+cpuProc->ioBurstCurr));
-                    priority_queue_status(priorityQueue, queueLen);
+                    priority_queue_status(priorityQueue, priorityQueueLen);
                 }
-#if DEBUG_MODE
-sleep(SLEEP_TIME_EVENT+timeAdd);
-#endif
-                }
+            #if DEBUG_MODE
+            sleep(SLEEP_TIME_EVENT+timeAdd);
+            #endif
+            }
         }
 
 
         //======================================================================================================================
-#if DEBUG_MODE
-printf("~~ Checking if process can be added to CPU...\n");
-#endif
-        if (queueLen!=0 && !cpuIsRunning){ // If queue isn't empty and nothing is in the CPU... 
+        #if DEBUG_MODE
+        printf("~~ Checking if process can be added to CPU...\n");
+        #endif
+        if (priorityQueueLen!=0 && !cpuIsRunning){ // If queue isn't empty and nothing is in the CPU... 
             if (csLeft==0){  // If done cs'ing...
                 csLeft = t_cs/2; //Reset
-                cpuProc = pop(priorityQueue, queueLen); // Get latest-in-queue process; this also resizes queue
+                cpuProc = pop(priorityQueue, priorityQueueLen); // Get latest-in-queue process; this also resizes queue
                 if (priorityQueue==NULL) {fprintf(stderr, "ERROR: realloc() failed\n"); return EXIT_FAILURE;}
-                queueLen -= 1;
+                priorityQueueLen -= 1;
                 cpuProc->state = 0; //state==IN-CPU
                 cpuProc->cpuBurstCurr = cpuProc->cpuBurstTimes[cpuProc->idx]; // Establish current CPU burst time
                 cpuIsRunning = 1;   // "CPU is now running a proccess"
 
                 printf("time %dms: Process %s started using the CPU for %dms burst",
                     time, cpuProc->ID, cpuProc->cpuBurstCurr);
-                priority_queue_status(priorityQueue, queueLen);
-#if DEBUG_MODE
-sleep(SLEEP_TIME_EVENT+timeAdd);
-#endif
+                priority_queue_status(priorityQueue, priorityQueueLen);
+                #if DEBUG_MODE
+                sleep(SLEEP_TIME_EVENT+timeAdd);
+                #endif
             }
         }
 
 
         //======================================================================================================================
-#if DEBUG_MODE
-printf("~~ Checking if process can be added back to queue after I/O...\n");
-#endif
-    while(1){ // Until all 0-I/O-burst-time processes have been moved...
-        
-        if (ioLen!=0){
-            if (io->head->p->ioBurstCurr==0){ // If next-up-proc's I/O burst is finished...
-                priorityQueue = realloc(priorityQueue, (queueLen+1)*sizeof(struct Process*));
-                if (!priorityQueue) {fprintf(stderr, "ERROR: realloc() failed\n"); return EXIT_FAILURE;}
-                
-                priorityQueue[queueLen] = queue_pop(io); // Remove next-up-proc, add to back of queue
-                priorityQueue[queueLen]->state = 1; //state=IN-QUEUE
-                priorityQueue[queueLen]->idx += 1; //Increase CPU and I/O bust times index
-                queueLen += 1;
-                ioLen -= 1;
+        #if DEBUG_MODE
+        printf("~~ Checking if process can be added back to queue after I/O...\n");
+        #endif
+        while(1){ // Until all 0-I/O-burst-time processes have been moved...
+            
+            if (ioLen!=0){ // If I/O isn't empty...
+                if (io->head->p->ioBurstCurr==0){ // If next-up-proc's I/O burst is finished...
+                    priorityQueue = realloc(priorityQueue, (priorityQueueLen+1)*sizeof(struct Process*));
+                    if (!priorityQueue) {fprintf(stderr, "ERROR: realloc() failed\n"); return EXIT_FAILURE;}
+                    
+                    priorityQueue[priorityQueueLen] = queue_pop(io); // Remove next-up-proc, add to back of queue
+                    priorityQueue[priorityQueueLen]->state = 1; //state=IN-QUEUE
+                    priorityQueue[priorityQueueLen]->idx += 1; //Increase CPU and I/O bust times index
+                    priorityQueueLen += 1;
+                    ioLen -= 1;
 
-                printf("time %dms: Process %s completed I/O; added to ready queue",
-                    time, priorityQueue[queueLen-1]->ID);
-                priority_queue_status(priorityQueue, queueLen);
-            }else{ // If next-up-proc's I/O burst isn't finished...
-                break;
-            }
-        }else{
-            break;
+                    printf("time %dms: Process %s completed I/O; added to ready queue",
+                        time, priorityQueue[priorityQueueLen-1]->ID);
+                    priority_queue_status(priorityQueue, priorityQueueLen);
+                }else {break;} // If next-up-proc's I/O burst isn't finished, continue past
+            }else{break;} // If I/O is empty, continue past
+            #if DEBUG_MODE
+            sleep(SLEEP_TIME_EVENT+timeAdd);
+            #endif
         }
-        
-#if DEBUG_MODE
-sleep(SLEEP_TIME_EVENT+timeAdd);
-#endif
-    }
 
 
         //======================================================================================================================
-#if DEBUG_MODE
-printf("~~ Checking if arriving process in memory can be added to queue...\n");
-#endif
+        #if DEBUG_MODE
+        printf("~~ Checking if arriving process in memory can be added to queue...\n");
+        #endif
         for(int i=0 ; i<n ; i++){ // For every process...
             if (allProcesses[i].arrivalTime==time){ // If arrTime is reached...
-#if DEBUG_MODE
-printf("~~ Proc %s has matching arrTime: %d\n", allProcesses[i].ID, allProcesses[i].arrivalTime);
-#endif
-                priorityQueue = realloc(priorityQueue, (queueLen+1)*sizeof(struct Process*));
+                #if DEBUG_MODE
+                printf("~~ Proc %s has matching arrTime: %d\n", allProcesses[i].ID, allProcesses[i].arrivalTime);
+                #endif
+                priorityQueue = realloc(priorityQueue, (priorityQueueLen+1)*sizeof(struct Process*));
                 if (!priorityQueue) {fprintf(stderr, "ERROR: realloc() failed\n"); return EXIT_FAILURE;}
-                priorityQueue[queueLen] = &allProcesses[i];
-                priorityQueue[queueLen]->state = 1; //state=IN-QUEUE
-                queueLen += 1;
+                priorityQueue[priorityQueueLen] = &allProcesses[i];
+                priorityQueue[priorityQueueLen]->state = 1; //state=IN-QUEUE
+                priorityQueueLen += 1;
                 
                 printf("time %dms: Process %s arrived; added to ready queue",
-                    time, priorityQueue[queueLen-1]->ID);
-                priority_queue_status(priorityQueue, queueLen);
-#if DEBUG_MODE
-sleep(SLEEP_TIME_EVENT+timeAdd);
-#endif
+                    time, priorityQueue[priorityQueueLen-1]->ID);
+                priority_queue_status(priorityQueue, priorityQueueLen);
+                #if DEBUG_MODE
+                sleep(SLEEP_TIME_EVENT+timeAdd);
+                #endif
             }
         }
 
-
-#if DEBUG_MODE
-printf("~~ Checking if algo is done...\n");
-#endif
-        // Exit Condition
+        //======================================================================================================================
+        #if DEBUG_MODE
+        printf("~~ Checking if algo is done...\n");
+        #endif        
         if (completedProcs==n){
-            printf("time %dms: Simulator ended for FCFS",
-                time);
-            priority_queue_status(priorityQueue, queueLen);
+            printf("time %dms: Simulator ended for FCFS", time);
+            priority_queue_status(priorityQueue, priorityQueueLen);
+            printf("\n");
             break;
         }
 
 
-#if DEBUG_MODE
-printf("~~ Updating all times...\n");
-#endif
-        /*
-        1. check context switch out start
-        2. check context switch out done
-        3. check context switch in start
-        4. check context switch in done
-        5. check IO
-        6. check arrival
-        */
-
-        // Check all "next events" and increase time based on smallest amount
+        //======================================================================================================================
+        #if DEBUG_MODE
+        printf("~~ Updating all times...\n");
+        #endif
         int advance = 2147483647; //~inf
         int nextArr;
 
@@ -227,7 +213,7 @@ printf("~~ Updating all times...\n");
             printf("~~ Found new advancing time: cs-out-of-CPU time of %d\n", advance);
             #endif
         }
-        if (queueLen!=0 && !cpuIsRunning && csLeft!=0){ // If cs-into-CPU is smallest, adv by that
+        if (priorityQueueLen!=0 && !cpuIsRunning && csLeft!=0){ // If cs-into-CPU is smallest, adv by that
             if (csLeft<advance){
                 advance = csLeft;
                 #if DEBUG_MODE
@@ -243,17 +229,15 @@ printf("~~ Updating all times...\n");
                 #endif
             }
         }
-
         nextArr = 2147483647;
         if (ioLen!=0){ // If curr I/O burst is smallest, adv by that
             if (io->head->p->ioBurstCurr<advance){
                 advance = io->head->p->ioBurstCurr;
-#if DEBUG_MODE
-printf("~~ Found new advancing time: remining I/O burst time of %d\n", advance);
-#endif
+                #if DEBUG_MODE
+                printf("~~ Found new advancing time: remining I/O burst time of %d\n", advance);
+                #endif
             }
         }
-        
         nextArr = 2147483647;
         for(int i=0 ; i<n ; i++){
             if (allProcesses[i].state==2 && allProcesses[i].arrivalTime>time && allProcesses[i].arrivalTime<nextArr) {nextArr = allProcesses[i].arrivalTime-time;}
@@ -266,7 +250,7 @@ printf("~~ Found new advancing time: remining I/O burst time of %d\n", advance);
         } // If next arrival time is smallest, adv by that
 
 
-        // Advance all time-keeping/-tracking variables
+        //======================================================================================================================
         #if DEBUG_MODE
         printf("~~ Attempting to advance by %dms...\n", advance);
         #endif
@@ -284,7 +268,7 @@ printf("~~ Found new advancing time: remining I/O burst time of %d\n", advance);
             printf("~~ CPU running, CPU burst done: decreasing cs time\n");
             #endif
         }
-        else if (queueLen!=0 && !cpuIsRunning && csLeft!=0){ // "If CPU isn't occupied but cs isn't over, decrease cs time"
+        else if (priorityQueueLen!=0 && !cpuIsRunning && csLeft!=0){ // "If CPU isn't occupied but cs isn't over, decrease cs time"
             csLeft -= advance;
             #if DEBUG_MODE
             printf("~~ Procs in-queue, CPU not running, cs time isn't done: decreasing cs time\n");
@@ -301,26 +285,28 @@ printf("~~ Found new advancing time: remining I/O burst time of %d\n", advance);
             printf("~~ Procs in I/O: decreasing all I/O burst times\n");
             #endif
         }
-#if DEBUG_MODE
-printf("~~ ============================================================================\n");
-print_all_proc(allProcesses, n);
-io_status(io);
-printf("~~ CPU running: %d\n", cpuIsRunning);
-printf("~~ queueLen = %d\n", queueLen);
-printf("~~ ioLen = %d\n", ioLen);
-printf("~~ ============================================================================\n");
-sleep(SLEEP_TIME_ADVANCING);
-//if(time>2000) {timeAdd = 3;}
-#endif
+        #if DEBUG_MODE
+        printf("~~ ============================================================================\n");
+        print_all_proc(allProcesses, n);
+        io_status(io);
+        printf("~~ CPU running: %d\n", cpuIsRunning);
+        printf("~~ queueLen = %d\n", queueLen);
+        printf("~~ ioLen = %d\n", ioLen);
+        printf("~~ ============================================================================\n");
+        sleep(SLEEP_TIME_ADVANCING);
+        //if(time>2000) {timeAdd = 3;}
+        #endif
     }
 
 
-
-    // simout.txt Informaton
+    //======================================================================================================================
+    #if DEBUG_MODE
+    printf("~~ Printing simout.txt information...\n");
+    #endif
     // [...]
 
 
-    
+    //======================================================================================================================
     free(priorityQueue);
     free(io);
 
