@@ -312,10 +312,15 @@ int FCFS(struct Process* allProcesses, int n, int t_cs, ssize_t bytesWritten, ch
     #if DEBUG_MODE
     printf("~~ Printing simout.txt information...\n");
     #endif
-    int cpuUtil = 0;
-    for(int i=0 ; i<n ; i++) {for(int j=0 ; j<allProcesses[i].cpuBurstCount ; j++) {cpuUtil += allProcesses[i].cpuBurstTimes[j];}}
+    float cpuUtil = 0;
+    for(int i=0 ; i<n ; i++){ // For every process...
+        for(int j=0 ; j<allProcesses[i].cpuBurstCount ; j++){ // For every CPU burst time
+            cpuUtil += allProcesses[i].cpuBurstTimes[j];
+        }
+    }
     cpuUtil /= time;
 
+    printf("CPU usage: %f%%\n", cpuUtil*100);
     printf("bytesWritten: %ld\n", bytesWritten);
     printf("toWrite: %s", toWrite);
 
