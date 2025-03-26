@@ -22,7 +22,7 @@
 
 
 
-int SJF(struct Process* allProcesses, int n, int t_cs, float alpha){
+int SJF(struct Process* allProcesses, int n, int t_cs, float alpha, ssize_t bytesWritten, char toWrite[200]){
     int time = 0;
     #if DEBUG_MODE
     int timeAdd = 0;
@@ -71,7 +71,7 @@ int SJF(struct Process* allProcesses, int n, int t_cs, float alpha){
                 cpuProc->ioBurstCurr = cpuProc->ioBurstTimes[cpuProc->idx];
             }
 
-            if(csLeft==0){ // If done cs'ing...
+            if(csLeft==0 && cpuProc->state==4){ // If done cs'ing...
                 csLeft = t_cs/2; //Reset
                 cpuIsRunning = 0; // "CPU no longer running a proccess"
 
@@ -79,18 +79,20 @@ int SJF(struct Process* allProcesses, int n, int t_cs, float alpha){
                     #if DEBUG_MODE
                     printf("~~ End of process...\n");
                     #endif
-                    cpuProc->state = 4; //state=TERMINATED
+                    cpuProc->state = 6; //state=TERMINATED
                     completedProcs += 1;
                 }else{ // If CPUProc still has CPU bursts...
                     #if DEBUG_MODE
                     printf("~~ Into I/O...\n");
                     #endif
-                    cpuProc->state = 3; //state==IN-I/O
-                    cpuProc->ioBurstCurr = cpuProc->ioBurstTimes[cpuProc->idx];   // Establish current I/O burst time
+                    cpuProc->state = 5; //state==IN-I/O
+                    cpuProc->ioBurstCurr = cpuProc->ioBurstTimes[cpuProc->idx]; // Establish current I/O burst time
                     queue_push_to_end(io, cpuProc);
                     ioLen += 1;
                 }
-            }else{ // If not, just print info
+            }else if (cpuProc->state!=4){ // If not, update states and print info
+                cpuProc->state = 4; //state==POST-CPU
+                
                 if ((cpuProc->idx+1)==cpuProc->cpuBurstCount){ // If CPUProc has no more CPU bursts...
                     printf("time %dms: Process %s terminated", time, cpuProc->ID);
                     priority_queue_status(priorityQueue, priorityQueueLen);
@@ -120,7 +122,7 @@ int SJF(struct Process* allProcesses, int n, int t_cs, float alpha){
 
         //======================================================================================================================
         #if DEBUG_MODE
-        printf("~~ Checking if process can be added to CPU...\n");
+        printf("~~ Checking if process can be added to CPU or Pre-CPU stage...\n");
         #endif
         if (priorityQueueLen!=0 && !cpuIsRunning){ // If queue isn't empty and nothing is in the CPU... 
             if (csLeft==0){  // If done cs'ing...
@@ -128,8 +130,7 @@ int SJF(struct Process* allProcesses, int n, int t_cs, float alpha){
                 cpuProc = pop(priorityQueue, priorityQueueLen); // Get latest-in-queue process; this also resizes queue
                 if (priorityQueue==NULL) {fprintf(stderr, "ERROR: realloc() failed\n"); return EXIT_FAILURE;}
                 priorityQueueLen -= 1;
-                cpuProc->state = 0; //state==IN-CPU
-                //cpuProc->cpuBurstCurr = cpuProc->cpuBurstTimes[cpuProc->idx]; // Establish current CPU burst time
+                cpuProc->state = 3; //state==IN-CPU
                 cpuIsRunning = 1;   // "CPU is now running a proccess"
 
                 printf("time %dms: Process %s (tau %dms) started using the CPU for %dms burst",
@@ -138,6 +139,8 @@ int SJF(struct Process* allProcesses, int n, int t_cs, float alpha){
                 #if DEBUG_MODE
                 sleep(SLEEP_TIME_EVENT+timeAdd);
                 #endif
+            }else{
+                priorityQueue[0]->state = 2; //state==PRE-CPU
             }
         }
 
@@ -194,6 +197,8 @@ int SJF(struct Process* allProcesses, int n, int t_cs, float alpha){
             }
         }
 
+
+
         //======================================================================================================================
         #if DEBUG_MODE
         printf("~~ Checking if algo is done...\n");
@@ -246,14 +251,18 @@ int SJF(struct Process* allProcesses, int n, int t_cs, float alpha){
         }
         nextArr = 2147483647;
         for(int i=0 ; i<n ; i++){
-            if (allProcesses[i].state==2 && allProcesses[i].arrivalTime>time && allProcesses[i].arrivalTime<nextArr) {nextArr = allProcesses[i].arrivalTime-time;}
+            if (allProcesses[i].state==0 && allProcesses[i].arrivalTime>time){
+                if(allProcesses[i].arrivalTime<nextArr){
+                    nextArr = allProcesses[i].arrivalTime;
+                }
+            }
         }
-        if (nextArr<advance) {
-            advance = nextArr;
+        if ((nextArr-time)<advance){ // If next arrival time is smallest, adv by that
+            advance = nextArr-time;
             #if DEBUG_MODE
             printf("~~ Found new advancing time: next arrival time of %d\n", advance);
             #endif
-        } // If next arrival time is smallest, adv by that
+        }
 
 
         //======================================================================================================================
@@ -296,7 +305,7 @@ int SJF(struct Process* allProcesses, int n, int t_cs, float alpha){
         print_all_proc(allProcesses, n);
         io_status(io);
         printf("~~ CPU running: %d\n", cpuIsRunning);
-        printf("~~ queueLen = %d\n", queueLen);
+        printf("~~ queueLen = %d\n", priorityQueueLen);
         printf("~~ ioLen = %d\n", ioLen);
         printf("~~ ============================================================================\n");
         sleep(SLEEP_TIME_ADVANCING);
@@ -309,8 +318,14 @@ int SJF(struct Process* allProcesses, int n, int t_cs, float alpha){
     #if DEBUG_MODE
     printf("~~ Printing simout.txt information...\n");
     #endif
-    // [...]
+    int cpuUtil = 0;
+    for(int i=0 ; i<n ; i++) {for(int j=0 ; j<allProcesses[i].cpuBurstCount ; j++) {cpuUtil += allProcesses[i].cpuBurstTimes[j];}}
+    cpuUtil /= time;
 
+    printf("bytesWritten: %ld\n", bytesWritten);
+    printf("toWrite: %s", toWrite);
+
+    
 
     //======================================================================================================================
     free(priorityQueue);

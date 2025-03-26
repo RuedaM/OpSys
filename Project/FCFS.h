@@ -47,15 +47,14 @@ int FCFS(struct Process* allProcesses, int n, int t_cs, ssize_t bytesWritten, ch
 
     int completedProcs = 0;
 
-    printf("time %dms: Simulator started for FCFS", time);
-    priority_queue_status(priorityQueue, priorityQueueLen);
-
 
 
     //======================================================================================================================
     #if DEBUG_MODE
     printf("~~ ===BEGINNING FCFS===\n");
     #endif
+    printf("time %dms: Simulator started for FCFS", time);
+    priority_queue_status(priorityQueue, priorityQueueLen);
     while(1){
         #if DEBUG_MODE
         printf("~~ TIME: %d\n", time);
@@ -246,10 +245,8 @@ int FCFS(struct Process* allProcesses, int n, int t_cs, ssize_t bytesWritten, ch
         }
         nextArr = 2147483647;
         for(int i=0 ; i<n ; i++){
-            //printf("Judging %s with arrTime %d compared to time %d and nextArr %d...\n", allProcesses[i].ID, allProcesses[i].arrivalTime, time, nextArr);
             if (allProcesses[i].state==0 && allProcesses[i].arrivalTime>time){
                 if(allProcesses[i].arrivalTime<nextArr){
-                    //printf("New possible shortest arrival time: %s with arrTime %d\n", allProcesses[i].ID, allProcesses[i].arrivalTime);
                     nextArr = allProcesses[i].arrivalTime;
                 }
             }

@@ -3,7 +3,7 @@
 /*
  * TERMINAL COMMANDS:
  * gcc -Wall -Werror -Wextra -g -o project_part1.out project_part1.c -lm
- * gcc -Wall -Werror -Wextra -g -o project_part1.out -D DEBUG_MODE project_part1.c -lm
+ * gcc -Wall -Werror -Wextra -g -o project_part1.out project_part1.c -lm -D DEBUG_MODE
  * ./project_part1.out <ARGS HERE>
  * ./project_part1.out <ARGS HERE> > TERMINAL_OUT.txt
  * valgrind -s --leak-check=full ./project_part1.out <ARGS HERE>
@@ -12,7 +12,7 @@
  * 3  1  32  0.001 1024 4 0.75 256
  * 8  6  768 0.001 1024 6 0.95 128
  * 16 2  256 0.001 2048 4 0.45 32
- * 
+ * 20 16 128 0.01  4096 4 0.99 64
  */
 
 #include <stdio.h>
@@ -192,17 +192,17 @@ int main(int argc, char** argv){
     printf("<<< PROJECT SIMULATIONS\n<<< -- t_cs=%dms; alpha=%.2f; t_slice=%dms\n", t_cs, alpha, t_slice);
     int ret;
 
-    allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
-    ret = FCFS(allProcesses, n, t_cs, bytesWritten, toWrite);
-    if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
-    for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
-    free(allProcesses);
-
     // allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
-    // ret = SJF(allProcesses, n, t_cs, alpha, bytesWritten, toWrite);
+    // ret = FCFS(allProcesses, n, t_cs, bytesWritten, toWrite);
     // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
     // for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
     // free(allProcesses);
+
+    allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
+    ret = SJF(allProcesses, n, t_cs, alpha, bytesWritten, toWrite);
+    if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
+    for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
+    free(allProcesses);
 
     // ret = STR(allProcesses, n, t_cs, alpha, t_slice, bytesWritten, toWrite);
     // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
