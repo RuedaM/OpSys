@@ -198,23 +198,12 @@ int main(int argc, char** argv){
     // for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
     // free(allProcesses);
 
-    allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
-    ret = SJF(allProcesses, n, t_cs, alpha, bytesWritten, toWrite);
-    if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
-
-    // int ret = RR(allProcesses, n, t_cs, t_slice);
+    // allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
+    // ret = SJF(allProcesses, n, t_cs, alpha, bytesWritten, toWrite);
     // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
-
-
-
-    // Freeing all Dynamically-Allocated Memory
-    for (int i=0 ; i<n ; i++){
-        free(allProcesses[i].cpuBurstTimes);
-        free(allProcesses[i].ioBurstTimes);
-        free(IDs[i]);
-    }
-    free(allProcesses);
-
+    // for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
+    // free(allProcesses);
+    
     // ret = STR(allProcesses, n, t_cs, alpha, t_slice, bytesWritten, toWrite);
     // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
     // for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
