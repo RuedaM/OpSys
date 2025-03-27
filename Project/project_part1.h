@@ -38,6 +38,10 @@ struct Process{
 
     int cpuBurstCurr;
     int ioBurstCurr;
+
+    int cpuWaitTime;
+    int cpuTurnAround;
+    int preempts;
 };
 
 // Struct for representing a node in a linked list
@@ -141,6 +145,10 @@ struct Process* gen_procs(char** IDs, int seed, int n, int n_cpu, float lambda, 
         int cpuBurstCurr = 0;   // Current CPU burst to focus on
         int ioBurstCurr = 0;   // Current I/O burst to focus on
 
+        int cpuWaitTime = 0;   // Record all wait times for CPU processes
+        int cpuTurnAround = 0;
+        int preempts = 0;    // Record all wait times for IO processes
+
 #if DEBUG_MODE
 printf("Building Process %s:\n", IDs[i]);
 printf("  Current binding: ");
@@ -154,7 +162,8 @@ for (int i=0 ; i<cpuBurstCount-1 ; i++){printf("%d] %d |", i, ioBurstTimes[i]);}
 printf("\n");
 #endif
         
-        struct Process proc = {IDs[i], state, binding, arrivalTime, cpuBurstCount, idx, tau, cpuBurstTimes, ioBurstTimes, cpuBurstCurr, ioBurstCurr};
+        struct Process proc = {IDs[i], state, binding, arrivalTime, cpuBurstCount, idx, tau, cpuBurstTimes, ioBurstTimes,
+            cpuBurstCurr, ioBurstCurr, cpuWaitTime, cpuTurnAround, preempts};
         allProcesses[i] = proc;
     }
 
