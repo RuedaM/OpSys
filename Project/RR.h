@@ -392,6 +392,10 @@ int RR(struct Process* allProcesses, int n, int t_cs, int t_slice, int fd, ssize
     float ioTotalTATime = 0;
     int numCPUcs = 0;
     int numIOcs = 0;
+    int cpuTotalPreempts = 0;
+    int ioTotalPreempts = 0;
+    float cpuTotalWithin = 0;
+    float ioTotalWithin = 0;
     for(int i=0 ; i<n ; i++){ // For every process...
         for(int j=0 ; j<allProcesses[i].cpuBurstCount ; j++){ // For every CPU burst time
             cpuUtil += allProcesses[i].cpuBurstTimes[j];
@@ -403,12 +407,16 @@ int RR(struct Process* allProcesses, int n, int t_cs, int t_slice, int fd, ssize
             cpuTotalWaitTime -= allProcesses[i].cpuBurstCount*(t_cs/2); // Remove context switches from total wait time
             cpuTotalTATime += allProcesses[i].cpuTurnAround; // Add to total turnaround time
             cpuTotalBursts += allProcesses[i].cpuBurstCount;
+            cpuTotalPreempts += allProcesses[i].preempts;
+            cpuTotalWithin += allProcesses[i].withinSlice;
         }else{ // If process is I/O bound...
             numIOcs += allProcesses[i].cpuBurstCount; // # context switches = cpu burst count
             ioTotalWaitTime += allProcesses[i].cpuWaitTime; // Total wait time (with context switches)
             ioTotalWaitTime -= allProcesses[i].cpuBurstCount*(t_cs/2); // Remove context switches from total wait time
             ioTotalTATime += allProcesses[i].cpuTurnAround; // Add to total turnaround time
             ioTotalBursts += allProcesses[i].cpuBurstCount;
+            ioTotalPreempts += allProcesses[i].preempts;
+            ioTotalWithin += allProcesses[i].withinSlice;
         }
     }
     cpuUtil /= time;
@@ -448,13 +456,24 @@ int RR(struct Process* allProcesses, int n, int t_cs, int t_slice, int fd, ssize
     // bytesWritten = write(fd, toWrite, strlen(toWrite));
     // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
     // // Preemptions
-    // sprintf(toWrite, "-- CPU-bound number of preemptions: 0\n");
+    // sprintf(toWrite, "-- CPU-bound number of preemptions: %d\n", cpuTotalPreempts);
     // bytesWritten = write(fd, toWrite, strlen(toWrite));
     // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    // sprintf(toWrite, "-- I/O-bound number of preemptions: 0\n");
+    // sprintf(toWrite, "-- I/O-bound number of preemptions: %d\n", ioTotalPreempts);
     // bytesWritten = write(fd, toWrite, strlen(toWrite));
     // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    // sprintf(toWrite, "-- overall number of preemptions: 0\n");
+    // sprintf(toWrite, "-- overall number of preemptions: %d\n", cpuTotalPreempts+ioTotalPreempts);
+    // bytesWritten = write(fd, toWrite, strlen(toWrite));
+    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    // RR specific stats
+    // sprintf(toWrite, "-- CPU-bound percentage of CPU bursts completed within one time slice: %.3f\n", ceil((cpuTotalWithin/cpuTotalBursts)*1000)/1000);
+    // bytesWritten = write(fd, toWrite, strlen(toWrite));
+    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    // sprintf(toWrite, "--- I/O-bound percentage of CPU bursts completed within one time slice: %.3f\n", ceil((ioTotalWithin/ioTotalBursts)*1000)/1000);
+    // bytesWritten = write(fd, toWrite, strlen(toWrite));
+    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    // sprintf(toWrite, "-- overall percentage of CPU bursts completed within one time slice: %.3f\n", 
+    //     ceil(((cpuTotalWithin+ioTotalWithin)/(cpuTotalBursts+ioTotalBursts))*1000)/1000);
     // bytesWritten = write(fd, toWrite, strlen(toWrite));
     // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
     printf("CPU usage: %f%%\n", cpuUtil*100);
