@@ -31,15 +31,15 @@ struct Process{
     // (Note: ioBurstCount = cpuBurstCount-1)
     int idx;   // Variable for indexing CPU bursts and I/O bursts
 
-    int tau;   // Predicted CPU burst time (for SJF and SRT)
+    int tauInit;   // Predicted CPU burst time (for SJF and SRT) - remains the same for recalculations
+    int tau;   // Predicted CPU burst time (for SJF and SRT) - gets decremented
     
     // Containers for storing CPU and I/O burst times
     int* cpuBurstTimes;
     int* ioBurstTimes;
 
-    // Current burst
-    int cpuBurstCurr;
-    int ioBurstCurr;
+    int cpuBurstCurr; // Currently-active CPU burst
+    int ioBurstCurr; // Currently-active I/O burst
 
     int cpuWaitTime;    // Total CPU wait time for process
     int cpuTurnAround;  // Total CPU turnaround for process
@@ -115,10 +115,11 @@ struct Process* gen_procs(char** IDs, int seed, int n, int n_cpu, float lambda, 
         int state = 0; //state=IN-MEMORY
         int binding; if(i<n_cpu) {binding=0;} else {binding=1;}
         int preemptState = 0; //preempt state=never preempted
-        float arrTime = next_exp(lambda, bound, "ceil", 0); // ON THE HANDOUT IT SHOULD SAY TO USE CEIL NOT FLOOR WTF
+        float arrivalTime = next_exp(lambda, bound, "ceil", 0); // ON THE HANDOUT IT SHOULD SAY TO USE CEIL NOT FLOOR WTF
         int cpuBurstCount = ceil(next_exp(lambda, bound, "-", 1)*32);
         int idx = 0;
-        int tau = ceil(1/lambda);
+        int tauInit = ceil(1/lambda);
+        int tau = tauInit;
         
         int* cpuBurstTimes = calloc(cpuBurstCount, sizeof(int)); //DYNAMIC.MEMORY
         int* ioBurstTimes = calloc(cpuBurstCount-1, sizeof(int)); //DYNAMIC.MEMORY
@@ -153,7 +154,7 @@ struct Process* gen_procs(char** IDs, int seed, int n, int n_cpu, float lambda, 
 printf("Building Process %s:\n", IDs[i]);
 printf("  Current binding: ");
 if (binding==0) {printf("CPU\n");} else {printf("I/O\n");}
-printf("  Generated interarrival_time: %f\n", arrTime);
+printf("  Generated interarrival_time: %f\n", arrivalTime);
 printf("  CPU Bursts: %d --- I/O Bursts: %d\n", cpuBurstCount, cpuBurstCount-1);
 printf("  CPU Burst Times: |");
 for (int i=0 ; i<cpuBurstCount ; i++){printf("%d] %d |", i, cpuBurstTimes[i]);} printf("\n");
@@ -162,7 +163,7 @@ for (int i=0 ; i<cpuBurstCount-1 ; i++){printf("%d] %d |", i, ioBurstTimes[i]);}
 printf("\n");
 #endif
         
-        struct Process proc = {IDs[i], state, binding, preemptState, arrTime, cpuBurstCount, idx, tau, cpuBurstTimes,
+        struct Process proc = {IDs[i], state, binding, preemptState, arrivalTime, cpuBurstCount, idx, tauInit, tau, cpuBurstTimes,
             ioBurstTimes, cpuBurstCurr, ioBurstCurr, cpuWaitTime, cpuTurnAround, preempts, withinSlice};
         allProcesses[i] = proc;
     }
@@ -270,6 +271,9 @@ struct Process* pop(struct Process** procQ, int numProc){
 //     }
 // }
 
+
+
+
 // =========================================================================================
 // ================================= RR HELPER FUNCTIONS ===================================
 // =========================================================================================
@@ -330,6 +334,38 @@ struct Process* priority_queue_push_front_SJF(struct Process*** priorityQueue, i
     return (*priorityQueue)[0]; // Return queue head
 }
 
+// =========================================================================================
+// ================================== SRT HELPER FUNCTIONS =================================
+// =========================================================================================
+// Function that removes the preempting (from I/O to queue, but immediately switch to CPU after that) process
+#include <string.h> // For strcmp()
+
+struct Process* priority_queue_remove_single(struct Process*** priorityQueue, int priorityQueueLen, char* p_in_ID) {
+    // Validate input parameters
+    if (priorityQueue==NULL || *priorityQueue==NULL || p_in_ID==NULL) {fprintf(stderr, "ERROR: p_q_rmv_single() param(s) invalid\n"); return NULL;}
+
+    // Search for the process with matching ID
+    for (int i=0; i<priorityQueueLen ; i++) {
+        if (strcmp((*priorityQueue)[i]->ID, p_in_ID)==0) {
+            struct Process* removed = (*priorityQueue)[i];
+
+            // Shift elements left to fill the gap
+            for (int j=i ; j<priorityQueueLen-1 ; j++) {(*priorityQueue)[j] = (*priorityQueue)[j+1];}
+
+            // Resize the array
+            struct Process** temp = realloc(*priorityQueue, (priorityQueueLen-1)*sizeof(struct Process*));
+            
+            // Update queue pointer (even if realloc fails for size 0)
+            if (priorityQueueLen-1>0 && temp!=NULL) {*priorityQueue = temp;}
+            else if (priorityQueueLen-1==0) {*priorityQueue = NULL;} // Empty queue
+
+            return removed;
+        }
+    }
+
+    return NULL; // Process not found
+}
+
 
 // =========================================================================================
 // ============================= PRINTING + DEBUGGING FUNCTIONS ============================
@@ -351,9 +387,11 @@ void print_proc(struct Process p){
     printf("//  Total I/O Bursts: %d\n", p.cpuBurstCount-1);
     printf("||  ArrTime: %d  ", p.arrivalTime);
     printf("//  Index: %d  ", p.idx);
-    printf("//  Tau: %d\n", p.tau);
+    printf("//  Tau: %d ", p.tau);
+    printf(" (Init. Tau: %d)\n", p.tauInit);
     printf("||  Current CPU Burst: %d  ", p.cpuBurstCurr);
     printf("//  Current I/O Burst: %d\n", p.ioBurstCurr);
+    printf("||  Preempts: %d\n", p.preempts);
     // printf("  CPU Burst Times: |");
     // for (int i=0 ; i<p.cpuBurstCount ; i++){printf("%d] %d |", i, p.cpuBurstTimes[i]);} printf("\n");
     // printf("  I/O Burst Times: |");
