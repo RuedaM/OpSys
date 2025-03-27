@@ -22,7 +22,7 @@
 
 
 
-int SJF(struct Process* allProcesses, int n, int t_cs, float alpha, ssize_t bytesWritten, char toWrite[200]){
+int SJF(struct Process* allProcesses, int n, int t_cs, double alpha, ssize_t bytesWritten, char toWrite[200]){
     int time = 0;
     #if DEBUG_MODE
     int timeAdd = 0;
@@ -59,8 +59,8 @@ int SJF(struct Process* allProcesses, int n, int t_cs, float alpha, ssize_t byte
         #if DEBUG_MODE
         printf("~~ TIME: %d\n", time);
         #endif
-
-
+        
+        
         //======================================================================================================================
         #if DEBUG_MODE
         printf("~~ Checking if process can be deleted or added to I/O...\n");
@@ -103,7 +103,8 @@ int SJF(struct Process* allProcesses, int n, int t_cs, float alpha, ssize_t byte
                     else                                              {printf("s to go");}
                     priority_queue_status(priorityQueue, priorityQueueLen);
                     
-                    int newTau = ceil(alpha*cpuProc->cpuBurstTimes[cpuProc->idx] + (1-alpha)*cpuProc->tau); // formula for newTau as is
+                    double computed = alpha * (double)cpuProc->cpuBurstTimes[cpuProc->idx] + (1.0-alpha) * (double)cpuProc->tau;
+                    int newTau = (int)ceil(computed);
                     printf("time %dms: Recalculated tau for process %s: old tau %dms ==> new tau %dms",
                         time, cpuProc->ID, cpuProc->tau, newTau);
                     priority_queue_status(priorityQueue, priorityQueueLen);
@@ -124,9 +125,10 @@ int SJF(struct Process* allProcesses, int n, int t_cs, float alpha, ssize_t byte
         #if DEBUG_MODE
         printf("~~ Checking if process can be added to CPU or Pre-CPU stage...\n");
         #endif
-        if (priorityQueueLen!=0 && !cpuIsRunning){ // If queue isn't empty and nothing is in the CPU... 
+        if (priorityQueueLen!=0 && !cpuIsRunning){ // If queue isn't empty and nothing is in the CPU...
             if (csLeft==0){  // If done cs'ing...
                 csLeft = t_cs/2; //Reset
+
                 cpuProc = pop(priorityQueue, priorityQueueLen); // Get latest-in-queue process; this also resizes queue
                 if (priorityQueue==NULL) {fprintf(stderr, "ERROR: realloc() failed\n"); return EXIT_FAILURE;}
                 priorityQueueLen -= 1;
@@ -136,18 +138,24 @@ int SJF(struct Process* allProcesses, int n, int t_cs, float alpha, ssize_t byte
                 printf("time %dms: Process %s (tau %dms) started using the CPU for %dms burst",
                     time, cpuProc->ID, cpuProc->tau, cpuProc->cpuBurstCurr);
                 priority_queue_status(priorityQueue, priorityQueueLen);
+                
                 #if DEBUG_MODE
                 sleep(SLEEP_TIME_EVENT+timeAdd);
                 #endif
             }else{
-                priorityQueue[0]->state = 2; //state==PRE-CPU
+                if (io->head!=NULL && io->head->p->ioBurstCurr==0
+                && io->head->p->cpuBurstTimes[io->head->p->idx+1]<priorityQueue[0]->cpuBurstTimes[priorityQueue[0]->idx+1]){
+                    io->head->p->state = 2; //state==PRE-CPU
+                }else{
+                    priorityQueue[0]->state = 2; //state==PRE-CPU
+                }
             }
         }
 
 
         //======================================================================================================================
         #if DEBUG_MODE
-        printf("~~ Checking if process can be added back to queue after I/O...\n");
+        printf("~~ Checking if process can be added from I/O back to queue...\n");
         #endif
         while(1){ // Until all 0-I/O-burst-time processes have been moved...
             
@@ -158,7 +166,7 @@ int SJF(struct Process* allProcesses, int n, int t_cs, float alpha, ssize_t byte
                     movingProc->state = 1; //state=IN-QUEUE
                     movingProc->idx += 1; //Increase CPU and I/O bust times index
                     movingProc->cpuBurstCurr = movingProc->cpuBurstTimes[movingProc->idx]; // Establish current CPU burst time
-                    priority_queue_push_SJF(priorityQueue, priorityQueueLen, movingProc);
+                    priority_queue_push_SJF(&priorityQueue, priorityQueueLen, movingProc);
                     priorityQueueLen += 1;
                     ioLen -= 1;
 
@@ -185,7 +193,7 @@ int SJF(struct Process* allProcesses, int n, int t_cs, float alpha, ssize_t byte
                 struct Process* movingProc = &allProcesses[i];
                 movingProc->state = 1; //state=IN-QUEUE
                 movingProc->cpuBurstCurr = movingProc->cpuBurstTimes[movingProc->idx]; // Establish current CPU burst time
-                priority_queue_push_SJF(priorityQueue, priorityQueueLen, movingProc);
+                priority_queue_push_SJF(&priorityQueue, priorityQueueLen, movingProc);
                 priorityQueueLen += 1;
                 
                 printf("time %dms: Process %s (tau %dms) arrived; added to ready queue",
@@ -318,10 +326,15 @@ int SJF(struct Process* allProcesses, int n, int t_cs, float alpha, ssize_t byte
     #if DEBUG_MODE
     printf("~~ Printing simout.txt information...\n");
     #endif
-    int cpuUtil = 0;
-    for(int i=0 ; i<n ; i++) {for(int j=0 ; j<allProcesses[i].cpuBurstCount ; j++) {cpuUtil += allProcesses[i].cpuBurstTimes[j];}}
+    float cpuUtil = 0;
+    for(int i=0 ; i<n ; i++){ // For every process...
+        for(int j=0 ; j<allProcesses[i].cpuBurstCount ; j++){ // For every CPU burst time
+            cpuUtil += allProcesses[i].cpuBurstTimes[j];
+        }
+    }
     cpuUtil /= time;
 
+    printf("CPU usage: %f%%\n", cpuUtil*100);
     printf("bytesWritten: %ld\n", bytesWritten);
     printf("toWrite: %s", toWrite);
 

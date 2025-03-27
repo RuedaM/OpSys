@@ -106,15 +106,10 @@ struct Process* gen_procs(char** IDs, int seed, int n, int n_cpu, float lambda, 
 
     for (int i=0 ; i<n ; i++){
         int state = 0; //state=IN-MEMORY
-
         int binding; if(i<n_cpu) {binding=0;} else {binding=1;}
-
-        float arrivalTime = next_exp(lambda, bound, "ceil", 0); // ON THE HANDOUT IT SHOULD SAY TO USE CEIL NOT FLOOR WTF
-        
+        float arrTime = next_exp(lambda, bound, "ceil", 0); // ON THE HANDOUT IT SHOULD SAY TO USE CEIL NOT FLOOR WTF
         int cpuBurstCount = ceil(next_exp(lambda, bound, "-", 1)*32);
-
         int idx = 0;
-
         int tau = ceil(1/lambda);
         
         int* cpuBurstTimes = calloc(cpuBurstCount, sizeof(int)); //DYNAMIC.MEMORY
@@ -145,7 +140,7 @@ struct Process* gen_procs(char** IDs, int seed, int n, int n_cpu, float lambda, 
 printf("Building Process %s:\n", IDs[i]);
 printf("  Current binding: ");
 if (binding==0) {printf("CPU\n");} else {printf("I/O\n");}
-printf("  Generated interarrival_time: %f\n", arrivalTime);
+printf("  Generated interarrival_time: %f\n", arrTime);
 printf("  CPU Bursts: %d --- I/O Bursts: %d\n", cpuBurstCount, cpuBurstCount-1);
 printf("  CPU Burst Times: |");
 for (int i=0 ; i<cpuBurstCount ; i++){printf("%d] %d |", i, cpuBurstTimes[i]);} printf("\n");
@@ -154,7 +149,7 @@ for (int i=0 ; i<cpuBurstCount-1 ; i++){printf("%d] %d |", i, ioBurstTimes[i]);}
 printf("\n");
 #endif
         
-        struct Process proc = {IDs[i], state, binding, arrivalTime, cpuBurstCount, idx, tau, cpuBurstTimes, ioBurstTimes, cpuBurstCurr, ioBurstCurr};
+        struct Process proc = {IDs[i], state, binding, arrTime, cpuBurstCount, idx, tau, cpuBurstTimes, ioBurstTimes, cpuBurstCurr, ioBurstCurr};
         allProcesses[i] = proc;
     }
 
@@ -264,7 +259,7 @@ struct Process* pop(struct Process** procQ, int numProc){
 // =========================================================================================
 // ================================= RR HELPER FUNCTIONS ===================================
 // =========================================================================================
-
+// Function for ...
 struct Process* cpuPop(struct Process* procQ){
     if (procQ==NULL) {return NULL;} // Safety check
 
@@ -279,22 +274,47 @@ struct Process* cpuPop(struct Process* procQ){
 // ================================== SJF HELPER FUNCTIONS =================================
 // =========================================================================================
 // Function for adding Process pointer to priority queue following SJF algorithm (sorting by CPU burst); returns head of priority queue
-struct Process* priority_queue_push_SJF(struct Process** priorityQueue, int priorityQueueLen, struct Process* p_in){
-    
-    if (priorityQueue==NULL || p_in==NULL) {fprintf(stderr, "ERROR: p_q_push_SJF() param(s) invalid\n"); return NULL;}  // Return unchanged queue
+struct Process* priority_queue_push_SJF(struct Process*** priorityQueue, int priorityQueueLen, struct Process* p_in){
+    if (priorityQueue==NULL || p_in==NULL) {fprintf(stderr, "ERROR: p_q_push_SJF() param(s) invalid\n"); return NULL;}
 
-    priorityQueue = realloc(priorityQueue, (priorityQueueLen+1)*sizeof(struct Process*));
-    if (priorityQueue==NULL) {fprintf(stderr, "ERROR: realloc failed\n"); exit(EXIT_FAILURE);}
+    // Reallocate memory for the priority queue
+    struct Process** temp = realloc(*priorityQueue, (priorityQueueLen+1)*sizeof(struct Process*));
+    if (temp==NULL) {fprintf(stderr, "ERROR: realloc failed\n"); return NULL;}
+
+    *priorityQueue = temp; // Update the caller's pointer
 
     int i;
-    for(i=priorityQueueLen-1 ; i>=0 && (priorityQueue[i]->tau)>(p_in->tau) ; i--){
-        priorityQueue[i+1] = priorityQueue[i]; // Shift elements right
+    // Traverse backward to find insertion point
+    for (i=priorityQueueLen-1 ; 
+         i>=0 && 
+         ( (*priorityQueue)[i]->tau>p_in->tau || 
+           ( (*priorityQueue)[i]->tau==p_in->tau && 
+             strcmp((*priorityQueue)[i]->ID, p_in->ID)>0 ) ) ; 
+         i--) {
+        (*priorityQueue)[i + 1] = (*priorityQueue)[i]; // Shift right
     }
-    priorityQueue[i+1] = p_in; // Insert new process at correct spot
+    (*priorityQueue)[i + 1] = p_in; // Insert new process
 
-    return priorityQueue[0]; // return head of queue
+    return (*priorityQueue)[0]; // Return queue head
 }
 
+// Function for adding Process pointer to priority queue following SJF algorithm (sorting by CPU burst); returns head of priority queue
+struct Process* priority_queue_push_front_SJF(struct Process*** priorityQueue, int priorityQueueLen, struct Process* p_in) {
+    // Validate input parameters
+    if (priorityQueue==NULL || p_in==NULL) {fprintf(stderr, "ERROR: p_q_push_front_SJF() param(s) invalid\n"); return NULL;}
+
+    // Reallocate memory for the priority queue
+    struct Process** temp = realloc(*priorityQueue, (priorityQueueLen+1)*sizeof(struct Process*));
+    if (temp==NULL) {fprintf(stderr, "ERROR: realloc failed\n"); return NULL;}
+
+    *priorityQueue = temp; // Update the caller's pointer
+
+    for (int i=priorityQueueLen-1 ; i>=0 ; i--) {(*priorityQueue)[i+1] = (*priorityQueue)[i];} // Shift existing elements to the right
+
+    (*priorityQueue)[0] = p_in; // Insert new process at the front
+
+    return (*priorityQueue)[0]; // Return queue head
+}
 
 
 // =========================================================================================
