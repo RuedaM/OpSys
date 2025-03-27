@@ -24,6 +24,7 @@ struct Process{
     char* ID; // Process ID (A0 - Z9)
     int state;   // States: IN-MEMORY (0) / IN-QUEUE (1) / PRE-CPU (2) / IN-CPU (3) / POST-CPU (4) / IN-I/O (5) / TERMINATED (6)
     int binding;   // Binding: CPU-Bound (0) / I/O-Bound (1)
+    int preemptState;  // States: never preempted (0) / previously preempted (1)
     
     int arrivalTime;   // Process arrival time
     int cpuBurstCount;   // Number of CPU burst for a single process
@@ -36,12 +37,14 @@ struct Process{
     int* cpuBurstTimes;
     int* ioBurstTimes;
 
+    // Current burst
     int cpuBurstCurr;
     int ioBurstCurr;
 
-    int cpuWaitTime;
-    int cpuTurnAround;
-    int preempts;
+    int cpuWaitTime;    // Total CPU wait time for process
+    int cpuTurnAround;  // Total CPU turnaround for process
+    int preempts;       // Total preempts for process
+    int withinSlice;    // Total bursts completed within a single time slice for process
 };
 
 // Struct for representing a node in a linked list
@@ -111,6 +114,7 @@ struct Process* gen_procs(char** IDs, int seed, int n, int n_cpu, float lambda, 
     for (int i=0 ; i<n ; i++){
         int state = 0; //state=IN-MEMORY
         int binding; if(i<n_cpu) {binding=0;} else {binding=1;}
+        int preemptState = 0; //preempt state=never preempted
         float arrTime = next_exp(lambda, bound, "ceil", 0); // ON THE HANDOUT IT SHOULD SAY TO USE CEIL NOT FLOOR WTF
         int cpuBurstCount = ceil(next_exp(lambda, bound, "-", 1)*32);
         int idx = 0;
@@ -141,8 +145,9 @@ struct Process* gen_procs(char** IDs, int seed, int n, int n_cpu, float lambda, 
         int ioBurstCurr = 0;   // Current I/O burst to focus on
 
         int cpuWaitTime = 0;   // Record all wait times for CPU processes
-        int cpuTurnAround = 0;
-        int preempts = 0;    // Record all wait times for IO processes
+        int cpuTurnAround = 0;  // Record all CPU turnaround time
+        int preempts = 0;    // Record number of preempts that occured for the process
+        int withinSlice = 0;    // Record number of CPU bursts completed with a single time slice
 
 #if DEBUG_MODE
 printf("Building Process %s:\n", IDs[i]);
@@ -157,12 +162,8 @@ for (int i=0 ; i<cpuBurstCount-1 ; i++){printf("%d] %d |", i, ioBurstTimes[i]);}
 printf("\n");
 #endif
         
-<<<<<<< HEAD
-        struct Process proc = {IDs[i], state, binding, arrTime, cpuBurstCount, idx, tau, cpuBurstTimes, ioBurstTimes, cpuBurstCurr, ioBurstCurr};
-=======
-        struct Process proc = {IDs[i], state, binding, arrivalTime, cpuBurstCount, idx, tau, cpuBurstTimes, ioBurstTimes,
-            cpuBurstCurr, ioBurstCurr, cpuWaitTime, cpuTurnAround, preempts};
->>>>>>> refs/remotes/origin/main
+        struct Process proc = {IDs[i], state, binding, preemptState, arrTime, cpuBurstCount, idx, tau, cpuBurstTimes,
+            ioBurstTimes, cpuBurstCurr, ioBurstCurr, cpuWaitTime, cpuTurnAround, preempts, withinSlice};
         allProcesses[i] = proc;
     }
 

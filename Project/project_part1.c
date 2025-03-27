@@ -192,38 +192,29 @@ int main(int argc, char** argv){
     printf("<<< PROJECT SIMULATIONS\n<<< -- t_cs=%dms; alpha=%.2f; t_slice=%dms\n", t_cs, alpha, t_slice);
     int ret;
 
-<<<<<<< HEAD
     // allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
-    // ret = FCFS(allProcesses, n, t_cs, bytesWritten, toWrite);
-=======
-    allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
-    ret = FCFS(allProcesses, n, t_cs, fd, bytesWritten, toWrite);
-    if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
-    for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
-    free(allProcesses);
-
-    // allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
-    // ret = SJF(allProcesses, n, t_cs, alpha, fd, bytesWritten, toWrite);
->>>>>>> refs/remotes/origin/main
+    // ret = FCFS(allProcesses, n, t_cs, fd, bytesWritten, toWrite);
     // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
     // for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
     // free(allProcesses);
 
-    allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
-    ret = SJF(allProcesses, n, t_cs, alpha, bytesWritten, toWrite);
-    if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
-    for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
-    free(allProcesses);
+    // allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
+    // ret = SJF(allProcesses, n, t_cs, alpha, bytesWritten, toWrite);
+    // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
+    // for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
+    // free(allProcesses);
     
-    // ret = STR(allProcesses, n, t_cs, alpha, t_slice, fd, bytesWritten, toWrite);
+    // allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
+    // ret = STR(allProcesses, n, t_cs, alpha, fd, bytesWritten, toWrite);
     // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
     // for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
     // free(allProcesses);
 
-    // ret = RR(allProcesses, n, t_cs, t_slice, fd, bytesWritten, toWrite);
-    // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
-    // for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
-    // free(allProcesses);
+    allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
+    ret = RR(allProcesses, n, t_cs, t_slice, fd, bytesWritten, toWrite);
+    if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
+    for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
+    free(allProcesses);
 
 
 
