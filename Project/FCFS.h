@@ -15,18 +15,18 @@
 
 #include "project_part1.h"
 
-#if DEBUG_MODE
-#define SLEEP_TIME_ADVANCING 0
-#define SLEEP_TIME_EVENT 0
-#endif
+// #if DEBUG_MODE
+// #define SLEEP_TIME_ADVANCING 0
+// #define SLEEP_TIME_EVENT 0
+// #endif
 
 
 
 int FCFS(struct Process* allProcesses, int n, int t_cs, int fd, ssize_t bytesWritten, char toWrite[200]){
     int time = 0;
-    #if DEBUG_MODE
-    int timeAdd = 0;
-    #endif
+    // #if DEBUG_MODE
+    // int timeAdd = 0;
+    // #endif
     int csLeft = t_cs/2;
     
     // Priority Queue = array of Process pointers
@@ -106,9 +106,9 @@ int FCFS(struct Process* allProcesses, int n, int t_cs, int fd, ssize_t bytesWri
                         time, cpuProc->ID, (time+(t_cs/2)+cpuProc->ioBurstCurr));
                     priority_queue_status(priorityQueue, priorityQueueLen);
                 }
-            #if DEBUG_MODE
-            sleep(SLEEP_TIME_EVENT+timeAdd);
-            #endif
+            // #if DEBUG_MODE
+            // sleep(SLEEP_TIME_EVENT+timeAdd);
+            // #endif
             }
         }
 
@@ -130,9 +130,9 @@ int FCFS(struct Process* allProcesses, int n, int t_cs, int fd, ssize_t bytesWri
                 printf("time %dms: Process %s started using the CPU for %dms burst",
                     time, cpuProc->ID, cpuProc->cpuBurstCurr);
                 priority_queue_status(priorityQueue, priorityQueueLen);
-                #if DEBUG_MODE
-                sleep(SLEEP_TIME_EVENT+timeAdd);
-                #endif
+                // #if DEBUG_MODE
+                // sleep(SLEEP_TIME_EVENT+timeAdd);
+                // #endif
             }else{
                 priorityQueue[0]->state = 2; //state==PRE-CPU
             }
@@ -161,9 +161,9 @@ int FCFS(struct Process* allProcesses, int n, int t_cs, int fd, ssize_t bytesWri
                     priority_queue_status(priorityQueue, priorityQueueLen);
                 }else {break;} // If next-up-proc's I/O burst isn't finished, continue past
             }else{break;} // If I/O is empty, continue past
-            #if DEBUG_MODE
-            sleep(SLEEP_TIME_EVENT+timeAdd);
-            #endif
+            // #if DEBUG_MODE
+            // sleep(SLEEP_TIME_EVENT+timeAdd);
+            // #endif
         }
 
 
@@ -185,9 +185,9 @@ int FCFS(struct Process* allProcesses, int n, int t_cs, int fd, ssize_t bytesWri
                 printf("time %dms: Process %s arrived; added to ready queue",
                     time, priorityQueue[priorityQueueLen-1]->ID);
                 priority_queue_status(priorityQueue, priorityQueueLen);
-                #if DEBUG_MODE
-                sleep(SLEEP_TIME_EVENT+timeAdd);
-                #endif
+                // #if DEBUG_MODE
+                // sleep(SLEEP_TIME_EVENT+timeAdd);
+                // #endif
             }
         }
 
@@ -310,7 +310,7 @@ int FCFS(struct Process* allProcesses, int n, int t_cs, int fd, ssize_t bytesWri
         printf("~~ queueLen = %d\n", priorityQueueLen);
         printf("~~ ioLen = %d\n", ioLen);
         printf("~~ ============================================================================\n");
-        sleep(SLEEP_TIME_ADVANCING);
+        // sleep(SLEEP_TIME_ADVANCING);
         //if(time>2000) {timeAdd = 3;}
         #endif
     }
@@ -331,17 +331,17 @@ int FCFS(struct Process* allProcesses, int n, int t_cs, int fd, ssize_t bytesWri
     int numCPUcs = 0;
     int numIOcs = 0;
     for(int i=0 ; i<n ; i++){ // For every process...
-        for(int j=0 ; j<allProcesses[i].cpuBurstCount ; j++){ // For every CPU burst time
-            cpuUtil += allProcesses[i].cpuBurstTimes[j];
+        for(int j=0 ; j<allProcesses[i].cpuBurstCount ; j++){ // For every CPU burst time...
+            cpuUtil += allProcesses[i].cpuBurstTimes[j]; // Add all CPU burst times
         }
         
-        if (allProcesses[i].binding==0) { // If process is CPU bound...
+        if (allProcesses[i].binding==0) { // If process is CPU-bound...
             numCPUcs += allProcesses[i].cpuBurstCount; // # context switches = cpu burst count
             cpuTotalWaitTime += allProcesses[i].cpuWaitTime; // Add to total wait time (with context switches)
             cpuTotalWaitTime -= allProcesses[i].cpuBurstCount*(t_cs/2); // Remove context switches from total wait time
             cpuTotalTATime += allProcesses[i].cpuTurnAround; // Add to total turnaround time
             cpuTotalBursts += allProcesses[i].cpuBurstCount;
-        }else{ // If process is I/O bound...
+        }else{ // If process is I/O-bound...
             numIOcs += allProcesses[i].cpuBurstCount; // # context switches = cpu burst count
             ioTotalWaitTime += allProcesses[i].cpuWaitTime; // Total wait time (with context switches)
             ioTotalWaitTime -= allProcesses[i].cpuBurstCount*(t_cs/2); // Remove context switches from total wait time

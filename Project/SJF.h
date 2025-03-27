@@ -15,18 +15,18 @@
 
 #include "project_part1.h"
 
-#if DEBUG_MODE
-#define SLEEP_TIME_ADVANCING 0
-#define SLEEP_TIME_EVENT 0
-#endif
+// #if DEBUG_MODE
+// #define SLEEP_TIME_ADVANCING 0
+// #define SLEEP_TIME_EVENT 0
+// #endif
 
 
 
-int SJF(struct Process* allProcesses, int n, int t_cs, double alpha, ssize_t bytesWritten, char toWrite[200]){
+int SJF(struct Process* allProcesses, int n, int t_cs, double alpha, int fd, ssize_t bytesWritten, char toWrite[200]){
     int time = 0;
-    #if DEBUG_MODE
-    int timeAdd = 0;
-    #endif
+    // #if DEBUG_MODE
+    // int timeAdd = 0;
+    // #endif
     int csLeft = t_cs/2;
     
     // Priority Queue = array of Process pointers
@@ -114,9 +114,9 @@ int SJF(struct Process* allProcesses, int n, int t_cs, double alpha, ssize_t byt
                         time, cpuProc->ID, (time+(t_cs/2)+cpuProc->ioBurstCurr));
                     priority_queue_status(priorityQueue, priorityQueueLen);
                 }
-            #if DEBUG_MODE
-            sleep(SLEEP_TIME_EVENT+timeAdd);
-            #endif
+            // #if DEBUG_MODE
+            // sleep(SLEEP_TIME_EVENT+timeAdd);
+            // #endif
             }
         }
 
@@ -139,9 +139,9 @@ int SJF(struct Process* allProcesses, int n, int t_cs, double alpha, ssize_t byt
                     time, cpuProc->ID, cpuProc->tau, cpuProc->cpuBurstCurr);
                 priority_queue_status(priorityQueue, priorityQueueLen);
                 
-                #if DEBUG_MODE
-                sleep(SLEEP_TIME_EVENT+timeAdd);
-                #endif
+                // #if DEBUG_MODE
+                // sleep(SLEEP_TIME_EVENT+timeAdd);
+                // #endif
             }else{
                 if (io->head!=NULL && io->head->p->ioBurstCurr==0
                 && io->head->p->cpuBurstTimes[io->head->p->idx+1]<priorityQueue[0]->cpuBurstTimes[priorityQueue[0]->idx+1]){
@@ -175,9 +175,9 @@ int SJF(struct Process* allProcesses, int n, int t_cs, double alpha, ssize_t byt
                     priority_queue_status(priorityQueue, priorityQueueLen);
                 }else {break;} // If next-up-proc's I/O burst isn't finished, continue past
             }else{break;} // If I/O is empty, continue past
-            #if DEBUG_MODE
-            sleep(SLEEP_TIME_EVENT+timeAdd);
-            #endif
+            // #if DEBUG_MODE
+            // sleep(SLEEP_TIME_EVENT+timeAdd);
+            // #endif
         }
 
 
@@ -199,9 +199,9 @@ int SJF(struct Process* allProcesses, int n, int t_cs, double alpha, ssize_t byt
                 printf("time %dms: Process %s (tau %dms) arrived; added to ready queue",
                     time, movingProc->ID, movingProc->tau);
                 priority_queue_status(priorityQueue, priorityQueueLen);
-                #if DEBUG_MODE
-                sleep(SLEEP_TIME_EVENT+timeAdd);
-                #endif
+                // #if DEBUG_MODE
+                // sleep(SLEEP_TIME_EVENT+timeAdd);
+                // #endif
             }
         }
 
@@ -316,7 +316,7 @@ int SJF(struct Process* allProcesses, int n, int t_cs, double alpha, ssize_t byt
         printf("~~ queueLen = %d\n", priorityQueueLen);
         printf("~~ ioLen = %d\n", ioLen);
         printf("~~ ============================================================================\n");
-        sleep(SLEEP_TIME_ADVANCING);
+        // sleep(SLEEP_TIME_ADVANCING);
         //if(time>2000) {timeAdd = 3;}
         #endif
     }
@@ -336,6 +336,7 @@ int SJF(struct Process* allProcesses, int n, int t_cs, double alpha, ssize_t byt
 
     printf("CPU usage: %f%%\n", cpuUtil*100);
     printf("bytesWritten: %ld\n", bytesWritten);
+    printf("fd: %d\n", fd);
     printf("toWrite: %s", toWrite);
 
     

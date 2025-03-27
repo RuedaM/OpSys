@@ -44,6 +44,8 @@ struct Process{
     int cpuWaitTime;    // Total CPU wait time for process
     int cpuTurnAround;  // Total CPU turnaround for process
     int preempts;       // Total preempts for process
+    int preempted;
+    int preempting;
     int withinSlice;    // Total bursts completed within a single time slice for process
 };
 
@@ -148,6 +150,8 @@ struct Process* gen_procs(char** IDs, int seed, int n, int n_cpu, float lambda, 
         int cpuWaitTime = 0;   // Record all wait times for CPU processes
         int cpuTurnAround = 0;  // Record all CPU turnaround time
         int preempts = 0;    // Record number of preempts that occured for the process
+        int preempted = 0;
+        int preempting = 0;
         int withinSlice = 0;    // Record number of CPU bursts completed with a single time slice
 
 #if DEBUG_MODE
@@ -164,7 +168,7 @@ printf("\n");
 #endif
         
         struct Process proc = {IDs[i], state, binding, preemptState, arrivalTime, cpuBurstCount, idx, tauInit, tau, cpuBurstTimes,
-            ioBurstTimes, cpuBurstCurr, ioBurstCurr, cpuWaitTime, cpuTurnAround, preempts, withinSlice};
+            ioBurstTimes, cpuBurstCurr, ioBurstCurr, cpuWaitTime, cpuTurnAround, preempts, preempted, preempting, withinSlice};
         allProcesses[i] = proc;
     }
 
