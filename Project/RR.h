@@ -304,8 +304,8 @@ int RR(struct Process* allProcesses, int n, int t_cs, int t_slice, int fd, ssize
             printf("~~ Found new advancing time: next arrival time of %d\n", advance);
             #endif
         }
-        if (tsliceLeft<advance && cpuProc->state!=4){ // If time slice is smallest, adv by that
-            advance = tsliceLeft;
+        if (tsliceLeft<advance && cpuProc){ // If time slice is smallest, adv by that
+            if (cpuProc->state!=4){advance = tsliceLeft;}
             #if DEBUG_MODE
             printf("~~ Found new advancing time: time slice time of %d\n", advance);
             #endif
