@@ -82,14 +82,18 @@ int RR(struct Process* allProcesses, int n, int t_cs, int t_slice, int fd, ssize
             }else if (cpuProc->state!=4){ // Change state of curr process to POST-CPU
                 cpuProc->state = 4;
                 cpuProc->preemptState = 1;  // Indicate current CPU burst was preempted
-                printf("time %dms: Time slice expired; preempting process %s with %dms remaining", time, cpuProc->ID, cpuProc->cpuBurstCurr);
-                priority_queue_status(priorityQueue, priorityQueueLen);
+                if (time<10000){
+                    printf("time %dms: Time slice expired; preempting process %s with %dms remaining", time, cpuProc->ID, cpuProc->cpuBurstCurr);
+                    priority_queue_status(priorityQueue, priorityQueueLen);
+                }
             }
         }else if (cpuIsRunning && cpuProc->cpuBurstCurr!=0 && priorityQueueLen==0){
             if(tsliceLeft==0 && !preemptFlag){
                 tsliceLeft = t_slice; //Reset
-                printf("time %dms: Time slice expired; no preemption because ready queue is empty", time);
-                priority_queue_status(priorityQueue, priorityQueueLen);
+                if (time<10000){
+                    printf("time %dms: Time slice expired; no preemption because ready queue is empty", time);
+                    priority_queue_status(priorityQueue, priorityQueueLen);
+                }
             }
         }
 
@@ -132,14 +136,16 @@ int RR(struct Process* allProcesses, int n, int t_cs, int t_slice, int fd, ssize
                     printf("time %dms: Process %s terminated", time, cpuProc->ID);
                     priority_queue_status(priorityQueue, priorityQueueLen);
                 }else{ // If CPUProc still has CPU bursts...
-                    printf("time %dms: Process %s completed a CPU burst; %d burst",
-                        time, cpuProc->ID, (cpuProc->cpuBurstCount-(cpuProc->idx+1)));
-                    if (cpuProc->cpuBurstCount-(cpuProc->idx+1) == 1) {printf(" to go");}
-                    else                                              {printf("s to go");}
-                    priority_queue_status(priorityQueue, priorityQueueLen);
-                    printf("time %dms: Process %s switching out of CPU; blocking on I/O until time %dms",
-                        time, cpuProc->ID, (time+(t_cs/2)+cpuProc->ioBurstCurr));
-                    priority_queue_status(priorityQueue, priorityQueueLen);
+                    if (time<10000){
+                        printf("time %dms: Process %s completed a CPU burst; %d burst",
+                            time, cpuProc->ID, (cpuProc->cpuBurstCount-(cpuProc->idx+1)));
+                        if (cpuProc->cpuBurstCount-(cpuProc->idx+1) == 1) {printf(" to go");}
+                        else                                              {printf("s to go");}
+                        priority_queue_status(priorityQueue, priorityQueueLen);
+                        printf("time %dms: Process %s switching out of CPU; blocking on I/O until time %dms",
+                            time, cpuProc->ID, (time+(t_cs/2)+cpuProc->ioBurstCurr));
+                        priority_queue_status(priorityQueue, priorityQueueLen);
+                    }
                 }
             #if DEBUG_MODE
             sleep(SLEEP_TIME_EVENT+timeAdd);
@@ -163,15 +169,17 @@ int RR(struct Process* allProcesses, int n, int t_cs, int t_slice, int fd, ssize
                 if (cpuProc->preemptState==0) {cpuProc->cpuBurstCurr = cpuProc->cpuBurstTimes[cpuProc->idx];} // Establish current CPU burst time
                 cpuIsRunning = 1;   // "CPU is now running a proccess"
 
-                if (cpuProc->preemptState==0) {
-                    printf("time %dms: Process %s started using the CPU for %dms burst",
-                        time, cpuProc->ID, cpuProc->cpuBurstCurr);
-                }else{
-                    printf("time %dms: Process %s started using the CPU for remaining %dms of %dms burst",
-                        time, cpuProc->ID, cpuProc->cpuBurstCurr, cpuProc->cpuBurstTimes[cpuProc->idx]);
+                if (time<10000){
+                    if (cpuProc->preemptState==0) {
+                        printf("time %dms: Process %s started using the CPU for %dms burst",
+                            time, cpuProc->ID, cpuProc->cpuBurstCurr);
+                    }else{
+                        printf("time %dms: Process %s started using the CPU for remaining %dms of %dms burst",
+                            time, cpuProc->ID, cpuProc->cpuBurstCurr, cpuProc->cpuBurstTimes[cpuProc->idx]);
+                    }
+                    priority_queue_status(priorityQueue, priorityQueueLen);
                 }
-                priority_queue_status(priorityQueue, priorityQueueLen);
-                #if DEBUG_MODE
+            #if DEBUG_MODE
                 sleep(SLEEP_TIME_EVENT+timeAdd);
                 #endif
             }else{
@@ -197,9 +205,11 @@ int RR(struct Process* allProcesses, int n, int t_cs, int t_slice, int fd, ssize
                     priorityQueueLen += 1;
                     ioLen -= 1;
 
-                    printf("time %dms: Process %s completed I/O; added to ready queue",
-                        time, priorityQueue[priorityQueueLen-1]->ID);
-                    priority_queue_status(priorityQueue, priorityQueueLen);
+                    if (time<10000){
+                        printf("time %dms: Process %s completed I/O; added to ready queue",
+                            time, priorityQueue[priorityQueueLen-1]->ID);
+                        priority_queue_status(priorityQueue, priorityQueueLen);
+                    }
                 }else {break;} // If next-up-proc's I/O burst isn't finished, continue past
             }else{break;} // If I/O is empty, continue past
             #if DEBUG_MODE
@@ -223,9 +233,11 @@ int RR(struct Process* allProcesses, int n, int t_cs, int t_slice, int fd, ssize
                 priorityQueue[priorityQueueLen]->state = 1; //state=IN-QUEUE
                 priorityQueueLen += 1;
                 
-                printf("time %dms: Process %s arrived; added to ready queue",
-                    time, priorityQueue[priorityQueueLen-1]->ID);
-                priority_queue_status(priorityQueue, priorityQueueLen);
+                if (time<10000){
+                    printf("time %dms: Process %s arrived; added to ready queue",
+                        time, priorityQueue[priorityQueueLen-1]->ID);
+                    priority_queue_status(priorityQueue, priorityQueueLen);
+                }
                 #if DEBUG_MODE
                 sleep(SLEEP_TIME_EVENT+timeAdd);
                 #endif

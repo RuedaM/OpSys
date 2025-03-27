@@ -97,22 +97,28 @@ int SJF(struct Process* allProcesses, int n, int t_cs, double alpha, int fd, ssi
                     printf("time %dms: Process %s terminated", time, cpuProc->ID);
                     priority_queue_status(priorityQueue, priorityQueueLen);
                 }else{ // If CPUProc still has CPU bursts...
-                    printf("time %dms: Process %s (tau %dms) completed a CPU burst; %d burst",
-                        time, cpuProc->ID, cpuProc->tau, (cpuProc->cpuBurstCount-(cpuProc->idx+1)));
-                    if (cpuProc->cpuBurstCount-(cpuProc->idx+1) == 1) {printf(" to go");}
-                    else                                              {printf("s to go");}
-                    priority_queue_status(priorityQueue, priorityQueueLen);
-                    
+                    if (time<10000){
+                        printf("time %dms: Process %s (tau %dms) completed a CPU burst; %d burst",
+                            time, cpuProc->ID, cpuProc->tau, (cpuProc->cpuBurstCount-(cpuProc->idx+1)));
+                        if (cpuProc->cpuBurstCount-(cpuProc->idx+1) == 1) {printf(" to go");}
+                        else                                              {printf("s to go");}
+                        priority_queue_status(priorityQueue, priorityQueueLen);
+                    }
+
                     double computed = alpha * (double)cpuProc->cpuBurstTimes[cpuProc->idx] + (1.0-alpha) * (double)cpuProc->tau;
                     int newTau = (int)ceil(computed);
-                    printf("time %dms: Recalculated tau for process %s: old tau %dms ==> new tau %dms",
-                        time, cpuProc->ID, cpuProc->tau, newTau);
-                    priority_queue_status(priorityQueue, priorityQueueLen);
+                    if (time<10000){
+                        printf("time %dms: Recalculated tau for process %s: old tau %dms ==> new tau %dms",
+                            time, cpuProc->ID, cpuProc->tau, newTau);
+                        priority_queue_status(priorityQueue, priorityQueueLen);
+                    }
                     cpuProc->tau = newTau;
 
-                    printf("time %dms: Process %s switching out of CPU; blocking on I/O until time %dms",
-                        time, cpuProc->ID, (time+(t_cs/2)+cpuProc->ioBurstCurr));
-                    priority_queue_status(priorityQueue, priorityQueueLen);
+                    if (time<10000){
+                        printf("time %dms: Process %s switching out of CPU; blocking on I/O until time %dms",
+                            time, cpuProc->ID, (time+(t_cs/2)+cpuProc->ioBurstCurr));
+                        priority_queue_status(priorityQueue, priorityQueueLen);
+                    }
                 }
             // #if DEBUG_MODE
             // sleep(SLEEP_TIME_EVENT+timeAdd);
@@ -135,10 +141,12 @@ int SJF(struct Process* allProcesses, int n, int t_cs, double alpha, int fd, ssi
                 cpuProc->state = 3; //state==IN-CPU
                 cpuIsRunning = 1;   // "CPU is now running a proccess"
 
-                printf("time %dms: Process %s (tau %dms) started using the CPU for %dms burst",
-                    time, cpuProc->ID, cpuProc->tau, cpuProc->cpuBurstCurr);
-                priority_queue_status(priorityQueue, priorityQueueLen);
-                
+                if (time<10000){
+                    printf("time %dms: Process %s (tau %dms) started using the CPU for %dms burst",
+                        time, cpuProc->ID, cpuProc->tau, cpuProc->cpuBurstCurr);
+                    priority_queue_status(priorityQueue, priorityQueueLen);
+                }
+
                 // #if DEBUG_MODE
                 // sleep(SLEEP_TIME_EVENT+timeAdd);
                 // #endif
@@ -170,9 +178,11 @@ int SJF(struct Process* allProcesses, int n, int t_cs, double alpha, int fd, ssi
                     priorityQueueLen += 1;
                     ioLen -= 1;
 
-                    printf("time %dms: Process %s (tau %dms) completed I/O; added to ready queue",
-                        time, movingProc->ID, movingProc->tau);
-                    priority_queue_status(priorityQueue, priorityQueueLen);
+                    if (time<10000){
+                        printf("time %dms: Process %s (tau %dms) completed I/O; added to ready queue",
+                            time, movingProc->ID, movingProc->tau);
+                        priority_queue_status(priorityQueue, priorityQueueLen);
+                    }
                 }else {break;} // If next-up-proc's I/O burst isn't finished, continue past
             }else{break;} // If I/O is empty, continue past
             // #if DEBUG_MODE
@@ -196,9 +206,11 @@ int SJF(struct Process* allProcesses, int n, int t_cs, double alpha, int fd, ssi
                 priority_queue_push_SJF(&priorityQueue, priorityQueueLen, movingProc);
                 priorityQueueLen += 1;
                 
-                printf("time %dms: Process %s (tau %dms) arrived; added to ready queue",
-                    time, movingProc->ID, movingProc->tau);
-                priority_queue_status(priorityQueue, priorityQueueLen);
+                if (time<10000){
+                    printf("time %dms: Process %s (tau %dms) arrived; added to ready queue",
+                        time, movingProc->ID, movingProc->tau);
+                    priority_queue_status(priorityQueue, priorityQueueLen);
+                }
                 // #if DEBUG_MODE
                 // sleep(SLEEP_TIME_EVENT+timeAdd);
                 // #endif
