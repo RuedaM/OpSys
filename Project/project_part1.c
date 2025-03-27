@@ -167,24 +167,24 @@ int main(int argc, char** argv){
     free(allProcesses);
 
     // simout.txt Output
-    // sprintf(toWrite, "-- CPU-bound average CPU burst time: %.3f ms\n", cpuBoundAvgCPUBurstTime);
-    // bytesWritten = write(fd, toWrite, strlen(toWrite));
-    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    // sprintf(toWrite, "-- I/O-bound average CPU burst time: %.3f ms\n", ioBoundAvgCPUBurstTime);
-    // bytesWritten = write(fd, toWrite, strlen(toWrite));
-    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    // sprintf(toWrite, "-- overall average CPU burst time: %.3f ms\n", totalAvgCPUBurstTime);
-    // bytesWritten = write(fd, toWrite, strlen(toWrite));
-    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    // sprintf(toWrite, "-- CPU-bound average I/O burst time: %.3f ms\n", cpuBoundAvgIOBurstTime);
-    // bytesWritten = write(fd, toWrite, strlen(toWrite));
-    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    // sprintf(toWrite, "-- I/O-bound average I/O burst time: %.3f ms\n", ioBoundAvgIOBurstTime);
-    // bytesWritten = write(fd, toWrite, strlen(toWrite));
-    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    // sprintf(toWrite, "-- overall average I/O burst time: %.3f ms\n\n", totalAvgIOBurstTime);
-    // bytesWritten = write(fd, toWrite, strlen(toWrite));
-    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- CPU-bound average CPU burst time: %.3f ms\n", cpuBoundAvgCPUBurstTime);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- I/O-bound average CPU burst time: %.3f ms\n", ioBoundAvgCPUBurstTime);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- overall average CPU burst time: %.3f ms\n", totalAvgCPUBurstTime);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- CPU-bound average I/O burst time: %.3f ms\n", cpuBoundAvgIOBurstTime);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- I/O-bound average I/O burst time: %.3f ms\n", ioBoundAvgIOBurstTime);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- overall average I/O burst time: %.3f ms\n", totalAvgIOBurstTime);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
 
 
 

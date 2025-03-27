@@ -382,7 +382,9 @@ int RR(struct Process* allProcesses, int n, int t_cs, int t_slice, int fd, ssize
     #if DEBUG_MODE
     printf("~~ Printing simout.txt information...\n");
     #endif
-    sprintf(toWrite, "Alogrithm RR\n");
+    sprintf(toWrite, "\nAlogrithm RR\n");
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
     float cpuUtil = 0;
     int cpuTotalBursts = 0;
     int ioTotalBursts = 0;
@@ -421,65 +423,61 @@ int RR(struct Process* allProcesses, int n, int t_cs, int t_slice, int fd, ssize
     }
     cpuUtil /= time;
 
-    // // CPU utilization
-    // sprintf(toWrite, "-- CPU utilization: %.3f%%\n", ceil(cpuUtil*100000)/1000);
-    // bytesWritten = write(fd, toWrite, strlen(toWrite));
-    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    // // Wait times
-    // sprintf(toWrite, "-- CPU-bound average wait time: %.3f ms\n", ceil((cpuTotalWaitTime/cpuTotalBursts)*1000)/1000);
-    // bytesWritten = write(fd, toWrite, strlen(toWrite));
-    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    // sprintf(toWrite, "-- I/O-bound average wait time: %.3f ms\n", ceil((ioTotalWaitTime/ioTotalBursts)*1000)/1000);
-    // bytesWritten = write(fd, toWrite, strlen(toWrite));
-    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    // sprintf(toWrite, "-- overall average wait time: %.3f ms\n", ceil(((cpuTotalWaitTime+ioTotalWaitTime)/(cpuTotalBursts+ioTotalBursts))*1000)/1000);
-    // bytesWritten = write(fd, toWrite, strlen(toWrite));
-    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    // // Turnaround times
-    // sprintf(toWrite, "-- CPU-bound average turnaround time: %.3f ms\n", ceil((cpuTotalTATime/cpuTotalBursts)*1000)/1000);
-    // bytesWritten = write(fd, toWrite, strlen(toWrite));
-    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    // sprintf(toWrite, "-- I/O-bound average turnaround time: %.3f ms\n", ceil((ioTotalTATime/ioTotalBursts)*1000)/1000);
-    // bytesWritten = write(fd, toWrite, strlen(toWrite));
-    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    // sprintf(toWrite, "-- overall average turnaround time: %.3f ms\n", ceil(((cpuTotalTATime+ioTotalTATime)/(cpuTotalBursts+ioTotalBursts))*1000)/1000);
-    // bytesWritten = write(fd, toWrite, strlen(toWrite));
-    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    // // Context switches
-    // sprintf(toWrite, "-- CPU-bound number of context switches: %d\n", numCPUcs);
-    // bytesWritten = write(fd, toWrite, strlen(toWrite));
-    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    // sprintf(toWrite, "-- I/O-bound number of context switches: %d\n", numIOcs);
-    // bytesWritten = write(fd, toWrite, strlen(toWrite));
-    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    // sprintf(toWrite, "-- overall number of context switches: %d\n", numCPUcs+numIOcs);
-    // bytesWritten = write(fd, toWrite, strlen(toWrite));
-    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    // // Preemptions
-    // sprintf(toWrite, "-- CPU-bound number of preemptions: %d\n", cpuTotalPreempts);
-    // bytesWritten = write(fd, toWrite, strlen(toWrite));
-    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    // sprintf(toWrite, "-- I/O-bound number of preemptions: %d\n", ioTotalPreempts);
-    // bytesWritten = write(fd, toWrite, strlen(toWrite));
-    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    // sprintf(toWrite, "-- overall number of preemptions: %d\n", cpuTotalPreempts+ioTotalPreempts);
-    // bytesWritten = write(fd, toWrite, strlen(toWrite));
-    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    // CPU utilization
+    sprintf(toWrite, "-- CPU utilization: %.3f%%\n", ceil(cpuUtil*100000)/1000);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    // Wait times
+    sprintf(toWrite, "-- CPU-bound average wait time: %.3f ms\n", ceil((cpuTotalWaitTime/cpuTotalBursts)*1000)/1000);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- I/O-bound average wait time: %.3f ms\n", ceil((ioTotalWaitTime/ioTotalBursts)*1000)/1000);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- overall average wait time: %.3f ms\n", ceil(((cpuTotalWaitTime+ioTotalWaitTime)/(cpuTotalBursts+ioTotalBursts))*1000)/1000);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    // Turnaround times
+    sprintf(toWrite, "-- CPU-bound average turnaround time: %.3f ms\n", ceil((cpuTotalTATime/cpuTotalBursts)*1000)/1000);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- I/O-bound average turnaround time: %.3f ms\n", ceil((ioTotalTATime/ioTotalBursts)*1000)/1000);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- overall average turnaround time: %.3f ms\n", ceil(((cpuTotalTATime+ioTotalTATime)/(cpuTotalBursts+ioTotalBursts))*1000)/1000);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    // Context switches
+    sprintf(toWrite, "-- CPU-bound number of context switches: %d\n", numCPUcs);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- I/O-bound number of context switches: %d\n", numIOcs);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- overall number of context switches: %d\n", numCPUcs+numIOcs);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    // Preemptions
+    sprintf(toWrite, "-- CPU-bound number of preemptions: %d\n", cpuTotalPreempts);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- I/O-bound number of preemptions: %d\n", ioTotalPreempts);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- overall number of preemptions: %d\n", cpuTotalPreempts+ioTotalPreempts);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
     // RR specific stats
-    // sprintf(toWrite, "-- CPU-bound percentage of CPU bursts completed within one time slice: %.3f\n", ceil((cpuTotalWithin/cpuTotalBursts)*1000)/1000);
-    // bytesWritten = write(fd, toWrite, strlen(toWrite));
-    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    // sprintf(toWrite, "--- I/O-bound percentage of CPU bursts completed within one time slice: %.3f\n", ceil((ioTotalWithin/ioTotalBursts)*1000)/1000);
-    // bytesWritten = write(fd, toWrite, strlen(toWrite));
-    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    // sprintf(toWrite, "-- overall percentage of CPU bursts completed within one time slice: %.3f\n", 
-    //     ceil(((cpuTotalWithin+ioTotalWithin)/(cpuTotalBursts+ioTotalBursts))*1000)/1000);
-    // bytesWritten = write(fd, toWrite, strlen(toWrite));
-    // if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    printf("CPU usage: %f%%\n", cpuUtil*100);
-    printf("file descriptor: %d\n", fd);
-    printf("bytesWritten: %ld\n", bytesWritten);
-    printf("toWrite: %s", toWrite);
+    sprintf(toWrite, "-- CPU-bound percentage of CPU bursts completed within one time slice: %.3f\n", ceil((cpuTotalWithin/cpuTotalBursts)*1000)/1000);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- I/O-bound percentage of CPU bursts completed within one time slice: %.3f\n", ceil((ioTotalWithin/ioTotalBursts)*1000)/1000);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- overall percentage of CPU bursts completed within one time slice: %.3f\n", 
+        ceil(((cpuTotalWithin+ioTotalWithin)/(cpuTotalBursts+ioTotalBursts))*1000)/1000);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
 
 
     //======================================================================================================================

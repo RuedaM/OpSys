@@ -320,7 +320,9 @@ int FCFS(struct Process* allProcesses, int n, int t_cs, int fd, ssize_t bytesWri
     #if DEBUG_MODE
     printf("~~ Printing simout.txt information...\n");
     #endif
-    sprintf(toWrite, "Alogrithm FCFS\n");
+    sprintf(toWrite, "\nAlogrithm FCFS\n");
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
     float cpuUtil = 0;
     int cpuTotalBursts = 0;
     int ioTotalBursts = 0;

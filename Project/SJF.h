@@ -326,20 +326,85 @@ int SJF(struct Process* allProcesses, int n, int t_cs, double alpha, int fd, ssi
     #if DEBUG_MODE
     printf("~~ Printing simout.txt information...\n");
     #endif
+    sprintf(toWrite, "\nAlogrithm SJF\n");
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
     float cpuUtil = 0;
+    int cpuTotalBursts = 0;
+    int ioTotalBursts = 0;
+    float cpuTotalWaitTime = 0;
+    float ioTotalWaitTime = 0;
+    float cpuTotalTATime = 0;
+    float ioTotalTATime = 0;
+    int numCPUcs = 0;
+    int numIOcs = 0;
     for(int i=0 ; i<n ; i++){ // For every process...
-        for(int j=0 ; j<allProcesses[i].cpuBurstCount ; j++){ // For every CPU burst time
-            cpuUtil += allProcesses[i].cpuBurstTimes[j];
+        for(int j=0 ; j<allProcesses[i].cpuBurstCount ; j++){ // For every CPU burst time...
+            cpuUtil += allProcesses[i].cpuBurstTimes[j]; // Add all CPU burst times
+        }
+        
+        if (allProcesses[i].binding==0) { // If process is CPU-bound...
+            numCPUcs += allProcesses[i].cpuBurstCount; // # context switches = cpu burst count
+            cpuTotalWaitTime += allProcesses[i].cpuWaitTime; // Add to total wait time (with context switches)
+            cpuTotalWaitTime -= allProcesses[i].cpuBurstCount*(t_cs/2); // Remove context switches from total wait time
+            cpuTotalTATime += allProcesses[i].cpuTurnAround; // Add to total turnaround time
+            cpuTotalBursts += allProcesses[i].cpuBurstCount;
+        }else{ // If process is I/O-bound...
+            numIOcs += allProcesses[i].cpuBurstCount; // # context switches = cpu burst count
+            ioTotalWaitTime += allProcesses[i].cpuWaitTime; // Total wait time (with context switches)
+            ioTotalWaitTime -= allProcesses[i].cpuBurstCount*(t_cs/2); // Remove context switches from total wait time
+            ioTotalTATime += allProcesses[i].cpuTurnAround; // Add to total turnaround time
+            ioTotalBursts += allProcesses[i].cpuBurstCount;
         }
     }
     cpuUtil /= time;
 
-    printf("CPU usage: %f%%\n", cpuUtil*100);
-    printf("bytesWritten: %ld\n", bytesWritten);
-    printf("fd: %d\n", fd);
-    printf("toWrite: %s", toWrite);
+    // CPU utilization
+    sprintf(toWrite, "-- CPU utilization: %.3f%%\n", ceil(cpuUtil*100000)/1000);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    // Wait times
+    sprintf(toWrite, "-- CPU-bound average wait time: %.3f ms\n", ceil((cpuTotalWaitTime/cpuTotalBursts)*1000)/1000);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- I/O-bound average wait time: %.3f ms\n", ceil((ioTotalWaitTime/ioTotalBursts)*1000)/1000);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- overall average wait time: %.3f ms\n", ceil(((cpuTotalWaitTime+ioTotalWaitTime)/(cpuTotalBursts+ioTotalBursts))*1000)/1000);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    // Turnaround times
+    sprintf(toWrite, "-- CPU-bound average turnaround time: %.3f ms\n", ceil((cpuTotalTATime/cpuTotalBursts)*1000)/1000);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- I/O-bound average turnaround time: %.3f ms\n", ceil((ioTotalTATime/ioTotalBursts)*1000)/1000);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- overall average turnaround time: %.3f ms\n", ceil(((cpuTotalTATime+ioTotalTATime)/(cpuTotalBursts+ioTotalBursts))*1000)/1000);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    // Context switches
+    sprintf(toWrite, "-- CPU-bound number of context switches: %d\n", numCPUcs);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- I/O-bound number of context switches: %d\n", numIOcs);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- overall number of context switches: %d\n", numCPUcs+numIOcs);
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    // FCFS has no preemptions
+    sprintf(toWrite, "-- CPU-bound number of preemptions: 0\n");
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- I/O-bound number of preemptions: 0\n");
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
+    sprintf(toWrite, "-- overall number of preemptions: 0\n");
+    bytesWritten = write(fd, toWrite, strlen(toWrite));
+    if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
 
-    
+
 
     //======================================================================================================================
     free(priorityQueue);
