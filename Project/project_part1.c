@@ -34,6 +34,7 @@
 #include "SJF.h"
 #include "SRT.h"
 #include "RR.h"
+#include "RRalt.h"
 
 
 
@@ -44,7 +45,10 @@ int main(int argc, char** argv){
     #ifdef DEBUG_MODE
     printf("=Check Arg Input= // "); for(int i=1 ; i<=8 ; i++){printf("%s // ",*(argv+i));} printf("\n");
     #endif    
-    if(argc!=9) {fprintf(stderr, "ERROR: Invalid number of arguments\n"); return EXIT_FAILURE;} // (1 .out file + 8 inputs = 9 args)
+    // (1 .out file + 8/10 inputs = 9/10 args)
+    if(argc!=9) {
+        if(argc!=10) {fprintf(stderr, "ERROR: Invalid number of arguments\n"); return EXIT_FAILURE;}
+    }
 
     // Command Line Arg Storage+Setting
     int n = atoi(argv[1]); // number of processes to simulate
@@ -192,27 +196,32 @@ int main(int argc, char** argv){
     printf("<<< PROJECT SIMULATIONS\n<<< -- t_cs=%dms; alpha=%.2f; t_slice=%dms\n", t_cs, alpha, t_slice);
     int ret;
 
-    allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
-    ret = FCFS(allProcesses, n, t_cs, fd, bytesWritten, toWrite);
-    if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
-    for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
-    free(allProcesses);
+    // allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
+    // ret = FCFS(allProcesses, n, t_cs, fd, bytesWritten, toWrite);
+    // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
+    // for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
+    // free(allProcesses);
 
-    allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
-    ret = SJF(allProcesses, n, t_cs, alpha, fd, bytesWritten, toWrite);
-    if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
-    for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
-    free(allProcesses);
+    // allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
+    // ret = SJF(allProcesses, n, t_cs, alpha, fd, bytesWritten, toWrite);
+    // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
+    // for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
+    // free(allProcesses);
     
-    allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
-    ret = SRT(allProcesses, n, t_cs, alpha, fd, bytesWritten, toWrite);
-    if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
-    for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
-    free(allProcesses);
+    // allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
+    // ret = SRT(allProcesses, n, t_cs, alpha, fd, bytesWritten, toWrite);
+    // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
+    // for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
+    // free(allProcesses);
 
     allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
-    ret = RR(allProcesses, n, t_cs, t_slice, fd, bytesWritten, toWrite);
-    if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
+    if (argc==9) {
+        ret = RR(allProcesses, n, t_cs, t_slice, fd, bytesWritten, toWrite);
+        if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
+    } else {
+        ret = RRalt(allProcesses, n, t_cs, t_slice, fd, bytesWritten, toWrite);
+        if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
+    }
     for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
     free(allProcesses);
 
