@@ -320,6 +320,31 @@ struct Process* priority_queue_push_SJF(struct Process*** priorityQueue, int pri
     return (*priorityQueue)[0]; // Return queue head
 }
 
+// Function for adding Process pointer to priority queue following SJF algorithm (sorting by REAL CPU burst); returns head of priority queue
+struct Process* priority_queue_push_SJFnoTau(struct Process*** priorityQueue, int priorityQueueLen, struct Process* p_in){
+    if (priorityQueue==NULL || p_in==NULL) {fprintf(stderr, "ERROR: p_q_push_SJF() param(s) invalid\n"); return NULL;}
+
+    // Reallocate memory for the priority queue
+    struct Process** temp = realloc(*priorityQueue, (priorityQueueLen+1)*sizeof(struct Process*));
+    if (temp==NULL) {fprintf(stderr, "ERROR: realloc failed\n"); return NULL;}
+
+    *priorityQueue = temp; // Update the caller's pointer
+
+    int i;
+    // Traverse backward to find insertion point
+    for (i=priorityQueueLen-1 ; 
+         i>=0 && 
+         ( (*priorityQueue)[i]->cpuBurstCurr > p_in->cpuBurstCurr || 
+           ( (*priorityQueue)[i]->cpuBurstCurr==p_in->cpuBurstCurr && 
+             strcmp((*priorityQueue)[i]->ID, p_in->ID)>0 ) ) ; 
+         i--) {
+        (*priorityQueue)[i+1] = (*priorityQueue)[i]; // Shift right
+    }
+    (*priorityQueue)[i + 1] = p_in; // Insert new process
+
+    return (*priorityQueue)[0]; // Return queue head
+}
+
 // Function for adding Process pointer to priority queue following SJF algorithm (sorting by CPU burst); returns head of priority queue
 struct Process* priority_queue_push_front_SJF(struct Process*** priorityQueue, int priorityQueueLen, struct Process* p_in) {
     // Validate input parameters
