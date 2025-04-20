@@ -42,19 +42,14 @@ int main(){
     
     /* create the shared memory segment with a size of 4 bytes */
     key_t key = SHM_SHARED_KEY;
-    int shmid = shmget(key, 32, IPC_CREAT | IPC_EXCL | 0660);
-                        /*for string*/           /* rw-rw---- */
+    int shmid = shmget(key, 32, IPC_CREAT | IPC_EXCL | 0660); // 0660 = rw-rw---- = 110110000
     if(shmid==-1) {perror("shmget() failed"); return EXIT_FAILURE;}
-
     printf("shmget() returned %d\n", shmid);
-
     /* NOTE that shmget() will zero out the newly created shared memory segment */
-
 
     /* attach to the shared memory segment */
     char* x = shmat(shmid, NULL, 0);
     if(x==(void*)-1) {perror("shmat() failed"); return EXIT_FAILURE;}
-
 
     /* create a child process --- child process inherits
     *  the pointer to the shared memory segment
@@ -65,7 +60,7 @@ int main(){
     if(p==0){
         printf("CHILD: type some characters (enter '!' to end)\n");
         int c;
-        char* ptr  =x;
+        char* ptr = x;
         do{
             c = getchar();
             *ptr = c;
@@ -79,13 +74,10 @@ int main(){
             sleep(1);
             if (waitpid(p, NULL, WNOHANG)>0) {break;} //Oopsie, check for error
         }
-
         printf("\rPARENT: all done\n");
     }
 
-    if(isatty(STDIN_FILENO)){
-        tcsetattr(STDIN_FILENO, TCSANOW, &ttyraw);
-    }
+    if(isatty(STDIN_FILENO)) {tcsetattr(STDIN_FILENO, TCSANOW, &ttyraw);}
 
 
     /* detach from the shared memory segment */

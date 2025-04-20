@@ -1,0 +1,33 @@
+Opened wordle_words06.txt; read 5757 valid words
+Wordle UDP server started
+New game request; assigned game token 1
+New game request; assigned game token 2
+New game request; assigned game token 3
+New game request; assigned game token 4
+New game request; assigned game token 5
+New game request; assigned game token 6
+GAME 1: Received guess: abcde
+GAME 1: Invalid guess; sending reply: ????? (6 guesses left)
+GAME 2: Received guess: abcde
+GAME 2: Invalid guess; sending reply: ????? (6 guesses left)
+GAME 3: Received guess: abcde
+GAME 3: Invalid guess; sending reply: ????? (6 guesses left)
+GAME 4: Received guess: abcde
+GAME 4: Invalid guess; sending reply: ????? (6 guesses left)
+GAME 5: Received guess: abcde
+GAME 5: Invalid guess; sending reply: ????? (6 guesses left)
+GAME 6: Received guess: abcde
+GAME 6: Invalid guess; sending reply: ????? (6 guesses left)
+SIGUSR1 received; Wordle server shutting down...
+GAME 1: Game over; word was noels!
+GAME 2: Game over; word was jaunt!
+GAME 3: Game over; word was crawl!
+GAME 4: Game over; word was mucus!
+GAME 5: Game over; word was molls!
+GAME 6: Game over; word was loose!
+
+games: 6
+wins: 0
+losses: 0
+
+Word(s) played: - noels - jaunt - crawl - mucus - molls - loose

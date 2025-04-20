@@ -1,0 +1,72 @@
+MAIN: Solving the knight's tour problem for a 3x4 board
+MAIN: Starting at row 1 and column 1 (move #1)
+MAIN: 2 possible moves after move #1; creating 2 child threads...
+T1: 2 possible moves after move #3; creating 2 child threads...
+T2: 2 possible moves after move #5; creating 2 child threads...
+T3: Dead end at move #6
+T2: T3 joined
+T4: 2 possible moves after move #6; creating 2 child threads...
+T5: Dead end at move #11
+T4: T5 joined
+T6: Dead end at move #11
+T4: T6 joined
+T2: T4 joined
+T1: T2 joined
+T7: 2 possible moves after move #4; creating 2 child threads...
+T8: 2 possible moves after move #6; creating 2 child threads...
+T9: 2 possible moves after move #7; creating 2 child threads...
+T10: Dead end at move #8
+T9: T10 joined
+T11: Dead end at move #8
+T9: T11 joined
+T8: T9 joined
+T12: Dead end at move #9
+T8: T12 joined
+T7: T8 joined
+T13: 2 possible moves after move #8; creating 2 child threads...
+T14: 2 possible moves after move #9; creating 2 child threads...
+T15: Dead end at move #10
+T14: T15 joined
+T16: Dead end at move #10
+T14: T16 joined
+T13: T14 joined
+T17: Dead end at move #9
+T13: T17 joined
+T7: T13 joined
+T1: T7 joined
+MAIN: T1 joined
+T18: 2 possible moves after move #3; creating 2 child threads...
+T19: 2 possible moves after move #4; creating 2 child threads...
+T20: 2 possible moves after move #6; creating 2 child threads...
+T21: 2 possible moves after move #7; creating 2 child threads...
+T22: Dead end at move #8
+T21: T22 joined
+T23: Dead end at move #8
+T21: T23 joined
+T20: T21 joined
+T24: Dead end at move #9
+T20: T24 joined
+T19: T20 joined
+T25: 2 possible moves after move #8; creating 2 child threads...
+T26: Dead end at move #9
+T25: T26 joined
+T27: 2 possible moves after move #9; creating 2 child threads...
+T28: Dead end at move #10
+T27: T28 joined
+T29: Dead end at move #10
+T27: T29 joined
+T25: T27 joined
+T19: T25 joined
+T18: T19 joined
+T30: 2 possible moves after move #5; creating 2 child threads...
+T31: Dead end at move #6
+T30: T31 joined
+T32: 2 possible moves after move #6; creating 2 child threads...
+T33: Dead end at move #11
+T32: T33 joined
+T34: Dead end at move #11
+T32: T34 joined
+T30: T32 joined
+T18: T30 joined
+MAIN: T18 joined
+MAIN: Search complete; best solution(s) visited 11 squares out of 12

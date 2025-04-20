@@ -27,7 +27,6 @@ int main(){
     /* create the shared memory segment with a size of 4 bytes */
     key_t key = SHM_SHARED_KEY;
     int shmid = shmget(key, sizeof(int), IPC_CREAT | IPC_EXCL | 0660);
-                                                            /* rw-rw---- */
     if(shmid==-1) {perror("shmget() failed"); return EXIT_FAILURE;}
 
     printf("shmget() returned %d\n", shmid);
@@ -80,10 +79,7 @@ int main(){
 #if 1
     if (p>0){
         /* mark the shared memory segment for deletion... */
-        if (shmctl(shmid, IPC_RMID, 0)==-1){
-            perror("shmctl() failed");
-            return EXIT_FAILURE;
-        }
+        if (shmctl(shmid, IPC_RMID, 0)==-1) {perror("shmctl() failed"); return EXIT_FAILURE;}
     }
 #endif
 

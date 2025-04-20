@@ -1,0 +1,388 @@
+MAIN: Solving the knight's tour problem for a 3x5 board
+MAIN: Starting at row 1 and column 2 (move #1)
+MAIN: 4 possible moves after move #1; creating 4 child threads...
+T1: 2 possible moves after move #3; creating 2 child threads...
+T2: 2 possible moves after move #3; creating 2 child threads...
+T3: 2 possible moves after move #3; creating 2 child threads...
+T4: 2 possible moves after move #3; creating 2 child threads...
+T5: 2 possible moves after move #5; creating 2 child threads...
+T6: 3 possible moves after move #4; creating 3 child threads...
+T7: 3 possible moves after move #4; creating 3 child threads...
+T8: 2 possible moves after move #5; creating 2 child threads...
+T9: 2 possible moves after move #5; creating 2 child threads...
+T11: 3 possible moves after move #4; creating 3 child threads...
+T10: 3 possible moves after move #4; creating 3 child threads...
+T12: 2 possible moves after move #5; creating 2 child threads...
+T13: Dead end at move #6
+T15: 3 possible moves after move #6; creating 3 child threads...
+T14: 3 possible moves after move #6; creating 3 child threads...
+T16: 2 possible moves after move #5; creating 2 child threads...
+T18: 3 possible moves after move #6; creating 3 child threads...
+T17: 3 possible moves after move #6; creating 3 child threads...
+T19: 3 possible moves after move #6; creating 3 child threads...
+T21: Dead end at move #6
+T20: 2 possible moves after move #5; creating 2 child threads...
+T22: 3 possible moves after move #6; creating 3 child threads...
+T23: 3 possible moves after move #6; creating 3 child threads...
+T24: Dead end at move #6
+T26: 2 possible moves after move #5; creating 2 child threads...
+T29: 3 possible moves after move #6; creating 3 child threads...
+T27: 3 possible moves after move #6; creating 3 child threads...
+T30: Dead end at move #6
+T28: 3 possible moves after move #6; creating 3 child threads...
+T31: 2 possible moves after move #7; creating 2 child threads...
+T34: 2 possible moves after move #8; creating 2 child threads...
+T32: Dead end at move #7
+T35: 2 possible moves after move #8; creating 2 child threads...
+T33: 2 possible moves after move #7; creating 2 child threads...
+T25: 3 possible moves after move #6; creating 3 child threads...
+T5: T13 joined
+T36: 2 possible moves after move #7; creating 2 child threads...
+T37: 2 possible moves after move #7; creating 2 child threads...
+T38: 2 possible moves after move #7; creating 2 child threads...
+T39: 2 possible moves after move #7; creating 2 child threads...
+T55: 2 possible moves after move #7; creating 2 child threads...
+T54: Dead end at move #6
+T57: Dead end at move #7
+T59: 2 possible moves after move #9; creating 2 child threads...
+T58: 2 possible moves after move #7; creating 2 child threads...
+T56: Dead end at move #7
+T60: Dead end at move #8
+T65: 2 possible moves after move #10; creating 2 child threads...
+T67: Dead end at move #10
+T66: Dead end at move #10
+T68: Dead end at move #8
+T42: 2 possible moves after move #8; creating 2 child threads...
+T41: 2 possible moves after move #7; creating 2 child threads...
+T69: 2 possible moves after move #7; creating 2 child threads...
+T71: Dead end at move #11
+T73: Dead end at move #6
+T70: 2 possible moves after move #8; creating 2 child threads...
+T72: Dead end at move #11
+T43: 2 possible moves after move #8; creating 2 child threads...
+T74: 2 possible moves after move #7; creating 2 child threads...
+T76: Dead end at move #9
+T75: 2 possible moves after move #8; creating 2 child threads...
+T78: 3 possible moves after move #8; creating 3 child threads...
+T77: 2 possible moves after move #9; creating 2 child threads...
+T80: 2 possible moves after move #9; creating 2 child threads...
+T81: Dead end at move #8
+T44: Dead end at move #6
+T82: 2 possible moves after move #7; creating 2 child threads...
+T83: Dead end at move #9
+T84: 2 possible moves after move #9; creating 2 child threads...
+T85: 2 possible moves after move #9; creating 2 child threads...
+T87: Dead end at move #8
+T86: Dead end at move #9
+T8: T21 joined
+T89: 2 possible moves after move #9; creating 2 child threads...
+T91: Dead end at move #9
+T92: 2 possible moves after move #9; creating 2 child threads...
+T74: T87 joined
+T94: Dead end at move #12
+T45: 2 possible moves after move #7; creating 2 child threads...
+T95: Dead end at move #10
+T93: Dead end at move #9
+T96: 2 possible moves after move #8; creating 2 child threads...
+T98: 2 possible moves after move #10; creating 2 child threads...
+T97: 2 possible moves after move #8; creating 2 child threads...
+T99: Dead end at move #10
+T58: T67 joined
+T58: T68 joined
+T100: Dead end at move #8
+T101: 3 possible moves after move #8; creating 3 child threads...
+T103: Dead end at move #10
+T104: Dead end at move #12
+T46: 2 possible moves after move #7; creating 2 child threads...
+T105: 2 possible moves after move #7; creating 2 child threads...
+T107: Dead end at move #10
+T106: Dead end at move #7
+T108: Dead end at move #12
+T88: 2 possible moves after move #9; creating 2 child threads...
+T109: Dead end at move #10
+T110: Dead end at move #10
+T102: Dead end at move #12
+T111: Dead end at move #10
+T113: 2 possible moves after move #9; creating 2 child threads...
+T47: Dead end at move #7
+T114: Dead end at move #9
+T115: 2 possible moves after move #7; creating 2 child threads...
+T117: Dead end at move #11
+T116: 2 possible moves after move #7; creating 2 child threads...
+T119: Dead end at move #9
+T118: Dead end at move #11
+T120: 2 possible moves after move #9; creating 2 child threads...
+T121: Dead end at move #9
+T65: T71 joined
+T65: T72 joined
+T122: 2 possible moves after move #9; creating 2 child threads...
+T123: Dead end at move #9
+T79: Dead end at move #8
+T26: T44 joined
+T124: Dead end at move #8
+T48: Dead end at move #8
+T126: Dead end at move #8
+T125: Dead end at move #10
+T128: Dead end at move #8
+T127: Dead end at move #8
+T129: Dead end at move #10
+T130: 2 possible moves after move #10; creating 2 child threads...
+T49: 2 possible moves after move #9; creating 2 child threads...
+T42: T76 joined
+T112: Dead end at move #8
+T136: Dead end at move #10
+T137: Dead end at move #10
+T90: Dead end at move #9
+T131: Dead end at move #10
+T139: Dead end at move #12
+T70: T83 joined
+T77: T94 joined
+T77: T95 joined
+T42: T77 joined
+T82: T100 joined
+T140: Dead end at move #11
+T141: Dead end at move #11
+T142: Dead end at move #12
+T143: Dead end at move #10
+T50: 2 possible moves after move #5; creating 2 child threads...
+T144: 3 possible moves after move #6; creating 3 child threads...
+T51: Dead end at move #9
+T52: Dead end at move #10
+T145: 2 possible moves after move #9; creating 2 child threads...
+T146: Dead end at move #8
+T85: T103 joined
+T89: T107 joined
+T89: T108 joined
+T84: T102 joined
+T84: T111 joined
+T70: T84 joined
+T28: T47 joined
+T61: 3 possible moves after move #8; creating 3 child threads...
+T153: Dead end at move #8
+T85: T104 joined
+T78: T91 joined
+T92: T109 joined
+T92: T110 joined
+T31: T48 joined
+T31: T128 joined
+T122: T136 joined
+T122: T137 joined
+T46: T124 joined
+T46: T125 joined
+T105: T126 joined
+T105: T127 joined
+T154: 2 possible moves after move #9; creating 2 child threads...
+T78: T92 joined
+T78: T93 joined
+T155: Dead end at move #9
+T156: Dead end at move #9
+T113: T131 joined
+T113: T139 joined
+T62: Dead end at move #8
+T157: Dead end at move #8
+T88: T129 joined
+T158: Dead end at move #10
+T159: Dead end at move #10
+T41: T78 joined
+T41: T79 joined
+T40: Dead end at move #7
+T160: 2 possible moves after move #7; creating 2 child threads...
+T161: 2 possible moves after move #7; creating 2 child threads...
+T38: T62 joined
+T38: T157 joined
+T101: T121 joined
+T101: T122 joined
+T101: T123 joined
+T63: Dead end at move #8
+T162: Dead end at move #8
+T154: T158 joined
+T154: T159 joined
+T82: T101 joined
+T64: Dead end at move #10
+T167: Dead end at move #8
+T22: T42 joined
+T27: T46 joined
+T27: T105 joined
+T27: T106 joined
+T26: T82 joined
+T39: T63 joined
+T39: T162 joined
+T96: T113 joined
+T96: T114 joined
+T132: Dead end at move #8
+T168: Dead end at move #10
+T20: T41 joined
+T20: T73 joined
+T148: 2 possible moves after move #7; creating 2 child threads...
+T149: Dead end at move #12
+T55: T64 joined
+T55: T167 joined
+T61: T154 joined
+T61: T155 joined
+T61: T156 joined
+T135: Dead end at move #10
+T169: Dead end at move #12
+T115: T132 joined
+T115: T168 joined
+T170: Dead end at move #8
+T171: Dead end at move #10
+T59: T65 joined
+T75: T89 joined
+T75: T90 joined
+T120: T135 joined
+T59: T66 joined
+T134: Dead end at move #8
+T172: Dead end at move #8
+T152: Dead end at move #10
+T150: Dead end at move #7
+T120: T169 joined
+T98: T117 joined
+T151: 2 possible moves after move #7; creating 2 child threads...
+T163: Dead end at move #8
+T43: T85 joined
+T97: T119 joined
+T17: T39 joined
+T17: T57 joined
+T17: T58 joined
+T164: Dead end at move #8
+T165: Dead end at move #10
+T19: T40 joined
+T166: Dead end at move #8
+T116: T134 joined
+T116: T172 joined
+T15: T31 joined
+T15: T32 joined
+T161: T165 joined
+T161: T166 joined
+T49: T142 joined
+T49: T143 joined
+T35: T51 joined
+T53: 2 possible moves after move #7; creating 2 child threads...
+T33: T52 joined
+T33: T146 joined
+T28: T115 joined
+T28: T116 joined
+T15: T33 joined
+T145: T149 joined
+T145: T152 joined
+T45: T112 joined
+T130: T140 joined
+T130: T141 joined
+T18: T38 joined
+T18: T55 joined
+T18: T56 joined
+T148: T170 joined
+T148: T171 joined
+T174: Dead end at move #7
+T175: 2 possible moves after move #7; creating 2 child threads...
+T133: 2 possible moves after move #9; creating 2 child threads...
+T36: T59 joined
+T36: T60 joined
+T88: T130 joined
+T176: Dead end at move #8
+T177: Dead end at move #10
+T98: T118 joined
+T35: T145 joined
+T178: Dead end at move #8
+T179: Dead end at move #8
+T180: Dead end at move #10
+T181: 2 possible moves after move #10; creating 2 child threads...
+T144: T148 joined
+T144: T150 joined
+T74: T88 joined
+T175: T178 joined
+T175: T179 joined
+T160: T163 joined
+T160: T164 joined
+T10: T26 joined
+T10: T27 joined
+T10: T28 joined
+T138: Dead end at move #9
+T19: T160 joined
+T19: T161 joined
+T6: T15 joined
+T147: Dead end at move #6
+T185: 2 possible moves after move #7; creating 2 child threads...
+T97: T120 joined
+T80: T98 joined
+T80: T99 joined
+T7: T18 joined
+T7: T19 joined
+T7: T20 joined
+T34: T49 joined
+T34: T138 joined
+T186: Dead end at move #8
+T187: 3 possible moves after move #8; creating 3 child threads...
+T50: T147 joined
+T2: T7 joined
+T53: T176 joined
+T53: T177 joined
+T188: Dead end at move #9
+T182: Dead end at move #11
+T189: Dead end at move #9
+T190: 2 possible moves after move #9; creating 2 child threads...
+T14: T34 joined
+T14: T35 joined
+T14: T36 joined
+T181: T182 joined
+T185: T186 joined
+T43: T86 joined
+T191: Dead end at move #10
+T192: Dead end at move #10
+T183: Dead end at move #11
+T69: T80 joined
+T69: T81 joined
+T181: T183 joined
+T22: T69 joined
+T133: T180 joined
+T173: Dead end at move #8
+T184: Dead end at move #8
+T5: T14 joined
+T187: T188 joined
+T25: T53 joined
+T37: T61 joined
+T190: T191 joined
+T22: T70 joined
+T8: T22 joined
+T151: T173 joined
+T151: T184 joined
+T187: T189 joined
+T144: T151 joined
+T2: T8 joined
+T25: T174 joined
+T25: T175 joined
+T37: T153 joined
+T1: T5 joined
+T190: T192 joined
+T11: T25 joined
+T133: T181 joined
+T23: T43 joined
+T23: T74 joined
+T23: T75 joined
+T187: T190 joined
+T16: T37 joined
+T16: T54 joined
+T45: T133 joined
+T185: T187 joined
+T6: T16 joined
+T6: T17 joined
+T50: T185 joined
+T1: T6 joined
+T9: T23 joined
+T9: T24 joined
+T11: T50 joined
+T11: T144 joined
+T29: T45 joined
+T29: T96 joined
+T29: T97 joined
+MAIN: T1 joined
+MAIN: T2 joined
+T3: T9 joined
+T3: T10 joined
+MAIN: T3 joined
+T4: T11 joined
+T12: T29 joined
+T12: T30 joined
+T4: T12 joined
+MAIN: T4 joined
+MAIN: Search complete; best solution(s) visited 12 squares out of 15

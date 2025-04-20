@@ -1,0 +1,72 @@
+[04/07/2025]
+
+int shmid = shmget( key, sizeof( struct xyz ),
+                    IPC_CREAT | /* IPC_EXCL | */ 0660 );
+
+struct xyz * data = shmat( shmid, NULL, 0 );
+
+  xyz->field1 = 12;
+  ...
+
+
+
+Q14
+<PARENT>fd table:
+         0: p[0] read
+         1: p[1] write
+         2: stderr
+
+        stack:
+         char * s
+         int * p
+         char * buffer
+
+        heap:
+         p-->_0_ _1_  (8 bytes)
+         buffer->__________ (1024 bytes)
+         buffer--> "ARE YOU READY FOR THARE YOU READY FOR THE EXAM?!\n"
+
+        data/code segment (read only):
+         s-->"ARE YOU READY FOR THE EXAM?"
+
+  pipe: "ARE YOU READY FOR THARE YOU READY FOR THE EXAM?!\n"
+
+<CHILD> fd table:
+         0: p[0] read
+         1: p[1] write
+         2: stderr
+
+        stack:
+         char * s
+         int * p
+
+        heap:
+         p-->_0_ _1_  (8 bytes)
+
+        data/code segment (read only):
+         s-->"ARE YOU READY FOR THE EXAM?"
+
+
+
+
+
+
+
+             +----------+
+Q15   data-->|          | (8 bytes)
+             +----------+
+
+
+
+
+Q17
+     main() stack:
+      rc = -1
+       x = 7
+
+    thread1:
+     arg points back to x in main()
+
+    thread2:
+     arg points back to x in main()
+

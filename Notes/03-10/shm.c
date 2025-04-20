@@ -13,12 +13,10 @@
  */
 
 /* you can use the shell to view/remove shared memory segments:
- *
  * bash$ ipcs
  * bash$ ipcs -m
  *
  * and this will remove all shared memory segments:
- *
  * bash$ ipcrm -a
  *
  */
@@ -34,22 +32,20 @@
 int main(){
     /* create the shared memory segment with a size of 4 bytes */
     key_t key = SHM_SHARED_KEY;
-    int shmid = shmget(key, sizeof(int), IPC_CREAT | IPC_EXCL | 0660);
-                                                            /* rw-rw---- */
+    int shmid = shmget(key, sizeof(int), IPC_CREAT | IPC_EXCL | 0660); // 0660 = rw-rw---- = 110110000
     if(shmid==-1) {perror("shmget() failed"); return EXIT_FAILURE;}
 
     printf("shmget() returned %d\n", shmid);
 
-    /* NOTE that shmget() will zero out the newly created shared memory segment */
+    /* NOTE: shmget() will ZERO OUT the newly created shared memory segment */
 
 
-    /* attach to the shared memory segment */
-    int * x = shmat(shmid, NULL, 0);
+    /* attach to the shared memory (shm) segment */
+    int* x = shmat(shmid, NULL, 0);
     if(x==(void*)-1) {perror("shmat() failed"); return EXIT_FAILURE;}
 
 
-    /* create a child process --- child process inherits
-    *  the pointer to the shared memory segment
+    /* create child process -- child process inherits ptr to shm segment
     */
     pid_t p = fork();
     if(p==-1) {perror("fork() failed"); return EXIT_FAILURE;}
@@ -62,7 +58,7 @@ int main(){
     if(p>0){
 #if 0
         /* this is the only synchronization mechanism that's
-        *  in this code --- synchronizes write and read on
+        *  in this code --- synchronizes write+read on
         *   the shared memory segment
         */
         waitpid( p, NULL, 0 );

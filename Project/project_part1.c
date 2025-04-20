@@ -204,11 +204,11 @@ int main(int argc, char** argv){
     for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
     free(allProcesses);
     
-    // allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
-    // ret = SRT(allProcesses, n, t_cs, alpha, fd, bytesWritten, toWrite);
-    // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
-    // for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
-    // free(allProcesses);
+    allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
+    ret = SRT(allProcesses, n, t_cs, alpha, fd, bytesWritten, toWrite);
+    if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
+    for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
+    free(allProcesses);
 
     allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
     ret = RR(allProcesses, n, t_cs, t_slice, fd, bytesWritten, toWrite);

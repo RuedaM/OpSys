@@ -1,0 +1,116 @@
+==281020== Memcheck, a memory error detector
+==281020== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==281020== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==281020== Command: ./hw3.out 4 4 1 1
+==281020== Parent PID: 19201
+==281020== 
+==281020== 
+==281020== HEAP SUMMARY:
+==281020==     in use at exit: 130,476 bytes in 5,636 blocks
+==281020==   total heap usage: 9,950 allocs, 4,314 frees, 193,268 bytes allocated
+==281020== 
+==281020== 4 bytes in 1 blocks are definitely lost in loss record 1 of 49
+==281020==    at 0x484DA83: calloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==281020==    by 0x10A59C: moving (hw3.c:409)
+==281020==    by 0x10965E: solve (hw3.c:106)
+==281020==    by 0x109399: main (hw3-main.c:42)
+==281020== 
+==281020== 64 bytes in 16 blocks are definitely lost in loss record 11 of 49
+==281020==    at 0x484DA83: calloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==281020==    by 0x10A59C: moving (hw3.c:409)
+==281020==    by 0x10A36C: moving (hw3.c:319)
+==281020==    by 0x10A36C: moving (hw3.c:319)
+==281020==    by 0x10A36C: moving (hw3.c:319)
+==281020==    by 0x4900AC2: start_thread (pthread_create.c:442)
+==281020==    by 0x4991A03: clone (clone.S:100)
+==281020== 
+==281020== 96 (64 direct, 32 indirect) bytes in 1 blocks are definitely lost in loss record 12 of 49
+==281020==    at 0x484DA83: calloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==281020==    by 0x10983C: moving (hw3.c:160)
+==281020==    by 0x10965E: solve (hw3.c:106)
+==281020==    by 0x109399: main (hw3-main.c:42)
+==281020== 
+==281020== 192 (128 direct, 64 indirect) bytes in 4 blocks are definitely lost in loss record 21 of 49
+==281020==    at 0x484DA83: calloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==281020==    by 0x10A9D3: move_copy (hw3.c:469)
+==281020==    by 0x10A437: moving (hw3.c:347)
+==281020==    by 0x10965E: solve (hw3.c:106)
+==281020==    by 0x109399: main (hw3-main.c:42)
+==281020== 
+==281020== 576 bytes in 144 blocks are definitely lost in loss record 28 of 49
+==281020==    at 0x484DA83: calloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==281020==    by 0x10A59C: moving (hw3.c:409)
+==281020==    by 0x10A36C: moving (hw3.c:319)
+==281020==    by 0x10A36C: moving (hw3.c:319)
+==281020==    by 0x4900AC2: start_thread (pthread_create.c:442)
+==281020==    by 0x4991A03: clone (clone.S:100)
+==281020== 
+==281020== 1,344 (1,024 direct, 320 indirect) bytes in 16 blocks are definitely lost in loss record 40 of 49
+==281020==    at 0x484DA83: calloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==281020==    by 0x10983C: moving (hw3.c:160)
+==281020==    by 0x10A36C: moving (hw3.c:319)
+==281020==    by 0x10A36C: moving (hw3.c:319)
+==281020==    by 0x10A36C: moving (hw3.c:319)
+==281020==    by 0x4900AC2: start_thread (pthread_create.c:442)
+==281020==    by 0x4991A03: clone (clone.S:100)
+==281020== 
+==281020== 1,416 bytes in 354 blocks are definitely lost in loss record 41 of 49
+==281020==    at 0x484DA83: calloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==281020==    by 0x10A59C: moving (hw3.c:409)
+==281020==    by 0x10A36C: moving (hw3.c:319)
+==281020==    by 0x4900AC2: start_thread (pthread_create.c:442)
+==281020==    by 0x4991A03: clone (clone.S:100)
+==281020== 
+==281020== 1,920 (1,280 direct, 640 indirect) bytes in 40 blocks are definitely lost in loss record 42 of 49
+==281020==    at 0x484DA83: calloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==281020==    by 0x10A9D3: move_copy (hw3.c:469)
+==281020==    by 0x10A437: moving (hw3.c:347)
+==281020==    by 0x10A36C: moving (hw3.c:319)
+==281020==    by 0x10A36C: moving (hw3.c:319)
+==281020==    by 0x4900AC2: start_thread (pthread_create.c:442)
+==281020==    by 0x4991A03: clone (clone.S:100)
+==281020== 
+==281020== 5,952 (3,968 direct, 1,984 indirect) bytes in 124 blocks are definitely lost in loss record 45 of 49
+==281020==    at 0x484DA83: calloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==281020==    by 0x10A9D3: move_copy (hw3.c:469)
+==281020==    by 0x10A437: moving (hw3.c:347)
+==281020==    by 0x10A36C: moving (hw3.c:319)
+==281020==    by 0x4900AC2: start_thread (pthread_create.c:442)
+==281020==    by 0x4991A03: clone (clone.S:100)
+==281020== 
+==281020== 10,208 (9,216 direct, 992 indirect) bytes in 144 blocks are definitely lost in loss record 46 of 49
+==281020==    at 0x484DA83: calloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==281020==    by 0x10983C: moving (hw3.c:160)
+==281020==    by 0x10A36C: moving (hw3.c:319)
+==281020==    by 0x10A36C: moving (hw3.c:319)
+==281020==    by 0x4900AC2: start_thread (pthread_create.c:442)
+==281020==    by 0x4991A03: clone (clone.S:100)
+==281020== 
+==281020== 12,288 (8,192 direct, 4,096 indirect) bytes in 256 blocks are definitely lost in loss record 47 of 49
+==281020==    at 0x484DA83: calloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==281020==    by 0x10A9D3: move_copy (hw3.c:469)
+==281020==    by 0x10A437: moving (hw3.c:347)
+==281020==    by 0x4900AC2: start_thread (pthread_create.c:442)
+==281020==    by 0x4991A03: clone (clone.S:100)
+==281020== 
+==281020== 26,160 (22,656 direct, 3,504 indirect) bytes in 354 blocks are definitely lost in loss record 48 of 49
+==281020==    at 0x484DA83: calloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==281020==    by 0x10983C: moving (hw3.c:160)
+==281020==    by 0x10A36C: moving (hw3.c:319)
+==281020==    by 0x4900AC2: start_thread (pthread_create.c:442)
+==281020==    by 0x4991A03: clone (clone.S:100)
+==281020== 
+==281020== 70,256 (63,104 direct, 7,152 indirect) bytes in 986 blocks are definitely lost in loss record 49 of 49
+==281020==    at 0x484DA83: calloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==281020==    by 0x10983C: moving (hw3.c:160)
+==281020==    by 0x4900AC2: start_thread (pthread_create.c:442)
+==281020==    by 0x4991A03: clone (clone.S:100)
+==281020== 
+==281020== LEAK SUMMARY:
+==281020==    definitely lost: 111,692 bytes in 2,440 blocks
+==281020==    indirectly lost: 18,784 bytes in 3,196 blocks
+==281020==      possibly lost: 0 bytes in 0 blocks
+==281020==    still reachable: 0 bytes in 0 blocks
+==281020==         suppressed: 0 bytes in 0 blocks
+==281020== 
+==281020== ERROR SUMMARY: 13 errors from 13 contexts (suppressed: 0 from 0)

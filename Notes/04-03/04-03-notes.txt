@@ -1,0 +1,16 @@
+[04/03/2025]
+
+SERVER TYPES:
+
+(0) udp-server.c --- iterative server (often UDP):
+    accept incoming UDP datagrams on a specific port number;
+    or accept and handle TCP connections one after the other
+     (also udp-server-random.c)
+
+(1) udp-server-w-fork.c --- multi-process UDP server:
+    a child process is created to handle each received UDP datagram
+
+
+HOMEWORK 4: (most likely) TCP server (maybe also supporting UDP)
+             to play Wordle   ^^^^^^
+

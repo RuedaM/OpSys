@@ -98,10 +98,12 @@ The highlighted CRITICAL SECTIONS are shown above...
 And a CRITICAL SECTION guarantees MUTUAL EXCLUSION among multiple processes
  for access to one or more shared resources, e.g., shared variable x
 
+ MTUAL EXCLUSION ensures only one thread or process can access a shared resource at a time
+
 To synchronize processes, first we must identify the critical sections
  of code within each process
 
 -- the OS must control access to the critical sections by providing us
     (as programmers) some mechanism to define the critical sections, etc.
-   -- e.g., semaphores
+   -- e.g., semaphores later on...
 

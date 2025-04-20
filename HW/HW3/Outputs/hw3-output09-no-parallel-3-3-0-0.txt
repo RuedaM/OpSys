@@ -1,0 +1,8 @@
+MAIN: Solving the knight's tour problem for a 3x3 board
+MAIN: Starting at row 0 and column 0 (move #1)
+MAIN: 2 possible moves after move #1; creating 2 child threads...
+T1: Dead end at move #8
+MAIN: T1 joined
+T2: Dead end at move #8
+MAIN: T2 joined
+MAIN: Search complete; best solution(s) visited 8 squares out of 9

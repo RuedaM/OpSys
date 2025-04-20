@@ -9,7 +9,7 @@ int main(){
   const int maxline = 80;
 
   char* format_string = calloc(maxline, sizeof(char));
-  sprintf( format_string, "%%d %%79[^\n]" );
+  sprintf(format_string, "%%d %%79[^\n]");
 
   char* line = calloc(maxline, sizeof(char));
   char* msg = calloc(maxline, sizeof(char));

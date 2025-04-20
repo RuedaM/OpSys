@@ -1,0 +1,3 @@
+MAIN: Solving the knight's tour problem for a 3x8 board
+MAIN: Starting at row 0 and column 0 (move #1)
+MAIN: Search complete; found 82 open tours and 0 closed tours

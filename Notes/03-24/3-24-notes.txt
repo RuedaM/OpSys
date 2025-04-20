@@ -1,0 +1,280 @@
+[03/24/2025]
+
+  /* Process P1 or Thread T1 */
+  while ( 1 )
+  {
+    execNonCriticalSection();
+    execCriticalSection();
+  }
+
+  /* Process P2 or Thread T2 */
+  while ( 1 )
+  {
+    execNonCriticalSection();
+    execCriticalSection();
+  }
+
+  ...
+
+  /* Process Pn or Thread Tn */
+  while ( 1 )
+  {
+    execNonCriticalSection();
+    execCriticalSection();
+  }
+
+=======================================================================================
+
+                    /* global or shared memory */
+                    int x = 5;
+                    int lock = 0;   /* 0 == lock is available */
+
+  /* Thread T1 */                        /* Thread T2 */
+  while ( 1 )                            while ( 1 )
+  {                                      {
+    execNonCriticalSection();              execNonCriticalSection();
+    while ( lock == 1 )                    while ( lock == 1 )
+    {                                      {
+      /* busy wait */                        /* busy wait */
+    }                                      }
+  --<context-switch>---------
+    lock = 1;                              lock = 1;
+    execCriticalSection();                 execCriticalSection();
+    lock = 0;                              lock = 0;
+  }                                      }
+
+=======================================================================================
+
+...from last time...
+
+  How do we parallelize the Producer/Consumer solution further such that
+   reads/writes can occur simultaneously in different slots of the array?
+                                            ^^^^^^^^^^^^^^^
+
+
+                       /* shared/global memory */
+                       int N = 20;
+                       buffer[N];
+                       semaphore empty_slots = N;  /* 0..N (counting semaphore) */
+                       semaphore used_slots = 0;   /* 0..N (counting semaphore) */
+                       int next_producer_index = 0;
+                       int next_consumer_index = 0;
+                       semaphore mutex_on_next_producer_index = 1;
+                       semaphore mutex_on_next_consumer_index = 1;
+
+  TO DO: incorporate the four new variables above to "better" synchronize
+          the solution below...
+
+  /* producer */                           /* consumer */
+  while ( 1 )                              while ( 1 )
+  {                                        {
+    item = produce_next_item();              P( used_slots );
+    P( empty_slots );                          P( mutex_on_next_consumer_index );
+      P( mutex_on_next_producer_index );         index = next_consumer_index;
+        index = next_producer_index;             next_consumer_index++;
+        next_producer_index++;                   next_consumer_index %= N;
+        next_producer_index %= N;              V( mutex_on_next_consumer_index );
+      V( mutex_on_next_producer_index );       item = remove_from_buffer( index );
+      add_to_buffer( item, index );          V( empty_slots );
+    V( used_slots );                         consume( item );
+  }                                        }
+
+    (reminder that P() essentially does S-- and V() does S++)
+
+ TEST this code: does this work with one producer and one consumer thread?
+                   (manually walk through different cases, e.g., full array, etc.)
+
+ TEST: what happens if there are more than N producers, all wanting to add to the buffer?
+
+ TEST: what happens if there are more than N consumers, all wanting to read from the buffer?
+
+ TEST: does this work with one producer and many (more than one) consumer threads?
+
+ TEST: does this work with many (more than one) producers and one consumer thread?
+
+ TEST: does this work with many (more than one) producers and many (more than one) consumers?
+
+ TEST: since P() is a blocking call/operation, do we ever reach a point where
+        threads are blocked forever, i.e., DEADLOCK
+
+=============================================================================================
+
+ DINING PHILOSOPHERS PROBLEM   (philosopher == process/thread)
+
+ Given: five philosophers that engage in only two activities:
+        (1) thinking (i.e., independent computation <== non-critical section)
+        (2) eating (i.e., sharing a resource; therefore, we need synchronization
+                                                    <== critical section)
+
+  philosopher( i )    /* i in 0..4 */
+  {
+    think()    /* non-critical section */
+    eat()      /* critical section */
+  }
+
+ Given: shared table with five bowls and five chopsticks,
+         and a bowl of food in the middle of the table
+          (which is endlessly replenished)
+
+ Key constraint: to eat(), a philosopher must obtain two chopsticks,
+                   one on the left, one on the right
+
+ Other key constraints: a philosopher eats for a finite amount of time;
+                         no two philosophers can simultaneously hold
+                          the same chopstick
+
+ Goal: Design a solution by which you can guarantee that each
+        philosopher eats; in order to eat, two chopsticks must be in hand
+
+       (Solution must avoid deadlock, have no individual starvation,
+          also be fair, efficient, etc.)
+
+ DEADLOCK: we have deadlock when no process/thread can make any further
+            progress, i.e., ALL blocked on a P() operation and
+             the given resource will NEVER become available
+
+
+First attempt:
+
+  chopstick is array[5] of binary semaphores (initialized to { 1, 1, 1, 1, 1 })
+
+  philosopher( i )     /* i in 0..4 */
+  {
+    while ( 1 )
+    {
+      think()
+      P( chopstick[i] )
+        P( chopstick[(i+1)%5] )
+          eat()                 /* critical section */
+        V( chopstick[(i+1)%5] )
+      V( chopstick[i] )
+    }
+  }
+
+PROBLEM: deadlock can occur if the first P() operation is successfully
+          executed by each philosopher, followed immediately by a context switch
+           -- no philosopher gets through to their second P() operation
+           -- no philosopher gets to calling a V() operation
+
+
+Second attempt (not so good...):
+
+  mutex is a binary semaphore
+  chopstick is array[5] of binary semaphores (initialized to { 1, 1, 1, 1, 1 })
+
+  philosopher( i )     /* i in 0..4 */
+  {
+    while ( 1 )
+    {
+      think()
+      P( mutex )   /* <== reserve the entire table! */
+        P( chopstick[i] )
+          P( chopstick[(i+1)%5] )
+            eat()                 /* critical section */
+          V( chopstick[(i+1)%5] )
+        V( chopstick[i] )
+      V( mutex )   /* relinquish access to the table */
+    }
+  }
+
+
+
+Third attempt:
+
+  mutex is a binary semaphore
+  chopstick is array[5] of binary semaphores (initialized to { 1, 1, 1, 1, 1 })
+
+  philosopher( i )     /* i in 0..4 */
+  {
+    while ( 1 )
+    {
+      think()
+      P( mutex )  /* <== lock the table so that we can pick up two chopsticks */
+        P( chopstick[i] )
+        P( chopstick[(i+1)%5] )
+      V( mutex )  /* <== unlock the table.... */
+      eat()                 /* critical section */
+      V( chopstick[(i+1)%5] )
+      V( chopstick[i] )
+    }
+  }
+
+TO DO: does this "third attempt" actually work, i.e., does this
+        avoid deadlock and also ensure that every philosopher is
+         able to eat?
+
+
+Fourth attempt: -- use an asymmetric solution
+
+  chopstick is array[5] of binary semaphores (initialized to { 1, 1, 1, 1, 1 })
+
+  philosopher( i )     /* i in 0..3 (instead of i in 0..4) */
+  {
+    while ( 1 )
+    {
+      think()
+      P( chopstick[i] )
+        P( chopstick[(i+1)%5] )
+          eat()                 /* critical section */
+        V( chopstick[(i+1)%5] )
+      V( chopstick[i] )
+    }
+  }
+
+  philosopher( i )     /* i is always 4 */
+  {
+    while ( 1 )
+    {
+      think()
+      P( chopstick[(i+1)%5] )    /* we swapped the order of the P() operations */
+        P( chopstick[i] )
+          eat()                 /* critical section */
+        V( chopstick[i] )
+      V( chopstick[(i+1)%5] )
+    }
+  }
+
+ TO DO: convince yourself (prove?) that the above solution works,
+         i.e., we avoid deadlock and also avoid starvation...?
+
+
+
+
+
+
+
+
+
+
+
+
+RESOURCE ALLOCATION GRAPHS (see slides):
+
+
+ P1:  P( R1 ); /* Y */
+      ...
+      P( R2 ); /* ? */
+
+ P2:  P( R2 ); /* Y */
+      ...
+      P( R3 ); /* ? */
+
+ P3:  P( R3 ); /* Y */
+
+    <no deadlock>
+
+
+ how could deadlock
+  occur...?
+
+ deadlock would occur
+  if we added one more
+   edge to the resource
+    alloc graph...
+
+ P3:  P( R1 );  /* ? */
+
+
+
+
+

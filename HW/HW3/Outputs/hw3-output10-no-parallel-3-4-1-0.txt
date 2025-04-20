@@ -1,0 +1,48 @@
+MAIN: Solving the knight's tour problem for a 3x4 board
+MAIN: Starting at row 1 and column 0 (move #1)
+MAIN: 2 possible moves after move #1; creating 2 child threads...
+T1: 2 possible moves after move #2; creating 2 child threads...
+T2: 2 possible moves after move #7; creating 2 child threads...
+T3: Found an open knight's tour; incremented total_open_tours
+T2: T3 joined
+T4: Found an open knight's tour; incremented total_open_tours
+T2: T4 joined
+T1: T2 joined
+T5: 2 possible moves after move #3; creating 2 child threads...
+T6: 2 possible moves after move #5; creating 2 child threads...
+T7: Dead end at move #9
+T6: T7 joined
+T8: Dead end at move #8
+T6: T8 joined
+T5: T6 joined
+T9: 2 possible moves after move #7; creating 2 child threads...
+T10: Dead end at move #8
+T9: T10 joined
+T11: Dead end at move #11
+T9: T11 joined
+T5: T9 joined
+T1: T5 joined
+MAIN: T1 joined
+T12: 2 possible moves after move #2; creating 2 child threads...
+T13: 2 possible moves after move #7; creating 2 child threads...
+T14: Found an open knight's tour; incremented total_open_tours
+T13: T14 joined
+T15: Found an open knight's tour; incremented total_open_tours
+T13: T15 joined
+T12: T13 joined
+T16: 2 possible moves after move #3; creating 2 child threads...
+T17: 2 possible moves after move #5; creating 2 child threads...
+T18: Dead end at move #9
+T17: T18 joined
+T19: Dead end at move #8
+T17: T19 joined
+T16: T17 joined
+T20: 2 possible moves after move #7; creating 2 child threads...
+T21: Dead end at move #11
+T20: T21 joined
+T22: Dead end at move #8
+T20: T22 joined
+T16: T20 joined
+T12: T16 joined
+MAIN: T12 joined
+MAIN: Search complete; found 4 open tours and 0 closed tours

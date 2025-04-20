@@ -1,0 +1,51 @@
+[03/27/2025]
+
+well-known port numbers (2-byte short data type):
+-- range 0-65535
+-- see /etc/services
+-- 21 FTP
+-- 22 SSH
+-- 23 TELNET (not used bc we should use SSH)
+-- 25 SMTP (simple mail transfer protocol)
+-- 80 HTTP
+-- 443 HTTPS
+--- 8333 bitcoin?!
+
+
+https://www.reddit.com/r/interestingasfuck/s/V2TDHcDkzb
+
+https://www.sri.com/hoi/arpanet/
+
+
+DECODING IP ADDRESSES....
+
+linux.cs.rpi.edu ==> 128.113.126.73
+                    /   \
+                   /     \
+          binary: 10000000    the leading 10 tells us this machine/host
+                  ^^           is on a class B network
+
+              ...and 128.113 is an RPI Class B network
+
+
+
+DATA MARSHALLING
+
+ what is meant by 04/01/2025?    is this April 1, 2025 or
+                                       January 4, 2025 or ....?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

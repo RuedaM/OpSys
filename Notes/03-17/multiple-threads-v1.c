@@ -9,12 +9,12 @@
 
 
 /* this function is called by each child thread */
-void * whattodo( void * arg );
+void* whattodo(void* arg);
 
 
 
 int main(int argc, char** argv){
-  srand( time( NULL ) * getpid() );
+  srand(time(NULL)* getpid());
 
   if (argc!=2){
     fprintf( stderr, "ERROR: invalid arguments\n" );
@@ -30,16 +30,16 @@ int main(int argc, char** argv){
 
   /* create the child threads */
   for(i=0 ; i<children ; i++){
-#if 0
+    #if 0
     int t = 10 + ( rand() % 21 );  /* [10,30] seconds */
     printf( "MAIN: next child thread will nap for %d seconds\n", t );
     rc = pthread_create( tid + i, NULL, whattodo, &t );
-#else
+    #else
     int* t = malloc(sizeof(int));
     *t = 10+(rand()%21);  /* [10,30] seconds */
     printf("MAIN: next child thread will nap for %d seconds\n", *t);
     rc = pthread_create(tid+i, NULL, whattodo, t);
-#endif
+    #endif
     if (rc!=0) {fprintf( stderr, "pthread_create() failed (%d)\n", rc );}
   }
 

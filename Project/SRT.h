@@ -62,13 +62,14 @@ int SRT(struct Process* allProcesses, int n, int t_cs, double alpha, int fd, ssi
         printf("~~ TIME: %d\n", time);
         #endif
         
+
         
         //======================================================================================================================
         #if DEBUG_MODE
         printf("~~ Checking if process can be deleted or added to I/O...\n");
         #endif
         if (cpuIsRunning && cpuProc->cpuBurstCurr==0){ // If CPU in-use and cpuProc's burst is done...
-            
+            cpuProc->preemptState = 0;
             if (cpuProc->idx!=cpuProc->cpuBurstCount-1){ // If proc not about to terminate, set current I/O burst time
                 cpuProc->ioBurstCurr = cpuProc->ioBurstTimes[cpuProc->idx];
             }
@@ -153,11 +154,10 @@ int SRT(struct Process* allProcesses, int n, int t_cs, double alpha, int fd, ssi
             preemptProc->state = 3; //state=IN-CPU
             cpuProc = priority_queue_remove_single(&priorityQueue, priorityQueueLen, preemptProc->ID);
             priorityQueueLen -= 1;
-
             if (time<10000){
                 printf("time %dms: Process %s (tau %dms) started using the CPU for",
                     time, cpuProc->ID, cpuProc->tauInit);
-                if (cpuProc->preempted) {
+                if (cpuProc->cpuBurstCount<cpuProc->cpuBurstTimes[cpuProc->idx]) {
                     printf(" remaining %dms of %dms burst", cpuProc->cpuBurstCurr, cpuProc->cpuBurstTimes[cpuProc->idx]);
                     cpuProc->preempted = 0;
                 }
@@ -225,6 +225,7 @@ int SRT(struct Process* allProcesses, int n, int t_cs, double alpha, int fd, ssi
                             printf(" preempting %s (predicted remaining time %dms)", cpuProc->ID, cpuProc->tau);
                         }
                         preemptFlag = 1;
+                        cpuProc->preemptState = 1;
                         movingProc->preempting = 1;
                         // #if DEBUG_MODE
                         // printf("~~ Preemption inbound -- preemptFlag=%d\n", preemptFlag);
@@ -280,7 +281,7 @@ int SRT(struct Process* allProcesses, int n, int t_cs, double alpha, int fd, ssi
         #if DEBUG_MODE
         printf("~~ Checking if algo is done...\n");
         #endif        
-        if (completedProcs==n){
+        if (completedProcs==n || time>10000){
             printf("time %dms: Simulator ended for SRT", time);
             priority_queue_status(priorityQueue, priorityQueueLen);
             printf("\n");

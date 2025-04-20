@@ -34,19 +34,14 @@
 int main(){
     /* create the shared memory segment with a size of 4 bytes */
     key_t key = SHM_SHARED_KEY;
-    int shmid = shmget(key, sizeof(int), IPC_CREAT | /* IPC_EXCL | */ 0660);
-                                                                    /* rw-rw---- */
+    int shmid = shmget(key, sizeof(int), IPC_CREAT | /* IPC_EXCL | */ 0660); // 0660 = rw-rw---- = 110110000
     if (shmid==-1) {perror("shmget() failed"); return EXIT_FAILURE;}
-
     printf("shmget() returned %d\n", shmid);
-
     /* NOTE that shmget() will zero out the newly created shared memory segment */
 
-
     /* attach to the shared memory segment */
-    int* x = shmat( shmid, NULL, 0 );
+    int* x = shmat(shmid, NULL, 0);
     if (x==(void *)-1) {perror("shmat() failed"); return EXIT_FAILURE;}
-
 
     /* create a child process --- child process inherits
     *  the pointer to the shared memory segment

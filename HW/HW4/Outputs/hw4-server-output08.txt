@@ -1,0 +1,34 @@
+Opened wordle_words08.txt; read 5757 valid words
+Wordle UDP server started
+New game request; assigned game token 1
+New game request; assigned game token 2
+New game request; assigned game token 3
+New game request; assigned game token 4
+GAME 256: Received guess: stare
+GAME 5: Received guess: stare
+GAME 4: Received guess: stare
+GAME 4: Sending reply: ----e (5 guesses left)
+GAME 4: Received guess: demon
+GAME 4: Sending reply: de--n (4 guesses left)
+GAME 4: Received guess: ended
+GAME 4: Sending reply: -n-ED (3 guesses left)
+GAME 4: Received guess: honed
+GAME 4: Sending reply: --nED (2 guesses left)
+GAME 4: Received guess: nixed
+GAME 4: Sending reply: N--ED (1 guess left)
+GAME 4: Received guess: nudge
+GAME 4: Sending reply: NUd-e (0 guesses left)
+GAME 4: Game over; word was nuked!
+GAME 4: Received guess: nuked
+New game request; assigned game token 5
+SIGUSR1 received; Wordle server shutting down...
+GAME 1: Game over; word was carte!
+GAME 2: Game over; word was decor!
+GAME 3: Game over; word was tubed!
+GAME 5: Game over; word was flora!
+
+games: 5
+wins: 0
+losses: 1
+
+Word(s) played: - carte - decor - tubed - nuked - flora

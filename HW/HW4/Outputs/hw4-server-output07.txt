@@ -1,0 +1,35 @@
+Opened wordle_words07.txt; read 5757 valid words
+Wordle UDP server started
+New game request; assigned game token 1
+GAME 1: Received guess: stare
+GAME 1: Sending reply: ---re (5 guesses left)
+New game request; assigned game token 2
+GAME 1: Received guess: reply
+GAME 1: Sending reply: reP-- (4 guesses left)
+New game request; assigned game token 3
+GAME 1: Received guess: coper
+GAME 1: Sending reply: --PER (3 guesses left)
+New game request; assigned game token 4
+GAME 1: Received guess: piper
+GAME 1: Sending reply: p-PER (2 guesses left)
+New game request; assigned game token 5
+GAME 1: Received guess: upper
+GAME 1: Sending reply: UPPER (1 guess left)
+GAME 1: Game over; word was upper!
+New game request; assigned game token 6
+GAME 5: Received guess: stare
+GAME 5: Sending reply: ----- (5 guesses left)
+New game request; assigned game token 7
+SIGUSR1 received; Wordle server shutting down...
+GAME 2: Game over; word was dozer!
+GAME 3: Game over; word was firer!
+GAME 4: Game over; word was bitsy!
+GAME 5: Game over; word was pulpy!
+GAME 6: Game over; word was kappa!
+GAME 7: Game over; word was droop!
+
+games: 7
+wins: 1
+losses: 0
+
+Word(s) played: - upper - dozer - firer - bitsy - pulpy - kappa - droop

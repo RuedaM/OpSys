@@ -1,0 +1,27 @@
+Opened wordle_words04.txt; read 5757 valid words
+Wordle UDP server started
+New game request; assigned game token 1
+GAME 1: Received guess: stare
+GAME 1: Sending reply: --a-e (5 guesses left)
+GAME 1: Received guess: caged
+GAME 1: Sending reply: -AgED (4 guesses left)
+New game request; assigned game token 2
+GAME 1: Received guess: gamed
+GAME 1: Sending reply: GA-ED (3 guesses left)
+GAME 2: Received guess: merit
+GAME 2: Sending reply: -er-t (5 guesses left)
+GAME 1: Received guess: gazed
+GAME 1: Sending reply: GAZED (2 guesses left)
+GAME 1: Game over; word was gazed!
+New game request; assigned game token 3
+New game request; assigned game token 4
+SIGUSR1 received; Wordle server shutting down...
+GAME 2: Game over; word was alter!
+GAME 3: Game over; word was monad!
+GAME 4: Game over; word was shrub!
+
+games: 4
+wins: 1
+losses: 0
+
+Word(s) played: - gazed - alter - monad - shrub
