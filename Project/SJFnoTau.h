@@ -165,7 +165,7 @@ int SJFnoTau(struct Process* allProcesses, int n, int t_cs, int fd, ssize_t byte
                     movingProc->state = 1; //state=IN-QUEUE
                     movingProc->idx += 1; //Increase CPU and I/O bust times index
                     movingProc->cpuBurstCurr = movingProc->cpuBurstTimes[movingProc->idx]; // Establish current CPU burst time
-                    priority_queue_push_SJF(&priorityQueue, priorityQueueLen, movingProc);
+                    priority_queue_push_SJFnoTau(&priorityQueue, priorityQueueLen, movingProc);
                     priorityQueueLen += 1;
                     ioLen -= 1;
 
@@ -194,7 +194,7 @@ int SJFnoTau(struct Process* allProcesses, int n, int t_cs, int fd, ssize_t byte
                 struct Process* movingProc = &allProcesses[i];
                 movingProc->state = 1; //state=IN-QUEUE
                 movingProc->cpuBurstCurr = movingProc->cpuBurstTimes[movingProc->idx]; // Establish current CPU burst time
-                priority_queue_push_SJF(&priorityQueue, priorityQueueLen, movingProc);
+                priority_queue_push_SJFnoTau(&priorityQueue, priorityQueueLen, movingProc);
                 priorityQueueLen += 1;
                 
                 if (time<10000){

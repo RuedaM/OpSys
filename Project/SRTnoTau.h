@@ -22,7 +22,7 @@
 
 
 
-int SRT(struct Process* allProcesses, int n, int t_cs, double alpha, int fd, ssize_t bytesWritten, char toWrite[200]){
+int SRTnoTau(struct Process* allProcesses, int n, int t_cs, double alpha, int fd, ssize_t bytesWritten, char toWrite[200]){
     int time = 0;
     #if DEBUG_MODE
     int timeAdd = 0;
@@ -145,7 +145,7 @@ int SRT(struct Process* allProcesses, int n, int t_cs, double alpha, int fd, ssi
             cpuProc->state = 1; //state=IN-QUEUE
             cpuProc->preempted = 1;
             cpuProc->preempts += 1;
-            priority_queue_push_SJF(&priorityQueue, priorityQueueLen, cpuProc);
+            priority_queue_push_SJFnoTau(&priorityQueue, priorityQueueLen, cpuProc);
             priorityQueueLen += 1;
 
             struct Process* preemptProc;
@@ -213,7 +213,7 @@ int SRT(struct Process* allProcesses, int n, int t_cs, double alpha, int fd, ssi
                     movingProc->state = 1; //state=IN-QUEUE
                     movingProc->idx += 1; //Increase CPU and I/O burst times index
                     movingProc->cpuBurstCurr = movingProc->cpuBurstTimes[movingProc->idx]; // Establish current CPU burst time
-                    priority_queue_push_SJF(&priorityQueue, priorityQueueLen, movingProc);
+                    priority_queue_push_SJFnoTau(&priorityQueue, priorityQueueLen, movingProc);
                     priorityQueueLen += 1;
                     ioLen -= 1;
 
@@ -261,7 +261,7 @@ int SRT(struct Process* allProcesses, int n, int t_cs, double alpha, int fd, ssi
 
                 movingProc->state = 1; //state=IN-QUEUE
                 movingProc->cpuBurstCurr = movingProc->cpuBurstTimes[movingProc->idx];
-                priority_queue_push_SJF(&priorityQueue, priorityQueueLen, movingProc);
+                priority_queue_push_SJFnoTau(&priorityQueue, priorityQueueLen, movingProc);
                 priorityQueueLen += 1;
                 
                 if (time<10000){
