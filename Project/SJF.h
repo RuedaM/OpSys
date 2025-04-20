@@ -338,7 +338,7 @@ int SJF(struct Process* allProcesses, int n, int t_cs, double alpha, int fd, ssi
     #if DEBUG_MODE
     printf("~~ Printing simout.txt information...\n");
     #endif
-    sprintf(toWrite, "\nAlogrithm SJF\n");
+    sprintf(toWrite, "\nAlgorithm SJF\n");
     bytesWritten = write(fd, toWrite, strlen(toWrite));
     if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
     float cpuUtil = 0;

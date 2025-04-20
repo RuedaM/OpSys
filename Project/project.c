@@ -2,12 +2,12 @@
 
 /*
  * TERMINAL COMMANDS:
- * gcc -Wall -Werror -Wextra -g -o project_part1.out project_part1.c -lm
- * gcc -Wall -Werror -Wextra -g -o project_part1.out project_part1.c -lm -D DEBUG_MODE
- * ./project_part1.out <ARGS HERE>
- * ./project_part1.out <ARGS HERE> > TERMINAL_OUT.txt
- * valgrind -s --leak-check=full ./project_part1.out <ARGS HERE>
- * valgrind -s --leak-check=full ./project_part1.out <ARGS HERE> > TERMINAL_OUT.txt
+ * gcc -Wall -Werror -Wextra -g -o project.out project.c -lm
+ * gcc -Wall -Werror -Wextra -g -o project.out project.c -lm -D DEBUG_MODE
+ * ./project.out <ARGS HERE>
+ * ./project.out <ARGS HERE> > TERMINAL_OUT.txt
+ * valgrind -s --leak-check=full ./project.out <ARGS HERE>
+ * valgrind -s --leak-check=full ./project.out <ARGS HERE> > TERMINAL_OUT.txt
  * ARGS:
  * 3  1  32  0.001 1024 4 0.75 256
  * 8  6  768 0.001 1024 6 0.95 128
@@ -42,9 +42,9 @@ int main(int argc, char** argv){
 
     //======================================================================================================================
     #ifdef DEBUG_MODE
-    printf("=Check Arg Input= // "); for(int i=1 ; i<=8 ; i++){printf("%s // ",*(argv+i));} printf("\n");
+    printf("=Check Arg Input= // "); printf("argc: %d // ", argc); for(int i=1 ; i<=8 ; i++){printf("%s // ",*(argv+i));} printf("\n");
     #endif    
-    if(argc!=9) {fprintf(stderr, "ERROR: Invalid number of arguments\n"); return EXIT_FAILURE;} // (1 .out file + 8 inputs = 9 args)
+    if(argc<9 || argc>10) {fprintf(stderr, "ERROR: Invalid number of arguments\n"); return EXIT_FAILURE;} // (1 .out file + 8 inputs = 9 args)
 
     // Command Line Arg Storage+Setting
     int n = atoi(argv[1]); // number of processes to simulate
@@ -55,6 +55,10 @@ int main(int argc, char** argv){
     int t_cs = atoi(argv[6]); // time, (in ms), that it takes to perform a context switch
     double alpha = atof(argv[7]); // for SJF and SRT algorithms
     int t_slice = atoi(argv[8]); // time slice value in ms for RR algorithm
+    // char* rrStatus = "NORMAL";
+    // if (argc==10){
+    //     rrStatus = argv[9];
+    // }
     #if DEBUG_MODE
     printf("Arg verification:\n");
     printf("  Processes: %d", n); printf("\t\tCPU-bound: %d\n", n_cpu);
@@ -74,7 +78,7 @@ int main(int argc, char** argv){
     if(bound<=0) {fprintf(stderr, "ERROR: bound must be a positive integer\n"); return EXIT_FAILURE;}
     // -----------------------------------------------------------------------------------
     if(t_cs<=0 && (t_cs%2)!=0) {fprintf(stderr, "ERROR: t_cs must be a positive even integer\n"); return EXIT_FAILURE;}
-    if(alpha<0 || alpha>1) {fprintf(stderr, "ERROR: alpha must be in range [0,1]}\n"); return EXIT_FAILURE;}
+    if (!((alpha>=0.0 && alpha<=1.0) || (alpha==-1.0))) {fprintf(stderr, "ERROR: alpha must be either in range [0,1] or equal to -1}\n"); return EXIT_FAILURE;}
     if(t_slice<=0) {fprintf(stderr, "ERROR: t_slice must be a positive integer\n"); return EXIT_FAILURE;}
 
     // Terminal Output
@@ -192,11 +196,11 @@ int main(int argc, char** argv){
     printf("<<< PROJECT SIMULATIONS\n<<< -- t_cs=%dms; alpha=%.2f; t_slice=%dms\n", t_cs, alpha, t_slice);
     int ret;
 
-    allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
-    ret = FCFS(allProcesses, n, t_cs, fd, bytesWritten, toWrite);
-    if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
-    for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
-    free(allProcesses);
+    // allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
+    // ret = FCFS(allProcesses, n, t_cs, fd, bytesWritten, toWrite);
+    // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
+    // for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
+    // free(allProcesses);
 
     allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
     ret = SJF(allProcesses, n, t_cs, alpha, fd, bytesWritten, toWrite);
@@ -204,17 +208,17 @@ int main(int argc, char** argv){
     for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
     free(allProcesses);
     
-    allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
-    ret = SRT(allProcesses, n, t_cs, alpha, fd, bytesWritten, toWrite);
-    if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
-    for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
-    free(allProcesses);
+    // allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
+    // ret = SRT(allProcesses, n, t_cs, alpha, fd, bytesWritten, toWrite);
+    // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
+    // for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
+    // free(allProcesses);
 
-    allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
-    ret = RR(allProcesses, n, t_cs, t_slice, fd, bytesWritten, toWrite);
-    if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
-    for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
-    free(allProcesses);
+    // allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
+    // ret = RR(allProcesses, n, t_cs, t_slice, fd, bytesWritten, toWrite);
+    // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
+    // for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
+    // free(allProcesses);
 
 
 
