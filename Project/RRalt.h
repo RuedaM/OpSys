@@ -105,14 +105,12 @@ int RRalt(struct Process* allProcesses, int n, int t_cs, int t_slice, int fd, ss
         printf("~~ Checking if process can be deleted or added to I/O...\n");
         #endif
         if (cpuIsRunning && cpuProc->cpuBurstCurr==0){ // If CPU in-use and cpuProc's burst is done...
-            
             if (cpuProc->idx!=cpuProc->cpuBurstCount-1){ // If proc not about to terminate, set current I/O burst time
                 cpuProc->ioBurstCurr = cpuProc->ioBurstTimes[cpuProc->idx];
             }
 
             if(csLeft==0 && cpuProc->state==4){ // If done cs'ing...
                 csLeft = t_cs/2; //Reset
-                tsliceLeft = t_slice; //Reset
                 cpuIsRunning = 0; // "CPU no longer running a proccess"
                 cpuProc->preemptState = 0; //Reset
 
