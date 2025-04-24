@@ -117,9 +117,12 @@ int main(int argc, char** argv){
 
     //======================================================================================================================
     // Calculations for simout.txt
-    float cpuBoundAvgCPUBurstTime, ioBoundAvgCPUBurstTime, totalAvgCPUBurstTime, cpuBoundAvgIOBurstTime, ioBoundAvgIOBurstTime, totalAvgIOBurstTime;
+    double cpuBoundAvgCPUBurstTime, ioBoundAvgCPUBurstTime, totalAvgCPUBurstTime, cpuBoundAvgIOBurstTime, ioBoundAvgIOBurstTime, totalAvgIOBurstTime;
+    cpuBoundAvgCPUBurstTime = ioBoundAvgCPUBurstTime = totalAvgCPUBurstTime = cpuBoundAvgIOBurstTime = ioBoundAvgIOBurstTime = totalAvgIOBurstTime = 0;
     int numCPUBoundAvgCPUBursts, numCPUBoundAvgIOBursts, numIOBoundAvgCPUBursts, numIOBoundAvgIOBursts;
+    numCPUBoundAvgCPUBursts = numCPUBoundAvgIOBursts = numIOBoundAvgCPUBursts = numIOBoundAvgIOBursts = 0;
     for(int i=0 ; i<n ; i++){//for every process...
+        printf("Num CPU: %d\n", numCPUBoundAvgIOBursts);
         if (allProcesses[i].binding==0) { //CPU-bound process
             for(int j=0 ; j<allProcesses[i].cpuBurstCount-1 ; j++){
                 cpuBoundAvgCPUBurstTime += allProcesses[i].cpuBurstTimes[j]; //Looking at CPU burst times
@@ -142,6 +145,7 @@ int main(int argc, char** argv){
     totalAvgIOBurstTime = cpuBoundAvgIOBurstTime + ioBoundAvgIOBurstTime; //Sum all I/O burst times
     
     // Finding Averages -- convert milliseconds to microseconds to correctly round using ceil function. Then convert microseconds back to milliseconds
+    printf("Total average: %f | Num CPU: %d | Num IO: %d\n", totalAvgCPUBurstTime, numCPUBoundAvgCPUBursts, numIOBoundAvgCPUBursts);
     totalAvgCPUBurstTime = ceil((totalAvgCPUBurstTime/(numCPUBoundAvgCPUBursts+numIOBoundAvgCPUBursts))*1000)/1000;
     totalAvgIOBurstTime = ceil((totalAvgIOBurstTime/(numCPUBoundAvgIOBursts+numIOBoundAvgIOBursts))*1000)/1000;
     cpuBoundAvgCPUBurstTime = ceil((cpuBoundAvgCPUBurstTime/numCPUBoundAvgCPUBursts)*1000)/1000;
@@ -196,23 +200,23 @@ int main(int argc, char** argv){
     printf("<<< PROJECT SIMULATIONS\n<<< -- t_cs=%dms; alpha=%.2f; t_slice=%dms\n", t_cs, alpha, t_slice);
     int ret;
 
-    // allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
-    // ret = FCFS(allProcesses, n, t_cs, fd, bytesWritten, toWrite);
-    // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
-    // for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
-    // free(allProcesses);
+    allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
+    ret = FCFS(allProcesses, n, t_cs, fd, bytesWritten, toWrite);
+    if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
+    for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
+    free(allProcesses);
 
-    // allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
-    // ret = SJF(allProcesses, n, t_cs, alpha, fd, bytesWritten, toWrite);
-    // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
-    // for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
-    // free(allProcesses);
+    allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
+    ret = SJF(allProcesses, n, t_cs, alpha, fd, bytesWritten, toWrite);
+    if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
+    for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
+    free(allProcesses);
     
-    // allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
-    // ret = SRT(allProcesses, n, t_cs, alpha, fd, bytesWritten, toWrite);
-    // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
-    // for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
-    // free(allProcesses);
+    allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
+    ret = SRT(allProcesses, n, t_cs, alpha, fd, bytesWritten, toWrite);
+    if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
+    for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
+    free(allProcesses);
 
     allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
     if (argc==9) {
