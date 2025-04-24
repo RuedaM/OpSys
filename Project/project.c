@@ -240,7 +240,6 @@ int main(int argc, char** argv){
         ret = RRalt(allProcesses, n, t_cs, t_slice, fd, bytesWritten, toWrite);
         if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
     }else{
-        printf("Yes\n");
         ret = RR(allProcesses, n, t_cs, t_slice, fd, bytesWritten, toWrite);
         if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
     }
