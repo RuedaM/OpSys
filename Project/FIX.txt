@@ -1,0 +1,17 @@
+simout stuff:
+- CPU bound avg CPU burst time, output5
+- overall avg IO burst time, output2
+
+FCFS simout calculations - certain values are off by a thousandth between outputs:
+- CPU bound + IO bound avg wait time, output4, output5
+- overall avg wait time, output4
+- CPU bound avg turnaround time, output3, output4, output7
+- IO bound avg turnaround time, output5
+
+SJF fully wrong
+- output7
+
+SJF simout - some are fully wrong
+- CPU util, output7
+- CPU + IO + overall bound avg wait time, output2, output3, output4, output5, output6, output7
+- CPU + IO + overall bound avg turnaround time, output2, output3, output4, output5, output6, output7
