@@ -60,9 +60,9 @@ int main(int argc, char** argv){
     int t_cs = atoi(argv[6]); // time, (in ms), that it takes to perform a context switch
     double alpha = atof(argv[7]); // for SJF and SRT algorithms
     int t_slice = atoi(argv[8]); // time slice value in ms for RR algorithm
-    char* rrStatus = "NULL";
+    char* rrStatus = calloc(10, sizeof(char));
     if (argc==10){
-        rrStatus = argv[9];
+        strcpy(rrStatus, argv[9]);
     }
     #if DEBUG_MODE
     printf("Arg verification:\n");
@@ -209,21 +209,21 @@ int main(int argc, char** argv){
 
 
 
-    allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
-    ret = FCFS(allProcesses, n, t_cs, fd, bytesWritten, toWrite);
-    if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
-    for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
-    free(allProcesses);
+    // allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
+    // ret = FCFS(allProcesses, n, t_cs, fd, bytesWritten, toWrite);
+    // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
+    // for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
+    // free(allProcesses);
 
-    allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
-    if (alpha==-1){
-        ret = SJFnoTau(allProcesses, n, t_cs, fd, bytesWritten, toWrite);
-    }else{
-        ret = SJF(allProcesses, n, t_cs, alpha, fd, bytesWritten, toWrite);
-    }
-    if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
-    for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
-    free(allProcesses);
+    // allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
+    // if (alpha==-1){
+    //     ret = SJFnoTau(allProcesses, n, t_cs, fd, bytesWritten, toWrite);
+    // }else{
+    //     ret = SJF(allProcesses, n, t_cs, alpha, fd, bytesWritten, toWrite);
+    // }
+    // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
+    // for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
+    // free(allProcesses);
     
     // allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
     // if (alpha==-1){
@@ -237,11 +237,12 @@ int main(int argc, char** argv){
 
     allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
     if (strcmp(rrStatus, "RR_ALT")){
-        // ret = RRalt(allProcesses, n, t_cs, t_slice, fd, bytesWritten, toWrite);
-        // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
+        ret = RRalt(allProcesses, n, t_cs, t_slice, fd, bytesWritten, toWrite);
+        if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
     }else{
-        // ret = RR(allProcesses, n, t_cs, t_slice, fd, bytesWritten, toWrite);
-        // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
+        printf("Yes\n");
+        ret = RR(allProcesses, n, t_cs, t_slice, fd, bytesWritten, toWrite);
+        if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
     }
     for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
     free(allProcesses);
@@ -250,7 +251,7 @@ int main(int argc, char** argv){
     // Freeing all other Dynamically-Allocated Memory
     for (int i=0 ; i<n ; i++){free(IDs[i]);}
     free(IDs);
-
+    free(rrStatus);
 
 
     return EXIT_SUCCESS;

@@ -332,13 +332,13 @@ int FCFS(struct Process* allProcesses, int n, int t_cs, int fd, ssize_t bytesWri
     sprintf(toWrite, "\nAlgorithm FCFS\n");
     bytesWritten = write(fd, toWrite, strlen(toWrite));
     if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
-    float cpuUtil = 0;
+    double cpuUtil = 0;
     int cpuTotalBursts = 0;
     int ioTotalBursts = 0;
-    float cpuTotalWaitTime = 0;
-    float ioTotalWaitTime = 0;
-    float cpuTotalTATime = 0;
-    float ioTotalTATime = 0;
+    double cpuTotalWaitTime = 0;
+    double ioTotalWaitTime = 0;
+    double cpuTotalTATime = 0;
+    double ioTotalTATime = 0;
     int numCPUcs = 0;
     int numIOcs = 0;
     for(int i=0 ; i<n ; i++){ // For every process...
