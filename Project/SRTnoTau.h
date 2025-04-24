@@ -22,7 +22,7 @@
 
 
 
-int SRTnoTau(struct Process* allProcesses, int n, int t_cs, double alpha, int fd, ssize_t bytesWritten, char toWrite[200]){
+int SRTnoTau(struct Process* allProcesses, int n, int t_cs, int fd, ssize_t bytesWritten, char toWrite[200]){
     int time = 0;
     #if DEBUG_MODE
     int timeAdd = 0;
@@ -101,22 +101,12 @@ int SRTnoTau(struct Process* allProcesses, int n, int t_cs, double alpha, int fd
                     priority_queue_status(priorityQueue, priorityQueueLen);
                 }else{ // If CPUProc still has CPU bursts...
                     if (time<10000){
-                        printf("time %dms: Process %s (tau %dms) completed a CPU burst; %d burst",
-                            time, cpuProc->ID, cpuProc->tauInit, (cpuProc->cpuBurstCount-(cpuProc->idx+1)));
+                        printf("time %dms: Process %s completed a CPU burst; %d burst",
+                            time, cpuProc->ID, (cpuProc->cpuBurstCount-(cpuProc->idx+1)));
                         if (cpuProc->cpuBurstCount-(cpuProc->idx+1) == 1) {printf(" to go");}
                         else                                              {printf("s to go");}
                         priority_queue_status(priorityQueue, priorityQueueLen);
                     }
-
-                    double computed = alpha * (double)cpuProc->cpuBurstTimes[cpuProc->idx] + (1.0-alpha) * (double)cpuProc->tauInit;
-                    int newTau = (int)ceil(computed);
-                    if (time<10000){
-                        printf("time %dms: Recalculated tau for process %s: old tau %dms ==> new tau %dms",
-                            time, cpuProc->ID, cpuProc->tauInit, newTau);
-                        priority_queue_status(priorityQueue, priorityQueueLen);
-                    }
-                    cpuProc->tauInit = newTau;
-                    cpuProc->tau = newTau;
 
                     if (time<10000){
                         printf("time %dms: Process %s switching out of CPU; blocking on I/O until time %dms",
@@ -155,8 +145,8 @@ int SRTnoTau(struct Process* allProcesses, int n, int t_cs, double alpha, int fd
             cpuProc = priority_queue_remove_single(&priorityQueue, priorityQueueLen, preemptProc->ID);
             priorityQueueLen -= 1;
             if (time<10000){
-                printf("time %dms: Process %s (tau %dms) started using the CPU for",
-                    time, cpuProc->ID, cpuProc->tauInit);
+                printf("time %dms: Process %s started using the CPU for",
+                    time, cpuProc->ID);
                 if (cpuProc->cpuBurstCount<cpuProc->cpuBurstTimes[cpuProc->idx]) {
                     printf(" remaining %dms of %dms burst", cpuProc->cpuBurstCurr, cpuProc->cpuBurstTimes[cpuProc->idx]);
                     cpuProc->preempted = 0;
@@ -178,8 +168,8 @@ int SRTnoTau(struct Process* allProcesses, int n, int t_cs, double alpha, int fd
                 cpuIsRunning = 1;   // "CPU is now running a proccess"
 
                 if (time<10000){
-                    printf("time %dms: Process %s (tau %dms) started using the CPU for %dms burst",
-                        time, cpuProc->ID, cpuProc->tauInit, cpuProc->cpuBurstCurr);
+                    printf("time %dms: Process %s started using the CPU for %dms burst",
+                        time, cpuProc->ID, cpuProc->cpuBurstCurr);
                     priority_queue_status(priorityQueue, priorityQueueLen);
                 }
                 #if DEBUG_MODE
@@ -206,8 +196,8 @@ int SRTnoTau(struct Process* allProcesses, int n, int t_cs, double alpha, int fd
                 if (io->head->p->ioBurstCurr==0){ // If next-up-proc's I/O burst is finished...
                     struct Process* movingProc = queue_pop(io); // Remove next-up-proc, add to back of queue
                     if (time<10000){
-                        printf("time %dms: Process %s (tau %dms) completed I/O;",
-                            time, movingProc->ID, movingProc->tauInit);
+                        printf("time %dms: Process %s completed I/O;",
+                            time, movingProc->ID);
                     }
                     
                     movingProc->state = 1; //state=IN-QUEUE
@@ -220,9 +210,9 @@ int SRTnoTau(struct Process* allProcesses, int n, int t_cs, double alpha, int fd
                     // #if DEBUG_MODE
                     // printf("~~ Deciding if out-of-I/O process should go to CPU or stay in queue...\n");
                     // #endif
-                    if (movingProc->tauInit < cpuProc->tau) {
+                    if (movingProc->cpuBurstCurr < cpuProc->cpuBurstCurr) {
                         if (time<10000){
-                            printf(" preempting %s (predicted remaining time %dms)", cpuProc->ID, cpuProc->tau);
+                            printf(" preempting %s", cpuProc->ID);
                         }
                         preemptFlag = 1;
                         cpuProc->preemptState = 1;
@@ -265,8 +255,8 @@ int SRTnoTau(struct Process* allProcesses, int n, int t_cs, double alpha, int fd
                 priorityQueueLen += 1;
                 
                 if (time<10000){
-                    printf("time %dms: Process %s (tau %dms) arrived; added to ready queue",
-                        time, movingProc->ID, movingProc->tau);
+                    printf("time %dms: Process %s arrived; added to ready queue",
+                        time, movingProc->ID);
                     priority_queue_status(priorityQueue, priorityQueueLen);
                 }
                 #if DEBUG_MODE
@@ -359,8 +349,6 @@ int SRTnoTau(struct Process* allProcesses, int n, int t_cs, double alpha, int fd
         
         if (cpuIsRunning && cpuProc->cpuBurstCurr!=0){ // "If CPU is occupied but burst time isn't done, decrease burst time"
             cpuProc->cpuBurstCurr -= advance;
-            cpuProc->tau -= advance;
-            if (cpuProc->tau<0) {cpuProc->tau = 0;}
             #if DEBUG_MODE
             printf("~~ CPU running, CPU burst not done: decreasing CPU burst time\n");
             #endif

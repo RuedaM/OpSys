@@ -12,7 +12,6 @@
 #include <signal.h>
 #include <math.h>
 #include <time.h>
-#include <stdbool.h>
 
 #include "project_part1.h"
 
@@ -122,13 +121,6 @@ int SJFnoTau(struct Process* allProcesses, int n, int t_cs, int fd, ssize_t byte
             }
         }
 
-        if (time==4127){
-            printf("+++++++++++++++++++++++++++++++++++++++++++++++++DEBUG+++++++++++++++++++++++++++++++++++++++++++++++++\n");
-            print_all_proc(allProcesses, n);
-            io_status(io);
-            printf("+++++++++++++++++++++++++++++++++++++++++++++++++DEBUG+++++++++++++++++++++++++++++++++++++++++++++++++\n");
-        }
-
 
         //======================================================================================================================
         #if DEBUG_MODE
@@ -160,24 +152,16 @@ int SJFnoTau(struct Process* allProcesses, int n, int t_cs, int fd, ssize_t byte
                 // sleep(SLEEP_TIME_EVENT+timeAdd);
                 // #endif
             }else{
-                // printf("~~ Cond1: %s\n", (io->head!=NULL) ? "true" : "false");
-                // printf("~~ Cond2: %s\n", (io->head->p->ioBurstCurr==0) ? "true" : "false");
-                // printf("~~ Cond3: %s\n", (io->head->p->cpuBurstTimes[io->head->p->idx+1]<priorityQueue[0]->cpuBurstTimes[priorityQueue[0]->idx+1]) ? "true" : "false");
-
-                if (io->head!=NULL){
-                    printf("PASSED1\n");
-                    if (io->head->p->ioBurstCurr==0){
-                        printf("PASSED2\n");
-                        if (io->head->p->cpuBurstTimes[io->head->p->idx+1]<priorityQueue[0]->cpuBurstTimes[priorityQueue[0]->idx+1]){
-                            printf("PASSED3\n");
-                            #if DEBUG_MODE
-                            printf("~~ Directly to CPU...\n");
-                            #endif
-                            io->head->p->state = 2; //state==PRE-CPU
-                            precpuProc = io->head->p;
-                        }
-                    }
-                }else{
+                if (io->head!=NULL
+                && io->head->p->ioBurstCurr==0
+                && io->head->p->cpuBurstTimes[io->head->p->idx+1]<priorityQueue[0]->cpuBurstTimes[priorityQueue[0]->idx+1]){
+                    #if DEBUG_MODE
+                    printf("~~ Directly to CPU...\n");
+                    #endif
+                    io->head->p->state = 2; //state==PRE-CPU
+                    precpuProc = io->head->p;
+                }else if (io->head!=NULL
+                      && io->head->p->ioBurstCurr==0){
                     #if DEBUG_MODE
                     printf("~~ Back to PriorityQueue...\n");
                     #endif
@@ -185,14 +169,6 @@ int SJFnoTau(struct Process* allProcesses, int n, int t_cs, int fd, ssize_t byte
                     precpuProc = priorityQueue[0];
                 }
             }
-        }
-
-
-        if (time==4127){
-            printf("+++++++++++++++++++++++++++++++++++++++++++++++++DEBUG+++++++++++++++++++++++++++++++++++++++++++++++++\n");
-            print_all_proc(allProcesses, n);
-            io_status(io);
-            printf("+++++++++++++++++++++++++++++++++++++++++++++++++DEBUG+++++++++++++++++++++++++++++++++++++++++++++++++\n");
         }
 
 
@@ -225,13 +201,6 @@ int SJFnoTau(struct Process* allProcesses, int n, int t_cs, int fd, ssize_t byte
             // #endif
         }
 
-        if (time==4127){
-            printf("+++++++++++++++++++++++++++++++++++++++++++++++++DEBUG+++++++++++++++++++++++++++++++++++++++++++++++++\n");
-            print_all_proc(allProcesses, n);
-            io_status(io);
-            printf("+++++++++++++++++++++++++++++++++++++++++++++++++DEBUG+++++++++++++++++++++++++++++++++++++++++++++++++\n");
-        }
-
 
         //======================================================================================================================
         #if DEBUG_MODE
@@ -257,13 +226,6 @@ int SJFnoTau(struct Process* allProcesses, int n, int t_cs, int fd, ssize_t byte
                 // sleep(SLEEP_TIME_EVENT+timeAdd);
                 // #endif
             }
-        }
-
-        if (time==4127){
-            printf("+++++++++++++++++++++++++++++++++++++++++++++++++DEBUG+++++++++++++++++++++++++++++++++++++++++++++++++\n");
-            print_all_proc(allProcesses, n);
-            io_status(io);
-            printf("+++++++++++++++++++++++++++++++++++++++++++++++++DEBUG+++++++++++++++++++++++++++++++++++++++++++++++++\n");
         }
 
 
