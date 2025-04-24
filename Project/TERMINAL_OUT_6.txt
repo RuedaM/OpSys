@@ -1,97 +1,201 @@
 <<< -- process set (n=3) with 1 CPU-bound process
-<<< -- seed=32; lambda=0.001000; bound=1024
+<<< -- seed=32; lambda=0.001000; bound=512
 
 CPU-bound process A0: arrival time 319ms; 25 CPU bursts:
-==> CPU burst 1448ms ==> I/O burst 608ms
-==> CPU burst 316ms ==> I/O burst 474ms
-==> CPU burst 3556ms ==> I/O burst 964ms
-==> CPU burst 2516ms ==> I/O burst 14ms
-==> CPU burst 732ms ==> I/O burst 669ms
-==> CPU burst 1872ms ==> I/O burst 82ms
-==> CPU burst 1020ms ==> I/O burst 486ms
-==> CPU burst 228ms ==> I/O burst 347ms
-==> CPU burst 2092ms ==> I/O burst 222ms
-==> CPU burst 3380ms ==> I/O burst 59ms
-==> CPU burst 1700ms ==> I/O burst 109ms
-==> CPU burst 664ms ==> I/O burst 332ms
-==> CPU burst 916ms ==> I/O burst 918ms
-==> CPU burst 1988ms ==> I/O burst 767ms
-==> CPU burst 3948ms ==> I/O burst 421ms
-==> CPU burst 340ms ==> I/O burst 761ms
-==> CPU burst 2768ms ==> I/O burst 270ms
+==> CPU burst 1448ms ==> I/O burst 79ms
+==> CPU burst 1896ms ==> I/O burst 14ms
+==> CPU burst 732ms ==> I/O burst 468ms
+==> CPU burst 328ms ==> I/O burst 255ms
+==> CPU burst 1944ms ==> I/O burst 57ms
+==> CPU burst 1388ms ==> I/O burst 222ms
+==> CPU burst 236ms ==> I/O burst 425ms
+==> CPU burst 436ms ==> I/O burst 166ms
+==> CPU burst 1328ms ==> I/O burst 229ms
+==> CPU burst 1988ms ==> I/O burst 421ms
+==> CPU burst 340ms ==> I/O burst 270ms
 ==> CPU burst 1540ms ==> I/O burst 149ms
 ==> CPU burst 1552ms ==> I/O burst 84ms
-==> CPU burst 224ms ==> I/O burst 650ms
-==> CPU burst 52ms ==> I/O burst 78ms
-==> CPU burst 3548ms ==> I/O burst 141ms
-==> CPU burst 820ms ==> I/O burst 1005ms
-==> CPU burst 920ms ==> I/O burst 448ms
-==> CPU burst 1876ms
+==> CPU burst 224ms ==> I/O burst 13ms
+==> CPU burst 312ms ==> I/O burst 141ms
+==> CPU burst 820ms ==> I/O burst 230ms
+==> CPU burst 1792ms ==> I/O burst 469ms
+==> CPU burst 2028ms ==> I/O burst 54ms
+==> CPU burst 516ms ==> I/O burst 158ms
+==> CPU burst 752ms ==> I/O burst 187ms
+==> CPU burst 1208ms ==> I/O burst 166ms
+==> CPU burst 292ms ==> I/O burst 408ms
+==> CPU burst 728ms ==> I/O burst 468ms
+==> CPU burst 356ms ==> I/O burst 1ms
+==> CPU burst 128ms
 
-I/O-bound process A1: arrival time 506ms; 5 CPU bursts:
-==> CPU burst 971ms ==> I/O burst 432ms
-==> CPU burst 129ms ==> I/O burst 1264ms
-==> CPU burst 188ms ==> I/O burst 1496ms
-==> CPU burst 302ms ==> I/O burst 1328ms
-==> CPU burst 73ms
+I/O-bound process A1: arrival time 106ms; 5 CPU bursts:
+==> CPU burst 82ms ==> I/O burst 520ms
+==> CPU burst 69ms ==> I/O burst 1856ms
+==> CPU burst 225ms ==> I/O burst 336ms
+==> CPU burst 335ms ==> I/O burst 1976ms
+==> CPU burst 66ms
 
-I/O-bound process A2: arrival time 821ms; 15 CPU bursts:
-==> CPU burst 408ms ==> I/O burst 5512ms
-==> CPU burst 182ms ==> I/O burst 3744ms
-==> CPU burst 89ms ==> I/O burst 8ms
-==> CPU burst 781ms ==> I/O burst 256ms
-==> CPU burst 107ms ==> I/O burst 656ms
-==> CPU burst 65ms ==> I/O burst 5872ms
-==> CPU burst 69ms ==> I/O burst 4344ms
-==> CPU burst 232ms ==> I/O burst 5120ms
-==> CPU burst 225ms ==> I/O burst 4688ms
-==> CPU burst 42ms ==> I/O burst 7504ms
-==> CPU burst 335ms ==> I/O burst 4992ms
-==> CPU burst 247ms ==> I/O burst 5960ms
-==> CPU burst 66ms ==> I/O burst 64ms
-==> CPU burst 155ms ==> I/O burst 5760ms
-==> CPU burst 280ms
+I/O-bound process A2: arrival time 7ms; 28 CPU bursts:
+==> CPU burst 280ms ==> I/O burst 3576ms
+==> CPU burst 115ms ==> I/O burst 2664ms
+==> CPU burst 320ms ==> I/O burst 544ms
+==> CPU burst 59ms ==> I/O burst 1600ms
+==> CPU burst 199ms ==> I/O burst 2216ms
+==> CPU burst 75ms ==> I/O burst 168ms
+==> CPU burst 260ms ==> I/O burst 1544ms
+==> CPU burst 86ms ==> I/O burst 2280ms
+==> CPU burst 16ms ==> I/O burst 3480ms
+==> CPU burst 323ms ==> I/O burst 2448ms
+==> CPU burst 89ms ==> I/O burst 1704ms
+==> CPU burst 20ms ==> I/O burst 80ms
+==> CPU burst 273ms ==> I/O burst 2920ms
+==> CPU burst 93ms ==> I/O burst 1896ms
+==> CPU burst 470ms ==> I/O burst 3928ms
+==> CPU burst 194ms ==> I/O burst 1032ms
+==> CPU burst 93ms ==> I/O burst 152ms
+==> CPU burst 298ms ==> I/O burst 64ms
+==> CPU burst 423ms ==> I/O burst 1200ms
+==> CPU burst 355ms ==> I/O burst 2264ms
+==> CPU burst 312ms ==> I/O burst 656ms
+==> CPU burst 300ms ==> I/O burst 3976ms
+==> CPU burst 343ms ==> I/O burst 3752ms
+==> CPU burst 112ms ==> I/O burst 2352ms
+==> CPU burst 486ms ==> I/O burst 1312ms
+==> CPU burst 232ms ==> I/O burst 3712ms
+==> CPU burst 66ms ==> I/O burst 1192ms
+==> CPU burst 66ms
 
 <<< PROJECT SIMULATIONS
-<<< -- t_cs=4ms; alpha=<n/a>; t_slice=256ms; RR_ALT
-time 0ms: Simulator started for SJF [Q empty]
+<<< -- t_cs=4ms; alpha=<n/a>; t_slice=512ms
+time 0ms: Simulator started for FCFS [Q empty]
+time 7ms: Process A2 arrived; added to ready queue [Q A2]
+time 9ms: Process A2 started using the CPU for 280ms burst [Q empty]
+time 106ms: Process A1 arrived; added to ready queue [Q A1]
+time 289ms: Process A2 completed a CPU burst; 27 bursts to go [Q A1]
+time 289ms: Process A2 switching out of CPU; blocking on I/O until time 3867ms [Q A1]
+time 293ms: Process A1 started using the CPU for 82ms burst [Q empty]
 time 319ms: Process A0 arrived; added to ready queue [Q A0]
-time 321ms: Process A0 started using the CPU for 1448ms burst [Q empty]
-time 506ms: Process A1 arrived; added to ready queue [Q A1]
-time 821ms: Process A2 arrived; added to ready queue [Q A2 A1]
-time 1769ms: Process A0 completed a CPU burst; 24 bursts to go [Q A2 A1]
-time 1769ms: Process A0 switching out of CPU; blocking on I/O until time 2379ms [Q A2 A1]
-time 1773ms: Process A2 started using the CPU for 408ms burst [Q A1]
-time 2181ms: Process A2 completed a CPU burst; 14 bursts to go [Q A1]
-time 2181ms: Process A2 switching out of CPU; blocking on I/O until time 7695ms [Q A1]
-time 2185ms: Process A1 started using the CPU for 971ms burst [Q empty]
-time 2379ms: Process A0 completed I/O; added to ready queue [Q A0]
-time 3156ms: Process A1 completed a CPU burst; 4 bursts to go [Q A0]
-time 3156ms: Process A1 switching out of CPU; blocking on I/O until time 3590ms [Q A0]
-time 3160ms: Process A0 started using the CPU for 316ms burst [Q empty]
-time 3476ms: Process A0 completed a CPU burst; 23 bursts to go [Q empty]
-time 3476ms: Process A0 switching out of CPU; blocking on I/O until time 3952ms [Q empty]
-time 3590ms: Process A1 completed I/O; added to ready queue [Q A1]
-time 3592ms: Process A1 started using the CPU for 129ms burst [Q empty]
-time 3721ms: Process A1 completed a CPU burst; 3 bursts to go [Q empty]
-time 3721ms: Process A1 switching out of CPU; blocking on I/O until time 4987ms [Q empty]
-time 3952ms: Process A0 completed I/O; added to ready queue [Q A0]
-time 3954ms: Process A0 started using the CPU for 3556ms burst [Q empty]
-time 4987ms: Process A1 completed I/O; added to ready queue [Q A1]
-time 7510ms: Process A0 completed a CPU burst; 22 bursts to go [Q A1]
-time 7510ms: Process A0 switching out of CPU; blocking on I/O until time 8476ms [Q A1]
-time 7514ms: Process A1 started using the CPU for 188ms burst [Q empty]
-time 7695ms: Process A2 completed I/O; added to ready queue [Q A2]
-time 7702ms: Process A1 completed a CPU burst; 2 bursts to go [Q A2]
-time 7702ms: Process A1 switching out of CPU; blocking on I/O until time 9200ms [Q A2]
-time 7706ms: Process A2 started using the CPU for 182ms burst [Q empty]
-time 7888ms: Process A2 completed a CPU burst; 13 bursts to go [Q empty]
-time 7888ms: Process A2 switching out of CPU; blocking on I/O until time 11634ms [Q empty]
-time 8476ms: Process A0 completed I/O; added to ready queue [Q A0]
-time 8478ms: Process A0 started using the CPU for 2516ms burst [Q empty]
-time 9200ms: Process A1 completed I/O; added to ready queue [Q A1]
-time 12999ms: Process A1 terminated [Q A0]
-time 51899ms: Process A0 terminated [Q empty]
-time 65753ms: Process A2 terminated [Q empty]
-time 65755ms: Simulator ended for SJF [Q empty]
+time 375ms: Process A1 completed a CPU burst; 4 bursts to go [Q A0]
+time 375ms: Process A1 switching out of CPU; blocking on I/O until time 897ms [Q A0]
+time 379ms: Process A0 started using the CPU for 1448ms burst [Q empty]
+time 897ms: Process A1 completed I/O; added to ready queue [Q A1]
+time 1827ms: Process A0 completed a CPU burst; 24 bursts to go [Q A1]
+time 1827ms: Process A0 switching out of CPU; blocking on I/O until time 1908ms [Q A1]
+time 1831ms: Process A1 started using the CPU for 69ms burst [Q empty]
+time 1900ms: Process A1 completed a CPU burst; 3 bursts to go [Q empty]
+time 1900ms: Process A1 switching out of CPU; blocking on I/O until time 3758ms [Q empty]
+time 1908ms: Process A0 completed I/O; added to ready queue [Q A0]
+time 1910ms: Process A0 started using the CPU for 1896ms burst [Q empty]
+time 3758ms: Process A1 completed I/O; added to ready queue [Q A1]
+time 3806ms: Process A0 completed a CPU burst; 23 bursts to go [Q A1]
+time 3806ms: Process A0 switching out of CPU; blocking on I/O until time 3822ms [Q A1]
+time 3810ms: Process A1 started using the CPU for 225ms burst [Q empty]
+time 3822ms: Process A0 completed I/O; added to ready queue [Q A0]
+time 3867ms: Process A2 completed I/O; added to ready queue [Q A0 A2]
+time 4035ms: Process A1 completed a CPU burst; 2 bursts to go [Q A0 A2]
+time 4035ms: Process A1 switching out of CPU; blocking on I/O until time 4373ms [Q A0 A2]
+time 4039ms: Process A0 started using the CPU for 732ms burst [Q A2]
+time 4373ms: Process A1 completed I/O; added to ready queue [Q A2 A1]
+time 4771ms: Process A0 completed a CPU burst; 22 bursts to go [Q A2 A1]
+time 4771ms: Process A0 switching out of CPU; blocking on I/O until time 5241ms [Q A2 A1]
+time 4775ms: Process A2 started using the CPU for 115ms burst [Q A1]
+time 4890ms: Process A2 completed a CPU burst; 26 bursts to go [Q A1]
+time 4890ms: Process A2 switching out of CPU; blocking on I/O until time 7556ms [Q A1]
+time 4894ms: Process A1 started using the CPU for 335ms burst [Q empty]
+time 5229ms: Process A1 completed a CPU burst; 1 burst to go [Q empty]
+time 5229ms: Process A1 switching out of CPU; blocking on I/O until time 7207ms [Q empty]
+time 5241ms: Process A0 completed I/O; added to ready queue [Q A0]
+time 5243ms: Process A0 started using the CPU for 328ms burst [Q empty]
+time 5571ms: Process A0 completed a CPU burst; 21 bursts to go [Q empty]
+time 5571ms: Process A0 switching out of CPU; blocking on I/O until time 5828ms [Q empty]
+time 5828ms: Process A0 completed I/O; added to ready queue [Q A0]
+time 5830ms: Process A0 started using the CPU for 1944ms burst [Q empty]
+time 7207ms: Process A1 completed I/O; added to ready queue [Q A1]
+time 7556ms: Process A2 completed I/O; added to ready queue [Q A1 A2]
+time 7774ms: Process A0 completed a CPU burst; 20 bursts to go [Q A1 A2]
+time 7774ms: Process A0 switching out of CPU; blocking on I/O until time 7833ms [Q A1 A2]
+time 7778ms: Process A1 started using the CPU for 66ms burst [Q A2]
+time 7833ms: Process A0 completed I/O; added to ready queue [Q A2 A0]
+time 7844ms: Process A1 terminated [Q A2 A0]
+time 7848ms: Process A2 started using the CPU for 320ms burst [Q A0]
+time 8168ms: Process A2 completed a CPU burst; 25 bursts to go [Q A0]
+time 8168ms: Process A2 switching out of CPU; blocking on I/O until time 8714ms [Q A0]
+time 8172ms: Process A0 started using the CPU for 1388ms burst [Q empty]
+time 8714ms: Process A2 completed I/O; added to ready queue [Q A2]
+time 9560ms: Process A0 completed a CPU burst; 19 bursts to go [Q A2]
+time 9560ms: Process A0 switching out of CPU; blocking on I/O until time 9784ms [Q A2]
+time 9564ms: Process A2 started using the CPU for 59ms burst [Q empty]
+time 9623ms: Process A2 completed a CPU burst; 24 bursts to go [Q empty]
+time 9623ms: Process A2 switching out of CPU; blocking on I/O until time 11225ms [Q empty]
+time 9784ms: Process A0 completed I/O; added to ready queue [Q A0]
+time 9786ms: Process A0 started using the CPU for 236ms burst [Q empty]
+time 30854ms: Process A0 terminated [Q empty]
+time 64672ms: Process A2 terminated [Q empty]
+time 64674ms: Simulator ended for FCFS [Q empty]
+
+time 0ms: Simulator started for SJF [Q empty]
+time 7ms: Process A2 arrived; added to ready queue [Q A2]
+time 9ms: Process A2 started using the CPU for 280ms burst [Q empty]
+time 106ms: Process A1 arrived; added to ready queue [Q A1]
+time 289ms: Process A2 completed a CPU burst; 27 bursts to go [Q A1]
+time 289ms: Process A2 switching out of CPU; blocking on I/O until time 3867ms [Q A1]
+time 293ms: Process A1 started using the CPU for 82ms burst [Q empty]
+time 319ms: Process A0 arrived; added to ready queue [Q A0]
+time 375ms: Process A1 completed a CPU burst; 4 bursts to go [Q A0]
+time 375ms: Process A1 switching out of CPU; blocking on I/O until time 897ms [Q A0]
+time 379ms: Process A0 started using the CPU for 1448ms burst [Q empty]
+time 897ms: Process A1 completed I/O; added to ready queue [Q A1]
+time 1827ms: Process A0 completed a CPU burst; 24 bursts to go [Q A1]
+time 1827ms: Process A0 switching out of CPU; blocking on I/O until time 1908ms [Q A1]
+time 1831ms: Process A1 started using the CPU for 69ms burst [Q empty]
+time 1900ms: Process A1 completed a CPU burst; 3 bursts to go [Q empty]
+time 1900ms: Process A1 switching out of CPU; blocking on I/O until time 3758ms [Q empty]
+time 1908ms: Process A0 completed I/O; added to ready queue [Q A0]
+time 1910ms: Process A0 started using the CPU for 1896ms burst [Q empty]
+time 3758ms: Process A1 completed I/O; added to ready queue [Q A1]
+time 3806ms: Process A0 completed a CPU burst; 23 bursts to go [Q A1]
+time 3806ms: Process A0 switching out of CPU; blocking on I/O until time 3822ms [Q A1]
+time 3810ms: Process A1 started using the CPU for 225ms burst [Q empty]
+time 3822ms: Process A0 completed I/O; added to ready queue [Q A0]
+time 3867ms: Process A2 completed I/O; added to ready queue [Q A2 A0]
+time 4035ms: Process A1 completed a CPU burst; 2 bursts to go [Q A2 A0]
+time 4035ms: Process A1 switching out of CPU; blocking on I/O until time 4373ms [Q A2 A0]
+time 4039ms: Process A2 started using the CPU for 115ms burst [Q A0]
+time 4154ms: Process A2 completed a CPU burst; 26 bursts to go [Q A0]
+time 4154ms: Process A2 switching out of CPU; blocking on I/O until time 6820ms [Q A0]
+time 4158ms: Process A0 started using the CPU for 732ms burst [Q empty]
+time 4373ms: Process A1 completed I/O; added to ready queue [Q A1]
+time 4890ms: Process A0 completed a CPU burst; 22 bursts to go [Q A1]
+time 4890ms: Process A0 switching out of CPU; blocking on I/O until time 5360ms [Q A1]
+time 4894ms: Process A1 started using the CPU for 335ms burst [Q empty]
+time 5229ms: Process A1 completed a CPU burst; 1 burst to go [Q empty]
+time 5229ms: Process A1 switching out of CPU; blocking on I/O until time 7207ms [Q empty]
+time 5360ms: Process A0 completed I/O; added to ready queue [Q A0]
+time 5362ms: Process A0 started using the CPU for 328ms burst [Q empty]
+time 5690ms: Process A0 completed a CPU burst; 21 bursts to go [Q empty]
+time 5690ms: Process A0 switching out of CPU; blocking on I/O until time 5947ms [Q empty]
+time 5947ms: Process A0 completed I/O; added to ready queue [Q A0]
+time 5949ms: Process A0 started using the CPU for 1944ms burst [Q empty]
+time 6820ms: Process A2 completed I/O; added to ready queue [Q A2]
+time 7207ms: Process A1 completed I/O; added to ready queue [Q A1 A2]
+time 7893ms: Process A0 completed a CPU burst; 20 bursts to go [Q A1 A2]
+time 7893ms: Process A0 switching out of CPU; blocking on I/O until time 7952ms [Q A1 A2]
+time 7897ms: Process A1 started using the CPU for 66ms burst [Q A2]
+time 7952ms: Process A0 completed I/O; added to ready queue [Q A2 A0]
+time 7963ms: Process A1 terminated [Q A2 A0]
+time 7967ms: Process A2 started using the CPU for 320ms burst [Q A0]
+time 8287ms: Process A2 completed a CPU burst; 25 bursts to go [Q A0]
+time 8287ms: Process A2 switching out of CPU; blocking on I/O until time 8833ms [Q A0]
+time 8291ms: Process A0 started using the CPU for 1388ms burst [Q empty]
+time 8833ms: Process A2 completed I/O; added to ready queue [Q A2]
+time 9679ms: Process A0 completed a CPU burst; 19 bursts to go [Q A2]
+time 9679ms: Process A0 switching out of CPU; blocking on I/O until time 9903ms [Q A2]
+time 9683ms: Process A2 started using the CPU for 59ms burst [Q empty]
+time 9742ms: Process A2 completed a CPU burst; 24 bursts to go [Q empty]
+time 9742ms: Process A2 switching out of CPU; blocking on I/O until time 11344ms [Q empty]
+time 9903ms: Process A0 completed I/O; added to ready queue [Q A0]
+time 9905ms: Process A0 started using the CPU for 236ms burst [Q empty]
+time 30973ms: Process A0 terminated [Q empty]
+time 64791ms: Process A2 terminated [Q empty]
+time 64793ms: Simulator ended for SJF [Q empty]
 

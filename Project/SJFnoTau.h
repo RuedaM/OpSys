@@ -37,6 +37,8 @@ int SJFnoTau(struct Process* allProcesses, int n, int t_cs, int fd, ssize_t byte
 
     // Pointer to "in-CPU" process
     struct Process* cpuProc;
+    struct Process* precpuProc;
+    //struct Process* postcpuProc;
     int cpuIsRunning = 0;   // Boolean to see if a process is in CPU
     
     // I/O = Sorted Linked List / Queue struct of Process pointers
@@ -65,9 +67,9 @@ int SJFnoTau(struct Process* allProcesses, int n, int t_cs, int fd, ssize_t byte
         #if DEBUG_MODE
         printf("~~ Checking if process can be deleted or added to I/O...\n");
         #endif
-        if (cpuIsRunning && cpuProc->cpuBurstCurr==0){ // If CPU in-use and cpuProc's burst is done...
+        if (cpuIsRunning && cpuProc->cpuBurstCurr==0){ // If CPU in-use and cpuProc's burst is done, must start to switch out
             
-            if (cpuProc->idx!=cpuProc->cpuBurstCount-1){ // If proc not about to terminate, set current I/O burst time
+            if (cpuProc->idx!=cpuProc->cpuBurstCount-1){ // If proc not about to terminate, set current I/O burst time in preparation
                 cpuProc->ioBurstCurr = cpuProc->ioBurstTimes[cpuProc->idx];
             }
 
@@ -90,8 +92,9 @@ int SJFnoTau(struct Process* allProcesses, int n, int t_cs, int fd, ssize_t byte
                     queue_push_to_end(io, cpuProc);
                     ioLen += 1;
                 }
-            }else if (cpuProc->state!=4){ // If not, update states and print info
+            }else if (cpuProc->state!=4){ // If not done cs'ing, update states and print info
                 cpuProc->state = 4; //state==POST-CPU
+                //postcpuProc = cpuProc;
                 
                 if ((cpuProc->idx+1)==cpuProc->cpuBurstCount){ // If CPUProc has no more CPU bursts...
                     printf("time %dms: Process %s terminated", time, cpuProc->ID);
@@ -126,9 +129,15 @@ int SJFnoTau(struct Process* allProcesses, int n, int t_cs, int fd, ssize_t byte
             if (csLeft==0){  // If done cs'ing...
                 csLeft = t_cs/2; //Reset
 
-                cpuProc = pop(priorityQueue, priorityQueueLen); // Get latest-in-queue process; this also resizes queue
-                if (priorityQueue==NULL) {fprintf(stderr, "ERROR: realloc() failed\n"); return EXIT_FAILURE;}
-                priorityQueueLen -= 1;
+                if (precpuProc!=NULL){
+                    cpuProc = precpuProc;
+                    precpuProc = NULL;
+                }
+                else{
+                    cpuProc = pop(priorityQueue, priorityQueueLen); // Get latest-in-queue process; this also resizes queue
+                    if (priorityQueue==NULL) {fprintf(stderr, "ERROR: realloc() failed\n"); return EXIT_FAILURE;}
+                    priorityQueueLen -= 1;
+                }
                 cpuProc->state = 3; //state==IN-CPU
                 cpuIsRunning = 1;   // "CPU is now running a proccess"
 
@@ -142,11 +151,14 @@ int SJFnoTau(struct Process* allProcesses, int n, int t_cs, int fd, ssize_t byte
                 // sleep(SLEEP_TIME_EVENT+timeAdd);
                 // #endif
             }else{
-                if (io->head!=NULL && io->head->p->ioBurstCurr==0
+                if (io->head!=NULL
+                && io->head->p->ioBurstCurr==0
                 && io->head->p->cpuBurstTimes[io->head->p->idx+1]<priorityQueue[0]->cpuBurstTimes[priorityQueue[0]->idx+1]){
                     io->head->p->state = 2; //state==PRE-CPU
+                    precpuProc = io->head->p;
                 }else{
                     priorityQueue[0]->state = 2; //state==PRE-CPU
+                    precpuProc = priorityQueue[0];
                 }
             }
         }

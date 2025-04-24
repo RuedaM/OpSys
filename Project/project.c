@@ -13,8 +13,8 @@
  * 8  6  768 0.001 1024 6 0.95 128
  * 16 2  256 0.001 2048 4 0.45 32
  * 20 16 128 0.01  4096 4 0.99 64
- * 3  1  32  0.001 1024 4 -1   256
- * 3  1  32  0.001 1024 4 0.75 256 RR_ALT
+ * 3  1  32  0.001 512  4 -1   512
+ * 8  6  768 0.001 1024 6 -1   128 RR_ALT
  */
 
 #include <stdio.h>
@@ -60,7 +60,7 @@ int main(int argc, char** argv){
     int t_cs = atoi(argv[6]); // time, (in ms), that it takes to perform a context switch
     double alpha = atof(argv[7]); // for SJF and SRT algorithms
     int t_slice = atoi(argv[8]); // time slice value in ms for RR algorithm
-    char* rrStatus = "NORMAL";
+    char* rrStatus = "NULL";
     if (argc==10){
         rrStatus = argv[9];
     }
@@ -202,17 +202,18 @@ int main(int argc, char** argv){
     //======================================================================================================================
     if (alpha==-1){printf("<<< PROJECT SIMULATIONS\n<<< -- t_cs=%dms; alpha=<n/a>; t_slice=%dms", t_cs, t_slice);}
     else{printf("<<< PROJECT SIMULATIONS\n<<< -- t_cs=%dms; alpha=%.2f; t_slice=%dms", t_cs, alpha, t_slice);}
-    if (strcmp(rrStatus, "RR_ALT")){printf("; RR_ALT\n");}
-    else{printf("\n");}
+    if (strcmp(rrStatus, "RR_ALT")==0){printf("; RR_ALT");}
+    printf("\n");
+    
     int ret;
 
 
 
-    // allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
-    // ret = FCFS(allProcesses, n, t_cs, fd, bytesWritten, toWrite);
-    // if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
-    // for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
-    // free(allProcesses);
+    allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
+    ret = FCFS(allProcesses, n, t_cs, fd, bytesWritten, toWrite);
+    if (ret==EXIT_FAILURE) {return EXIT_FAILURE;}
+    for (int i=0 ; i<n ; i++) {free(allProcesses[i].cpuBurstTimes); free(allProcesses[i].ioBurstTimes);}
+    free(allProcesses);
 
     allProcesses = gen_procs(IDs, seed, n, n_cpu, lambda, bound);
     if (alpha==-1){
