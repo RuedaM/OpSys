@@ -484,7 +484,7 @@ int RRalt(struct Process* allProcesses, int n, int t_cs, int t_slice, int fd, ss
     bytesWritten = write(fd, toWrite, strlen(toWrite));
     if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
     // RR specific stats
-    sprintf(toWrite, "-- CPU-bound percentage of CPU bursts completed within one time slice: %.3f%%\n", ceil((cpuTotalWithin-1/cpuTotalBursts)*100000)/1000);
+    sprintf(toWrite, "-- CPU-bound percentage of CPU bursts completed within one time slice: %.3f%%\n", ceil((cpuTotalWithin/cpuTotalBursts)*100000)/1000);
     bytesWritten = write(fd, toWrite, strlen(toWrite));
     if (bytesWritten==-1) {fprintf(stderr, "ERROR: write() failed\n"); close(fd); return EXIT_FAILURE;}
     sprintf(toWrite, "-- I/O-bound percentage of CPU bursts completed within one time slice: %.3f%%\n", ceil((ioTotalWithin/ioTotalBursts)*100000)/1000);
