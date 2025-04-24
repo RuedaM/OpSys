@@ -122,8 +122,10 @@ int main(int argc, char** argv){
 
     //======================================================================================================================
     // Calculations for simout.txt
-    float cpuBoundAvgCPUBurstTime, ioBoundAvgCPUBurstTime, totalAvgCPUBurstTime, cpuBoundAvgIOBurstTime, ioBoundAvgIOBurstTime, totalAvgIOBurstTime;
+    double cpuBoundAvgCPUBurstTime, ioBoundAvgCPUBurstTime, totalAvgCPUBurstTime, cpuBoundAvgIOBurstTime, ioBoundAvgIOBurstTime, totalAvgIOBurstTime;
+    cpuBoundAvgCPUBurstTime = ioBoundAvgCPUBurstTime = totalAvgCPUBurstTime = cpuBoundAvgIOBurstTime = ioBoundAvgIOBurstTime = totalAvgIOBurstTime = 0;
     int numCPUBoundAvgCPUBursts, numCPUBoundAvgIOBursts, numIOBoundAvgCPUBursts, numIOBoundAvgIOBursts;
+    numCPUBoundAvgCPUBursts = numCPUBoundAvgIOBursts = numIOBoundAvgCPUBursts = numIOBoundAvgIOBursts = 0;
     for(int i=0 ; i<n ; i++){//for every process...
         if (allProcesses[i].binding==0) { //CPU-bound process
             for(int j=0 ; j<allProcesses[i].cpuBurstCount-1 ; j++){
